@@ -1,0 +1,39 @@
+plugins {
+    id "fabric-loom" version "1.0-SNAPSHOT"
+    id "io.github.juuxel.loom-quiltflower" version "1.7.3"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+compileJava.options.encoding = "UTF-8"
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/immediatelyfast.accesswidener")
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+}

@@ -1,0 +1,5 @@
+accessWidener v1 named
+#https://fabricmc.net/wiki/tutorial:accesswideners
+
+accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
+accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
