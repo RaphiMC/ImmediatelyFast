@@ -8,6 +8,12 @@ import java.util.*;
 
 public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
+    /**
+     * A fallback buffer has to be defined because Iris tries to release that buffer, so it can't be null. It should be fine
+     * to reuse/release the buffer multiple times, as it won't ever be written into by minecraft or Iris.
+     */
+    private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
+
     protected final Multimap<RenderLayer, BufferBuilder> fallbackBuffers = LinkedListMultimap.create();
     protected final Set<RenderLayer> activeLayers = new LinkedHashSet<>();
 
@@ -16,7 +22,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     }
 
     public ImmediateAdapter(final Map<RenderLayer, BufferBuilder> layerBuffers) {
-        super(null, layerBuffers);
+        super(FALLBACK_BUFFER, layerBuffers);
     }
 
     @Override
