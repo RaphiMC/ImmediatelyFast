@@ -11,18 +11,22 @@ import java.util.Set;
 public class BufferBuilderPool {
 
     public static final int MAX_SIZE = 4096;
-
     private static final Set<Pair<BufferBuilder, Long>> POOL = new HashSet<>();
+
+    private static long lastCleanup = 0;
 
     private BufferBuilderPool() {
     }
 
     public static BufferBuilder get() {
-        cleanup();
+        if (lastCleanup < System.currentTimeMillis() - 5_000) {
+            lastCleanup = System.currentTimeMillis();
+            cleanup();
+        }
 
         for (Pair<BufferBuilder, Long> entry : POOL) {
             final BufferBuilder bufferBuilder = entry.getKey();
-            if (!bufferBuilder.isBuilding()) {
+            if (!bufferBuilder.isBuilding() && !((IBufferBuilder) bufferBuilder).isReleased()) {
                 entry.setValue(System.currentTimeMillis());
                 return bufferBuilder;
             }
