@@ -1,17 +1,17 @@
 package net.raphimc.immediatelyfast.util;
 
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.client.render.BufferBuilder;
 import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class BufferBuilderPool {
 
     public static final int MAX_SIZE = 4096;
-    private static final Set<Pair<BufferBuilder, Long>> POOL = new HashSet<>();
+    private static final Set<Pair<BufferBuilder, Long>> POOL = new ReferenceArraySet<>(MAX_SIZE);
 
     private static long lastCleanup = 0;
 

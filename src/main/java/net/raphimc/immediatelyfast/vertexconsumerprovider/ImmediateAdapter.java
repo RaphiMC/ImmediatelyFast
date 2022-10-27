@@ -1,6 +1,7 @@
 package net.raphimc.immediatelyfast.vertexconsumerprovider;
 
 import com.google.common.collect.*;
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import net.minecraft.client.render.*;
 import net.raphimc.immediatelyfast.util.BufferBuilderPool;
 
@@ -15,7 +16,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
 
     protected final Multimap<RenderLayer, BufferBuilder> fallbackBuffers = LinkedListMultimap.create();
-    protected final Set<RenderLayer> activeLayers = new LinkedHashSet<>();
+    protected final Set<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
 
     public ImmediateAdapter() {
         this(ImmutableMap.of());
