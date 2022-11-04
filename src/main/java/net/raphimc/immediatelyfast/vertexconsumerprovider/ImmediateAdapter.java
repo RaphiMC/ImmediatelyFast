@@ -1,7 +1,7 @@
 package net.raphimc.immediatelyfast.vertexconsumerprovider;
 
-import com.google.common.collect.*;
-import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.*;
 import net.raphimc.immediatelyfast.util.BufferBuilderPool;
 
@@ -15,8 +15,8 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
      */
     private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
 
-    protected final Multimap<RenderLayer, BufferBuilder> fallbackBuffers = LinkedListMultimap.create();
-    protected final Set<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
+    protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = new Reference2ObjectLinkedOpenHashMap<>();
+    protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
 
     public ImmediateAdapter() {
         this(ImmutableMap.of());
@@ -59,15 +59,17 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     public void draw(final RenderLayer layer) {
         this.activeLayers.remove(layer);
         this._draw(layer);
-        this.fallbackBuffers.removeAll(layer);
+        this.fallbackBuffers.remove(layer);
     }
 
     @Override
     public void close() {
         this.activeLayers.clear();
-        for (BufferBuilder bufferBuilder : this.fallbackBuffers.values()) {
-            if (bufferBuilder.isBuilding()) {
-                bufferBuilder.end().release();
+        for (ReferenceSet<BufferBuilder> bufferBuilders : this.fallbackBuffers.values()) {
+            for (BufferBuilder bufferBuilder : bufferBuilders) {
+                if (bufferBuilder.isBuilding()) {
+                    bufferBuilder.end().release();
+                }
             }
         }
         this.fallbackBuffers.clear();
@@ -77,28 +79,30 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     protected BufferBuilder getOrCreateBufferBuilder(final RenderLayer layer) {
         if (!layer.areVerticesNotShared()) {
-            final BufferBuilder bufferBuilder = BufferBuilderPool.get();
-            this.fallbackBuffers.put(layer, bufferBuilder);
-            return bufferBuilder;
+            return this.addNewFallbackBuffer(layer);
         } else if (this.layerBuffers.containsKey(layer)) {
             return this.layerBuffers.get(layer);
         } else if (this.fallbackBuffers.containsKey(layer)) {
             return this.fallbackBuffers.get(layer).iterator().next();
         } else {
-            final BufferBuilder bufferBuilder = BufferBuilderPool.get();
-            this.fallbackBuffers.put(layer, bufferBuilder);
-            return bufferBuilder;
+            return this.addNewFallbackBuffer(layer);
         }
     }
 
-    protected Collection<BufferBuilder> getBufferBuilder(final RenderLayer layer) {
+    protected Set<BufferBuilder> getBufferBuilder(final RenderLayer layer) {
         if (this.fallbackBuffers.containsKey(layer)) {
             return this.fallbackBuffers.get(layer);
         } else if (this.layerBuffers.containsKey(layer)) {
             return Collections.singleton(this.layerBuffers.get(layer));
         } else {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
+    }
+
+    protected BufferBuilder addNewFallbackBuffer(final RenderLayer layer) {
+        final BufferBuilder bufferBuilder = BufferBuilderPool.get();
+        this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
+        return bufferBuilder;
     }
 
 }
