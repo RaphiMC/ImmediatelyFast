@@ -42,9 +42,10 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void drawCurrentLayer() {
-        for (RenderLayer layer : new LinkedHashSet<>(this.activeLayers)) {
-            if (!this.layerBuffers.containsKey(layer)) this.draw(layer);
-        }
+        this.activeLayers.stream().filter(l -> !this.layerBuffers.containsKey(l)).sorted((l1, l2) -> {
+            if (l1.translucent == l2.translucent) return 0;
+            return l1.translucent ? 1 : -1;
+        }).forEachOrdered(this::draw);
     }
 
     @Override
