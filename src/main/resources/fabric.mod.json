@@ -32,9 +32,6 @@
   "recommends": {
     "sodium": "*"
   },
-  "conflicts": {
-    "iris": "*"
-  },
   "breaks": {
     "optifabric": "*"
   },
