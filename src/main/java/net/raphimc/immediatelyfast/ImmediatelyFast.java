@@ -10,6 +10,7 @@ public class ImmediatelyFast implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
         LOGGER.info("Loaded ImmediatelyFast");
     }
 

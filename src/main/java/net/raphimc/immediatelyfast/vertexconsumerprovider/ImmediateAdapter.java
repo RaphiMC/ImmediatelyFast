@@ -18,6 +18,8 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = new Reference2ObjectLinkedOpenHashMap<>();
     protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
 
+    private boolean drawFallbackLayersFirst = false;
+
     public ImmediateAdapter() {
         this(ImmutableMap.of());
     }
@@ -27,10 +29,20 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     }
 
     @Override
-    public VertexConsumer getBuffer(RenderLayer layer) {
+    public VertexConsumer getBuffer(final RenderLayer layer) {
         final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
         if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
             throw new IllegalStateException("Tried to write shared vertices into the same buffer");
+        }
+
+        if (!this.drawFallbackLayersFirst) {
+            final Optional<RenderLayer> newLayer = layer.asOptional();
+            if (!this.currentLayer.equals(newLayer)) {
+                if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(this.currentLayer.get())) {
+                    this.drawFallbackLayersFirst = true;
+                }
+            }
+            this.currentLayer = newLayer;
         }
 
         if (!bufferBuilder.isBuilding()) {
@@ -42,6 +54,9 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void drawCurrentLayer() {
+        this.currentLayer = Optional.empty();
+        this.drawFallbackLayersFirst = false;
+
         this.activeLayers.stream().filter(l -> !this.layerBuffers.containsKey(l)).sorted((l1, l2) -> {
             if (l1.translucent == l2.translucent) return 0;
             return l1.translucent ? 1 : -1;
@@ -58,6 +73,10 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void draw(final RenderLayer layer) {
+        if (this.drawFallbackLayersFirst) {
+            this.drawCurrentLayer();
+        }
+
         this.activeLayers.remove(layer);
         this._draw(layer);
         this.fallbackBuffers.remove(layer);
