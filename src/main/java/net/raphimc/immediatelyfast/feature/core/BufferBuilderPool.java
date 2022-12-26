@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.util;
+package net.raphimc.immediatelyfast.feature.core;
 
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.client.render.BufferBuilder;
@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class BufferBuilderPool {
 
-    public static final int MAX_SIZE = 4096;
-    private static final Set<Pair<BufferBuilder, Long>> POOL = new ReferenceArraySet<>(MAX_SIZE);
+    private static final int INITIAL_SIZE = 256;
+    private static final Set<Pair<BufferBuilder, Long>> POOL = new ReferenceArraySet<>(INITIAL_SIZE);
 
     private static long lastCleanup = 0;
 
@@ -30,10 +30,6 @@ public class BufferBuilderPool {
                 entry.setValue(System.currentTimeMillis());
                 return bufferBuilder;
             }
-        }
-
-        if (POOL.size() >= MAX_SIZE) {
-            throw new RuntimeException("BufferBuilder pool is exhausted");
         }
 
         final BufferBuilder bufferBuilder = new BufferBuilder(256);

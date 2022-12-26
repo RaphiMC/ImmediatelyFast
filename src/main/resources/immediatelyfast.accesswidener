@@ -4,3 +4,4 @@ accessWidener v1 named
 accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
+accessible class net/minecraft/client/render/MapRenderer$MapTexture

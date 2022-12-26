@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.vertexconsumerprovider;
+package net.raphimc.immediatelyfast.feature.core;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;

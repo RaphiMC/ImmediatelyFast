@@ -1,9 +1,8 @@
-package net.raphimc.immediatelyfast.vertexconsumerprovider;
+package net.raphimc.immediatelyfast.feature.core;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.*;
-import net.raphimc.immediatelyfast.util.BufferBuilderPool;
 
 import java.util.*;
 

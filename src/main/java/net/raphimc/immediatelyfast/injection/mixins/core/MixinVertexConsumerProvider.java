@@ -1,9 +1,9 @@
-package net.raphimc.immediatelyfast.injection.mixins;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.render.*;
+import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
-import net.raphimc.immediatelyfast.vertexconsumerprovider.BatchableImmediate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 

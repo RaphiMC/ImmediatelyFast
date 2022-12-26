@@ -4,9 +4,12 @@
   "package": "net.raphimc.immediatelyfast.injection.mixins",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "MixinBufferBuilder",
-    "MixinDebugHud",
-    "MixinVertexConsumerProvider"
+    "core.MixinBufferBuilder",
+    "core.MixinDebugHud",
+    "core.MixinTextureManager",
+    "core.MixinVertexConsumerProvider",
+    "map_atlas_generation.MixinMapRenderer",
+    "map_atlas_generation.MixinMapRenderer_MapTexture"
   ],
   "injectors": {
     "defaultRequire": 1

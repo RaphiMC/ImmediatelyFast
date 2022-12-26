@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.injection.mixins;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.util.GlAllocationUtils;
