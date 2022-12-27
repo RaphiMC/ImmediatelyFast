@@ -8,6 +8,7 @@
     "core.MixinDebugHud",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
+    "font_atlas_layouting.MixinGlyphAtlasTexture",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderer_MapTexture"
   ],

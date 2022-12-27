@@ -31,14 +31,14 @@ The following parts of the rendering code are replaced with a more efficient imp
 ## Performance
 Here are some performance comparisons of areas the mod optimizes particularly well:
 
-
 Test Hardware: Ryzen 5 1600, 32GB DDR4, GTX 1060  
 FPS Numbers were taken from the F3 screen and averaged over a couple of seconds.
+
 ### Entity Rendering
 Generally FPS should be 2x higher on busy servers and might also be up to 4x higher in cases where there are many entities.
 
 The following table shows the performance improvements of the mod.  
-Tested on a spigot server with 1000 cows in a 3x3 box and all on screen.  
+Tested on a spigot server with 1000 cows in a 3x3 box on screen.  
 Test Hardware: Ryzen 5 1600, 32GB DDR4, GTX 1060
 
 | Other mods      | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
@@ -64,7 +64,6 @@ Test Hardware: Ryzen 5 1600, 32GB DDR4, GTX 1060
 
 The mod should work fine with almost all mods.  
 Known incompatibilities:
-
 - Optifabric
 
 Iris is supported but defeats some of ImmediatelyFast's optimizations, as Iris replaces the Entity rendering engine with
