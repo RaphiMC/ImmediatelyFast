@@ -22,6 +22,11 @@ public abstract class MixinMapRenderer_MapTexture {
     @Shadow
     private MapState state;
 
+    @Mutable
+    @Shadow
+    @Final
+    private NativeImageBackedTexture texture;
+
     @Unique
     private static final NativeImageBackedTexture DUMMY_TEXTURE;
 
@@ -68,6 +73,7 @@ public abstract class MixinMapRenderer_MapTexture {
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureManager;registerDynamicTexture(Ljava/lang/String;Lnet/minecraft/client/texture/NativeImageBackedTexture;)Lnet/minecraft/util/Identifier;"))
     private Identifier getAtlasTextureIdentifier(TextureManager textureManager, String id, NativeImageBackedTexture texture) {
         if (this.atlasTexture != null) {
+            this.texture = null; // Don't leave the texture field pointing to the uninitialized dummy texture
             return this.atlasTexture.getIdentifier();
         } else {
             return textureManager.registerDynamicTexture(id, texture);
