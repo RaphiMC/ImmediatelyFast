@@ -17,15 +17,15 @@ public class BatchingBuffers {
      *
      * Set to null if batching is disabled and the data should be drawn immediately as usual.
      */
-    public static VertexConsumerProvider TEXTURE_CONSUMER = null;
     public static VertexConsumerProvider FILL_CONSUMER = null;
+    public static VertexConsumerProvider TEXTURE_CONSUMER = null;
     public static VertexConsumerProvider TEXT_CONSUMER = null;
 
     /*
      * The batching buffers which hold the vertex data of the batch.
      */
-    private static final BatchableImmediate TEXTURE_BATCH = new BatchableImmediate();
     private static final BatchableImmediate FILL_BATCH = new BatchableImmediate();
+    private static final BatchableImmediate TEXTURE_BATCH = new BatchableImmediate();
     private static final BatchableImmediate TEXT_BATCH = new BatchableImmediate();
 
     public static void beginHudBatching() {
