@@ -8,9 +8,11 @@
     "batching.MixinChatHud",
     "batching.MixinDebugHud",
     "batching.MixinInGameHud",
+    "batching.MixinMinecraftClient",
     "batching.MixinPlayerListHud",
     "batching.MixinSubtitlesHud",
     "batching.consumer.MixinDrawableHelper",
+    "batching.consumer.MixinItemRenderer",
     "batching.consumer.MixinTextRenderer",
     "core.MixinBufferBuilder",
     "core.MixinDebugHud",
@@ -25,8 +27,5 @@
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "mixins": [
-    "batching.MixinMinecraftClient"
-  ]
+  }
 }

@@ -38,6 +38,18 @@ public class BatchingRenderLayers {
         RenderSystem.enableTexture();
     });
 
+    public static final RenderLayer GUI_QUAD = new ImmediatelyFastRenderLayer("gui_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, true, () -> {
+        RenderSystem.enableBlend();
+        RenderSystem.disableTexture();
+        RenderSystem.disableDepthTest();
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+    }, () -> {
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+        RenderSystem.enableDepthTest();
+    });
+
 
     public static <A> Function<A, RenderLayer> memoizeTemp(final Function<A, RenderLayer> function) {
         return new Function<>() {

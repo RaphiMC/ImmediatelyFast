@@ -64,6 +64,11 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void draw() {
+        if (this.activeLayers.isEmpty()) {
+            this.close();
+            return;
+        }
+
         this.drawCurrentLayer();
         for (RenderLayer layer : this.layerBuffers.keySet()) {
             this.draw(layer);

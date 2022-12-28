@@ -23,7 +23,7 @@ public abstract class MixinInGameHud {
         BatchingBuffers.endHudBatching();
     }
 
-    // TODO: ExperienceBar has some z layering issues
+    // TODO: Z layering issues
     /*@Inject(method = "renderExperienceBar", at = @At("HEAD"))
     private void beginExperienceBarBatching(MatrixStack matrices, int x, CallbackInfo ci) {
         BatchingBuffers.beginHudBatching();
@@ -52,6 +52,18 @@ public abstract class MixinInGameHud {
     @Inject(method = "renderScoreboardSidebar", at = @At("RETURN"))
     private void endScoreboardSidebarBatching(MatrixStack matrices, ScoreboardObjective objective, CallbackInfo ci) {
         BatchingBuffers.endHudBatching();
+    }
+
+    @Inject(method = "renderHotbar", at = @At("HEAD"))
+    private void beginHotbarBatching(float tickDelta, MatrixStack matrices, CallbackInfo ci) {
+        //BatchingBuffers.beginHudBatching(); // TODO: Z layering issues
+        BatchingBuffers.beginItemBatching();
+    }
+
+    @Inject(method = "renderHotbar", at = @At("RETURN"))
+    private void endHotbarBatching(float tickDelta, MatrixStack matrices, CallbackInfo ci) {
+        //BatchingBuffers.endHudBatching();
+        BatchingBuffers.endItemBatching();
     }
 
 }
