@@ -26,7 +26,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.12.0",
-    "minecraft": ">=1.19",
+    "minecraft": "1.19.3",
     "java": ">=17"
   },
   "recommends": {
@@ -34,7 +34,7 @@
   },
   "breaks": {
     "optifabric": "*",
-    "porting_lib": "<=2.0.591+1.19.2"
+    "porting_lib": "<=2.0.591"
   },
   "custom": {
     "modmenu": {
