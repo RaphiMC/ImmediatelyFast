@@ -11,14 +11,12 @@ import net.minecraft.util.math.ColorHelper;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(value = ItemRenderer.class, priority = 1100)
+@Mixin(value = ItemRenderer.class, priority = 900)
 public abstract class MixinItemRenderer {
-
-    @Shadow
-    protected abstract void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha);
 
     @ModifyArg(method = "renderGuiItemModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"))
     private VertexConsumerProvider renderItemIntoBuffer(ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
@@ -38,8 +36,12 @@ public abstract class MixinItemRenderer {
         return BatchingBuffers.ITEM_OVERLAY_CONSUMER != null ? BatchingBuffers.ITEM_OVERLAY_CONSUMER : vertexConsumers;
     }
 
-    @Redirect(method = "renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderGuiQuad(Lnet/minecraft/client/render/BufferBuilder;IIIIIIII)V"))
-    private void renderQuadInfoBuffer(ItemRenderer instance, BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+    /**
+     * @author RK_01
+     * @reason Allow batching of the vertex data. Overwritten for performance. Also fixes incompatibility with Colormatic caused by redirecting this method call.
+     */
+    @Overwrite
+    public void renderGuiQuad(BufferBuilder buffer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
         if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
             int color = alpha << 24 | red << 16 | green << 8 | blue;
             final float[] shaderColor = RenderSystem.getShaderColor();
@@ -51,7 +53,13 @@ public abstract class MixinItemRenderer {
             vertexConsumer.vertex(x + width, y + height, 0).color(color).next();
             vertexConsumer.vertex(x + width, y, 0).color(color).next();
         } else {
-            this.renderGuiQuad(buffer, x, y, width, height, red, green, blue, alpha);
+            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            buffer.vertex(x, y, 0).color(red, green, blue, alpha).next();
+            buffer.vertex(x, y + height, 0).color(red, green, blue, alpha).next();
+            buffer.vertex(x + width, y + height, 0).color(red, green, blue, alpha).next();
+            buffer.vertex(x + width, y, 0).color(red, green, blue, alpha).next();
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
         }
     }
 
