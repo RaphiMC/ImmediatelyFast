@@ -64,6 +64,11 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void draw() {
+        if (this.activeLayers.isEmpty()) {
+            this.close();
+            return;
+        }
+
         this.drawCurrentLayer();
         for (RenderLayer layer : this.layerBuffers.keySet()) {
             this.draw(layer);
@@ -83,14 +88,16 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public void close() {
-        this.activeLayers.clear();
-        for (ReferenceSet<BufferBuilder> bufferBuilders : this.fallbackBuffers.values()) {
-            for (BufferBuilder bufferBuilder : bufferBuilders) {
-                if (bufferBuilder.isBuilding()) {
-                    bufferBuilder.end().release();
-                }
+        this.currentLayer = Optional.empty();
+        this.drawFallbackLayersFirst = false;
+
+        for (RenderLayer layer : this.activeLayers) {
+            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+                bufferBuilder.end().release();
             }
         }
+
+        this.activeLayers.clear();
         this.fallbackBuffers.clear();
     }
 

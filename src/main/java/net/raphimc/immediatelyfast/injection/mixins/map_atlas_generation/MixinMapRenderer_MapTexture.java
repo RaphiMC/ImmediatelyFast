@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(MapRenderer.MapTexture.class)
+@Mixin(value = MapRenderer.MapTexture.class, priority = 1100) // TODO: Workaround for Porting-Lib which relies on the LVT to be intact
 public abstract class MixinMapRenderer_MapTexture {
 
     @Shadow
