@@ -89,6 +89,10 @@ public class BatchingBuffers {
         TEXTURE_BATCH.draw();
     }
 
+    public static boolean isTextureBatching() {
+        return TEXTURE_CONSUMER instanceof BatchableImmediate;
+    }
+
     public static void beginFillBatching() {
         FILL_BATCH.close();
         FILL_CONSUMER = FILL_BATCH;
@@ -99,6 +103,10 @@ public class BatchingBuffers {
         FILL_BATCH.draw();
     }
 
+    public static boolean isFillBatching() {
+        return FILL_CONSUMER instanceof BatchableImmediate;
+    }
+
     public static void beginTextBatching() {
         TEXT_BATCH.close();
         TEXT_CONSUMER = TEXT_BATCH;
@@ -107,6 +115,10 @@ public class BatchingBuffers {
     public static void endTextBatching() {
         TEXT_CONSUMER = null;
         TEXT_BATCH.draw();
+    }
+
+    public static boolean isTextBatching() {
+        return TEXT_CONSUMER instanceof BatchableImmediate;
     }
 
     public static void beginItemModelBatching() {
@@ -135,6 +147,10 @@ public class BatchingBuffers {
         RenderSystem.applyModelViewMatrix();
     }
 
+    public static boolean isItemModelBatching() {
+        return LIT_ITEM_MODEL_CONSUMER instanceof BatchableImmediate || UNLIT_ITEM_MODEL_CONSUMER instanceof BatchableImmediate;
+    }
+
     public static void beginItemOverlayBatching() {
         ITEM_OVERLAY_BATCH.close();
         ITEM_OVERLAY_CONSUMER = ITEM_OVERLAY_BATCH;
@@ -143,6 +159,10 @@ public class BatchingBuffers {
     public static void endItemOverlayBatching() {
         ITEM_OVERLAY_CONSUMER = null;
         ITEM_OVERLAY_BATCH.draw();
+    }
+
+    public static boolean isItemOverlayBatching() {
+        return ITEM_OVERLAY_CONSUMER instanceof BatchableImmediate;
     }
 
     /**
