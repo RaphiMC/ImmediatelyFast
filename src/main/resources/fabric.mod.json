@@ -33,8 +33,7 @@
     "sodium": "*"
   },
   "breaks": {
-    "optifabric": "*",
-    "porting_lib": "<=2.0.591"
+    "optifabric": "*"
   },
   "custom": {
     "modmenu": {
