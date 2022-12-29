@@ -18,7 +18,7 @@ public abstract class MixinDrawableHelper {
      * @reason Allow batching of the vertex data. Overwritten for performance.
      */
     @Overwrite
-    private static void fill(Matrix4f matrix, int x1, int y1, int x2, int y2, int color) {
+    public static void fill(Matrix4f matrix, int x1, int y1, int x2, int y2, int color) {
         if (x1 < x2) {
             x1 = x1 ^ x2;
             x2 = x1 ^ x2;
@@ -61,7 +61,7 @@ public abstract class MixinDrawableHelper {
      * @reason Allow batching of the vertex data. Overwritten for performance.
      */
     @Overwrite
-    private static void drawTexturedQuad(Matrix4f matrix, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
+    public static void drawTexturedQuad(Matrix4f matrix, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1) {
         if (BatchingBuffers.TEXTURE_CONSUMER != null) {
             final float[] shaderColor = RenderSystem.getShaderColor();
             final int r = (int) (shaderColor[0] * 255);
