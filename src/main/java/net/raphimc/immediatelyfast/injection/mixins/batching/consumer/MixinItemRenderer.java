@@ -23,7 +23,7 @@ public abstract class MixinItemRenderer {
         if (BatchingBuffers.LIT_ITEM_MODEL_CONSUMER != null || BatchingBuffers.UNLIT_ITEM_MODEL_CONSUMER != null) {
             // Get the model view transformations and apply them to the empty matrix stack.
             // When rendering that batch the model view matrix will be set to the identity matrix to not apply the model view transformations twice.
-            matrices.peek().getPositionMatrix().set(RenderSystem.getModelViewMatrix());
+            matrices.peek().getPositionMatrix().load(RenderSystem.getModelViewMatrix());
 
             return model.isSideLit() ? BatchingBuffers.LIT_ITEM_MODEL_CONSUMER : BatchingBuffers.UNLIT_ITEM_MODEL_CONSUMER;
         }
@@ -31,7 +31,7 @@ public abstract class MixinItemRenderer {
         return vertexConsumers;
     }
 
-    @ModifyArg(method = "renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"))
+    @ModifyArg(method = "renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFIZLnet/minecraft/util/math/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;ZII)I"))
     private VertexConsumerProvider renderTextInfoBuffer(VertexConsumerProvider vertexConsumers) {
         return BatchingBuffers.ITEM_OVERLAY_CONSUMER != null ? BatchingBuffers.ITEM_OVERLAY_CONSUMER : vertexConsumers;
     }
@@ -53,13 +53,13 @@ public abstract class MixinItemRenderer {
             vertexConsumer.vertex(x + width, y + height, 0).color(color).next();
             vertexConsumer.vertex(x + width, y, 0).color(color).next();
         } else {
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             buffer.vertex(x, y, 0).color(red, green, blue, alpha).next();
             buffer.vertex(x, y + height, 0).color(red, green, blue, alpha).next();
             buffer.vertex(x + width, y + height, 0).color(red, green, blue, alpha).next();
             buffer.vertex(x + width, y, 0).color(red, green, blue, alpha).next();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            BufferRenderer.drawWithShader(buffer.end());
         }
     }
 

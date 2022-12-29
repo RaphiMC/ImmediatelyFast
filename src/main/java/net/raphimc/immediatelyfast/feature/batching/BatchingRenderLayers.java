@@ -22,7 +22,7 @@ public class BatchingRenderLayers {
         RenderSystem.enableTexture();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
     }, () -> {
         RenderSystem.disableBlend();
         RenderSystem.disableTexture();
@@ -32,7 +32,7 @@ public class BatchingRenderLayers {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
     }, () -> {
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
@@ -43,7 +43,7 @@ public class BatchingRenderLayers {
         RenderSystem.disableTexture();
         RenderSystem.disableDepthTest();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
     }, () -> {
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();

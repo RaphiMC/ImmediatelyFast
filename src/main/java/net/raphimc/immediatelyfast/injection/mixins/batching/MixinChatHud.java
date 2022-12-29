@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinChatHud {
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void beginBatching(MatrixStack matrices, int currentTick, int mouseX, int mouseY, CallbackInfo ci) {
+    private void beginBatching(MatrixStack matrices, int currentTick, CallbackInfo ci) {
         BatchingBuffers.beginHudBatching();
     }
 
     @Inject(method = "render", at = @At("RETURN"))
-    private void endBatching(MatrixStack matrices, int currentTick, int mouseX, int mouseY, CallbackInfo ci) {
+    private void endBatching(MatrixStack matrices, int currentTick, CallbackInfo ci) {
         BatchingBuffers.endHudBatching();
     }
 

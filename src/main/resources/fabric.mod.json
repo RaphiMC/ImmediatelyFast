@@ -26,7 +26,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.12.0",
-    "minecraft": "1.19.3",
+    "minecraft": ">=1.19 <=1.19.2",
     "java": ">=17"
   },
   "recommends": {

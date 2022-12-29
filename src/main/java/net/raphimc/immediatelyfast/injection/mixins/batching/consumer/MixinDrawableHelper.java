@@ -4,9 +4,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.*;
 import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.Matrix4f;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
-import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -43,14 +43,14 @@ public abstract class MixinDrawableHelper {
             RenderSystem.enableBlend();
             RenderSystem.disableTexture();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             final BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             bufferBuilder.vertex(matrix, x1, y2, 0F).color(color).next();
             bufferBuilder.vertex(matrix, x2, y2, 0F).color(color).next();
             bufferBuilder.vertex(matrix, x2, y1, 0F).color(color).next();
             bufferBuilder.vertex(matrix, x1, y1, 0F).color(color).next();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            BufferRenderer.drawWithShader(bufferBuilder.end());
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
         }
@@ -74,14 +74,14 @@ public abstract class MixinDrawableHelper {
             vertexConsumer.vertex(matrix, x1, y0, z).texture(u1, v0).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x0, y0, z).texture(u0, v0).color(r, g, b, a).next();
         } else {
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
             final BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
             bufferBuilder.vertex(matrix, x0, y1, z).texture(u0, v1).next();
             bufferBuilder.vertex(matrix, x1, y1, z).texture(u1, v1).next();
             bufferBuilder.vertex(matrix, x1, y0, z).texture(u1, v0).next();
             bufferBuilder.vertex(matrix, x0, y0, z).texture(u0, v0).next();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            BufferRenderer.drawWithShader(bufferBuilder.end());
         }
     }
 

@@ -2,7 +2,6 @@ package net.raphimc.immediatelyfast.injection.mixins.batching;
 
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.JumpingMount;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,12 +34,12 @@ public abstract class MixinInGameHud {
     }*/
 
     @Inject(method = "renderMountJumpBar", at = @At("HEAD"))
-    private void beginMountJumpBarBatching(JumpingMount mount, MatrixStack matrices, int x, CallbackInfo ci) {
+    private void beginMountJumpBarBatching(MatrixStack matrices, int x, CallbackInfo ci) {
         BatchingBuffers.beginHudBatching();
     }
 
     @Inject(method = "renderMountJumpBar", at = @At("RETURN"))
-    private void endMountJumpBarBatching(JumpingMount mount, MatrixStack matrices, int x, CallbackInfo ci) {
+    private void endMountJumpBarBatching(MatrixStack matrices, int x, CallbackInfo ci) {
         BatchingBuffers.endHudBatching();
     }
 
