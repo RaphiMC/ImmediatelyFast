@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import net.minecraft.client.render.*;
 import net.minecraft.screen.PlayerScreenHandler;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 
 import java.util.Map;
@@ -80,7 +81,10 @@ public class BatchingBuffers {
 
 
     public static void beginTextureBatching() {
-        TEXTURE_BATCH.close();
+        if (TEXTURE_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("Texture batching was already active! endTextureBatching() was not called before beginTextureBatching(). This will cause rendering issues.");
+            TEXTURE_BATCH.close();
+        }
         TEXTURE_CONSUMER = TEXTURE_BATCH;
     }
 
@@ -94,7 +98,10 @@ public class BatchingBuffers {
     }
 
     public static void beginFillBatching() {
-        FILL_BATCH.close();
+        if (FILL_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("Fill batching was already active! endFillBatching() was not called before beginFillBatching(). This will cause rendering issues.");
+            FILL_BATCH.close();
+        }
         FILL_CONSUMER = FILL_BATCH;
     }
 
@@ -108,7 +115,10 @@ public class BatchingBuffers {
     }
 
     public static void beginTextBatching() {
-        TEXT_BATCH.close();
+        if (TEXT_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("Text batching was already active! endTextBatching() was not called before beginTextBatching(). This will cause rendering issues.");
+            TEXT_BATCH.close();
+        }
         TEXT_CONSUMER = TEXT_BATCH;
     }
 
@@ -122,8 +132,11 @@ public class BatchingBuffers {
     }
 
     public static void beginItemModelBatching() {
-        LIT_ITEM_MODEL_BATCH.close();
-        UNLIT_ITEM_MODEL_BATCH.close();
+        if (LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("Item model batching was already active! endItemModelBatching() was not called before beginItemModelBatching(). This will cause rendering issues.");
+            LIT_ITEM_MODEL_BATCH.close();
+            UNLIT_ITEM_MODEL_BATCH.close();
+        }
         LIT_ITEM_MODEL_CONSUMER = LIT_ITEM_MODEL_BATCH;
         UNLIT_ITEM_MODEL_CONSUMER = UNLIT_ITEM_MODEL_BATCH;
     }
@@ -152,7 +165,10 @@ public class BatchingBuffers {
     }
 
     public static void beginItemOverlayBatching() {
-        ITEM_OVERLAY_BATCH.close();
+        if (ITEM_OVERLAY_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("Item overlay batching was already active! endItemOverlayBatching() was not called before beginItemOverlayBatching(). This will cause rendering issues.");
+            ITEM_OVERLAY_BATCH.close();
+        }
         ITEM_OVERLAY_CONSUMER = ITEM_OVERLAY_BATCH;
     }
 
