@@ -24,7 +24,7 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;render(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;renderSpectatorMenu(Lnet/minecraft/client/util/math/MatrixStack;)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final Operation<MatrixStack> operation) {
+    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices);
         BatchingBuffers.endHudBatching();
@@ -35,7 +35,7 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderMountJumpBar(Lnet/minecraft/client/util/math/MatrixStack;I)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderExperienceBar(Lnet/minecraft/client/util/math/MatrixStack;I)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final int x, final Operation<MatrixStack> operation) {
+    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final int x, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices, x);
         BatchingBuffers.endHudBatching();
@@ -44,7 +44,7 @@ public abstract class MixinInGameHud {
     @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/PlayerListHud;render(Lnet/minecraft/client/util/math/MatrixStack;ILnet/minecraft/scoreboard/Scoreboard;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final int scaledWindowWidth, final Scoreboard scoreboard, final ScoreboardObjective objective, final Operation<MatrixStack> operation) {
+    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final int scaledWindowWidth, final Scoreboard scoreboard, final ScoreboardObjective objective, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices, scaledWindowWidth, scoreboard, objective);
         BatchingBuffers.endHudBatching();
@@ -53,7 +53,7 @@ public abstract class MixinInGameHud {
     @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderScoreboardSidebar(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/scoreboard/ScoreboardObjective;)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final ScoreboardObjective objective, final Operation<MatrixStack> operation) {
+    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final ScoreboardObjective objective, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices, objective);
         BatchingBuffers.endHudBatching();
@@ -62,7 +62,7 @@ public abstract class MixinInGameHud {
     @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbar(FLnet/minecraft/client/util/math/MatrixStack;)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final float tickDelta, final MatrixStack matrices, final Operation<MatrixStack> operation) {
+    private void if$Batching(@Coerce final Object instance, final float tickDelta, final MatrixStack matrices, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
         BatchingBuffers.beginItemBatching();
         operation.call(instance, tickDelta, matrices);
