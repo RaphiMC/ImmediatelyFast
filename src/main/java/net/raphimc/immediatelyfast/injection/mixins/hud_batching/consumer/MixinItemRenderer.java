@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.injection.mixins.batching.consumer;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;

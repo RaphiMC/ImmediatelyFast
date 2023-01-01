@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.injection.mixins.font_atlas_layouting;
+package net.raphimc.immediatelyfast.injection.mixins.font_atlas_resizing;
 
 import net.minecraft.client.font.GlyphAtlasTexture;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.injection.mixins.batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
