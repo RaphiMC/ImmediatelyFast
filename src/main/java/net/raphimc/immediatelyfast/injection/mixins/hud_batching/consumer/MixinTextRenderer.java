@@ -1,4 +1,4 @@
-package net.raphimc.immediatelyfast.injection.mixins.batching.consumer;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.consumer;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;

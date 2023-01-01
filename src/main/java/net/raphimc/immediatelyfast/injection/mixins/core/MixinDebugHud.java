@@ -1,6 +1,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import net.minecraft.client.gui.hud.DebugHud;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BufferBuilderPool;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +15,8 @@ public abstract class MixinDebugHud {
 
     @Inject(method = "getRightText", at = @At("RETURN"))
     private void appendAllocationInfo(CallbackInfoReturnable<List<String>> cir) {
+        if (ImmediatelyFast.config.dont_add_info_into_debug_hud) return;
+
         cir.getReturnValue().add("");
         cir.getReturnValue().add("ImmediatelyFast");
         cir.getReturnValue().add("Buffer Pool: " + BufferBuilderPool.getAllocatedSize());

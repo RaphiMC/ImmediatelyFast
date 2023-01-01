@@ -101,6 +101,10 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         this.fallbackBuffers.clear();
     }
 
+    public boolean hasActiveLayers() {
+        return !this.activeLayers.isEmpty();
+    }
+
     protected abstract void _draw(RenderLayer layer);
 
     protected BufferBuilder getOrCreateBufferBuilder(final RenderLayer layer) {
