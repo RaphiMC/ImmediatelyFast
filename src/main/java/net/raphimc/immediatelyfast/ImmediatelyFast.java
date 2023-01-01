@@ -1,19 +1,26 @@
 package net.raphimc.immediatelyfast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
+import java.io.File;
+import java.io.FileReader;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 
 public class ImmediatelyFast implements ClientModInitializer, PreLaunchEntrypoint {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("ImmediatelyFast");
     public static final Unsafe UNSAFE = getUnsafe();
+    public static ImmediatelyFastConfig config;
 
     @Override
     public void onInitializeClient() {
@@ -26,6 +33,25 @@ public class ImmediatelyFast implements ClientModInitializer, PreLaunchEntrypoin
     @Override
     public void onPreLaunch() {
         MixinExtrasBootstrap.init();
+    }
+
+    public static void loadConfig() {
+        final File configFile = FabricLoader.getInstance().getConfigDir().resolve("immediatelyfast.json").toFile();
+        if (configFile.exists()) {
+            try {
+                config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+            } catch (Throwable e) {
+                LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
+            }
+        }
+        if (config == null) {
+            config = new ImmediatelyFastConfig();
+        }
+        try {
+            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(config));
+        } catch (Throwable e) {
+            LOGGER.error("Failed to save ImmediatelyFast config.", e);
+        }
     }
 
     private static Unsafe getUnsafe() {

@@ -1,7 +1,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.render.*;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,16 +17,11 @@ public interface MixinVertexConsumerProvider {
      * @reason Universal Batching
      */
     @Overwrite
-    static VertexConsumerProvider.Immediate immediate(BufferBuilder buffer) {
-        return immediate(ImmutableMap.of(), buffer);
-    }
-
-    /**
-     * @author RK_01
-     * @reason Universal Batching
-     */
-    @Overwrite
     static VertexConsumerProvider.Immediate immediate(Map<RenderLayer, BufferBuilder> layerBuffers, BufferBuilder fallbackBuffer) {
+        if (ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching) {
+            return new VertexConsumerProvider.Immediate(fallbackBuffer, layerBuffers);
+        }
+
         if (!fallbackBuffer.equals(Tessellator.getInstance().getBuffer())) {
             ((IBufferBuilder) fallbackBuffer).release();
         }

@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "net.raphimc.immediatelyfast.injection.mixins",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "batching.MixinDebugHud",
     "batching.MixinInGameHud",
