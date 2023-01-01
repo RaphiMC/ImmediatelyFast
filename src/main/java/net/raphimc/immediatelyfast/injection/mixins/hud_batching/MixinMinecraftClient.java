@@ -17,7 +17,7 @@ public abstract class MixinMinecraftClient {
     @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;drawProfilerResults(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/profiler/ProfileResult;)V"),
     })
-    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final ProfileResult profileResult, final Operation<Void> operation) {
+    private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final ProfileResult profileResult, final Operation<MatrixStack> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices, profileResult);
         BatchingBuffers.endHudBatching();

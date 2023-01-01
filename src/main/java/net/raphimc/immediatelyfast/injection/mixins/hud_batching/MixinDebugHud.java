@@ -15,7 +15,7 @@ public abstract class MixinDebugHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;renderLeftText(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;renderRightText(Lnet/minecraft/client/util/math/MatrixStack;)V"),
     })
-    private void if$batching(final DebugHud instance, final MatrixStack matrices, final Operation<Void> operation) {
+    private void if$batching(final DebugHud instance, final MatrixStack matrices, final Operation<MatrixStack> operation) {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices);
         BatchingBuffers.endHudBatching();

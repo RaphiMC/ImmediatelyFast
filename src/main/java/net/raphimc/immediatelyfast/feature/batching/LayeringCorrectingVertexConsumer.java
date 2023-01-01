@@ -2,6 +2,7 @@ package net.raphimc.immediatelyfast.feature.batching;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexFormat;
+import net.raphimc.immediatelyfast.util.ImmediateUtil;
 
 public class LayeringCorrectingVertexConsumer implements VertexConsumer {
 
@@ -52,7 +53,7 @@ public class LayeringCorrectingVertexConsumer implements VertexConsumer {
     public void next() {
         this.delegate.next();
         this.vertexCount++;
-        if (!this.drawMode.shareVertices && this.vertexCount % this.drawMode.additionalVertexCount == 0) {
+        if (!ImmediateUtil.sharedVerticesComparator(this.drawMode.size) && this.vertexCount % this.drawMode.size == 0) {
             this.zOffset = getNextZOffset();
         }
     }
