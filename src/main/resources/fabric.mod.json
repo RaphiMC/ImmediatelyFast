@@ -18,6 +18,9 @@
   "entrypoints": {
     "client": [
       "net.raphimc.immediatelyfast.ImmediatelyFast"
+    ],
+    "preLaunch": [
+      "net.raphimc.immediatelyfast.ImmediatelyFast"
     ]
   },
   "accessWidener": "immediatelyfast.accesswidener",

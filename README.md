@@ -86,7 +86,6 @@ Tested on a spigot server with different HUD elements on screen (Scoreboard, Pot
 | None                | 225 FPS                 | 330 FPS              | 1.47x       |
 | Sodium              | 270 FPS                 | 490 FPS              | 1.81x       |
 | Iris and Sodium     | 270 FPS                 | 460 FPS              | 1.70x       |
-| Exordium and Sodium | 750 FPS                 | 830 FPS              | 1.11x       |
 
 ## Compatibility
 

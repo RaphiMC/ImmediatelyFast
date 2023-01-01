@@ -85,7 +85,7 @@ public class BatchingBuffers {
             ImmediatelyFast.LOGGER.warn("Texture batching was already active! endTextureBatching() was not called before beginTextureBatching(). This will cause rendering issues.");
             TEXTURE_BATCH.close();
         }
-        TEXTURE_CONSUMER = TEXTURE_BATCH;
+        TEXTURE_CONSUMER = new LayeringCorrectingVertexConsumerProvider(TEXT_BATCH);
     }
 
     public static void endTextureBatching() {
@@ -94,7 +94,7 @@ public class BatchingBuffers {
     }
 
     public static boolean isTextureBatching() {
-        return TEXTURE_CONSUMER instanceof BatchableImmediate;
+        return TEXTURE_CONSUMER != null;
     }
 
     public static void beginFillBatching() {
@@ -102,7 +102,7 @@ public class BatchingBuffers {
             ImmediatelyFast.LOGGER.warn("Fill batching was already active! endFillBatching() was not called before beginFillBatching(). This will cause rendering issues.");
             FILL_BATCH.close();
         }
-        FILL_CONSUMER = FILL_BATCH;
+        FILL_CONSUMER = new LayeringCorrectingVertexConsumerProvider(FILL_BATCH);
     }
 
     public static void endFillBatching() {
@@ -111,7 +111,7 @@ public class BatchingBuffers {
     }
 
     public static boolean isFillBatching() {
-        return FILL_CONSUMER instanceof BatchableImmediate;
+        return FILL_CONSUMER != null;
     }
 
     public static void beginTextBatching() {
@@ -119,7 +119,7 @@ public class BatchingBuffers {
             ImmediatelyFast.LOGGER.warn("Text batching was already active! endTextBatching() was not called before beginTextBatching(). This will cause rendering issues.");
             TEXT_BATCH.close();
         }
-        TEXT_CONSUMER = TEXT_BATCH;
+        TEXT_CONSUMER = new LayeringCorrectingVertexConsumerProvider(TEXT_BATCH);
     }
 
     public static void endTextBatching() {
@@ -128,7 +128,7 @@ public class BatchingBuffers {
     }
 
     public static boolean isTextBatching() {
-        return TEXT_CONSUMER instanceof BatchableImmediate;
+        return TEXT_CONSUMER != null;
     }
 
     public static void beginItemModelBatching() {
@@ -137,8 +137,8 @@ public class BatchingBuffers {
             LIT_ITEM_MODEL_BATCH.close();
             UNLIT_ITEM_MODEL_BATCH.close();
         }
-        LIT_ITEM_MODEL_CONSUMER = LIT_ITEM_MODEL_BATCH;
-        UNLIT_ITEM_MODEL_CONSUMER = UNLIT_ITEM_MODEL_BATCH;
+        LIT_ITEM_MODEL_CONSUMER = new LayeringCorrectingVertexConsumerProvider(LIT_ITEM_MODEL_BATCH);
+        UNLIT_ITEM_MODEL_CONSUMER = new LayeringCorrectingVertexConsumerProvider(UNLIT_ITEM_MODEL_BATCH);
     }
 
     public static void endItemModelBatching() {
@@ -161,7 +161,7 @@ public class BatchingBuffers {
     }
 
     public static boolean isItemModelBatching() {
-        return LIT_ITEM_MODEL_CONSUMER instanceof BatchableImmediate || UNLIT_ITEM_MODEL_CONSUMER instanceof BatchableImmediate;
+        return LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null;
     }
 
     public static void beginItemOverlayBatching() {
@@ -169,7 +169,7 @@ public class BatchingBuffers {
             ImmediatelyFast.LOGGER.warn("Item overlay batching was already active! endItemOverlayBatching() was not called before beginItemOverlayBatching(). This will cause rendering issues.");
             ITEM_OVERLAY_BATCH.close();
         }
-        ITEM_OVERLAY_CONSUMER = ITEM_OVERLAY_BATCH;
+        ITEM_OVERLAY_CONSUMER = new LayeringCorrectingVertexConsumerProvider(ITEM_OVERLAY_BATCH);
     }
 
     public static void endItemOverlayBatching() {
@@ -178,7 +178,7 @@ public class BatchingBuffers {
     }
 
     public static boolean isItemOverlayBatching() {
-        return ITEM_OVERLAY_CONSUMER instanceof BatchableImmediate;
+        return ITEM_OVERLAY_CONSUMER != null;
     }
 
     /**
