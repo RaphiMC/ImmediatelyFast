@@ -2,10 +2,8 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,7 @@ import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 
-public class ImmediatelyFast implements ClientModInitializer, PreLaunchEntrypoint {
+public class ImmediatelyFast implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("ImmediatelyFast");
     public static final Unsafe UNSAFE = getUnsafe();
@@ -28,11 +26,6 @@ public class ImmediatelyFast implements ClientModInitializer, PreLaunchEntrypoin
             LOGGER.info("Loading ImmediatelyFast " + modContainer.getMetadata().getVersion().getFriendlyString());
         });
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
-    }
-
-    @Override
-    public void onPreLaunch() {
-        MixinExtrasBootstrap.init();
     }
 
     public static void loadConfig() {
