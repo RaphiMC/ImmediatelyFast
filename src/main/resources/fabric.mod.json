@@ -20,7 +20,7 @@
       "net.raphimc.immediatelyfast.ImmediatelyFast"
     ],
     "preLaunch": [
-      "net.raphimc.immediatelyfast.ImmediatelyFastPreLaunch"
+      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ]
   },
   "accessWidener": "immediatelyfast.accesswidener",
