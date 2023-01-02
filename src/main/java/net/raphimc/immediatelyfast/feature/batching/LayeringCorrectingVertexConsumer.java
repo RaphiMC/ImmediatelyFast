@@ -1,6 +1,7 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import net.minecraft.client.render.VertexConsumer;
+import net.raphimc.immediatelyfast.util.ImmediateUtil;
 
 public class LayeringCorrectingVertexConsumer implements VertexConsumer {
 
