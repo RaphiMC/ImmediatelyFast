@@ -12,7 +12,8 @@ public class LayeringCorrectingVertexConsumerProvider implements VertexConsumerP
 
     @Override
     public VertexConsumer getBuffer(RenderLayer layer) {
-        return new LayeringCorrectingVertexConsumer(this.delegate.getBuffer(layer), layer.getDrawMode());
+        LayeringCorrectingVertexConsumer.incrementZOffset();
+        return new LayeringCorrectingVertexConsumer(this.delegate.getBuffer(layer));
     }
 
 }

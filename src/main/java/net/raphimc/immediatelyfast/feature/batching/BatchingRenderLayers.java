@@ -20,10 +20,12 @@ public class BatchingRenderLayers {
     public static final Function<Integer, RenderLayer> COLORED_TEXTURE = memoize(id -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, true, () -> {
         RenderSystem.enableBlend();
         RenderSystem.enableTexture();
+        RenderSystem.enableDepthTest();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
     }, () -> {
+        RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
         RenderSystem.disableTexture();
     }));
@@ -31,9 +33,11 @@ public class BatchingRenderLayers {
     public static final RenderLayer FILLED_QUAD = new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, true, () -> {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
+        RenderSystem.enableDepthTest();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
     }, () -> {
+        RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
     });
