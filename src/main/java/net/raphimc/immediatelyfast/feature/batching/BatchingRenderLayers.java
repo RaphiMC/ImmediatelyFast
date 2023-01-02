@@ -17,7 +17,7 @@ import static net.minecraft.util.Util.memoize;
  */
 public class BatchingRenderLayers {
 
-    public static final Function<Integer, RenderLayer> COLORED_TEXTURE = memoize(id -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, true, () -> {
+    public static final Function<Integer, RenderLayer> COLORED_TEXTURE = memoize(id -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
         RenderSystem.enableBlend();
         RenderSystem.enableTexture();
         RenderSystem.enableDepthTest();
@@ -30,7 +30,7 @@ public class BatchingRenderLayers {
         RenderSystem.disableTexture();
     }));
 
-    public static final RenderLayer FILLED_QUAD = new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, true, () -> {
+    public static final RenderLayer FILLED_QUAD = new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.enableDepthTest();
@@ -42,7 +42,7 @@ public class BatchingRenderLayers {
         RenderSystem.enableTexture();
     });
 
-    public static final RenderLayer GUI_QUAD = new ImmediatelyFastRenderLayer("gui_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, true, () -> {
+    public static final RenderLayer GUI_QUAD = new ImmediatelyFastRenderLayer("gui_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
         RenderSystem.disableDepthTest();
