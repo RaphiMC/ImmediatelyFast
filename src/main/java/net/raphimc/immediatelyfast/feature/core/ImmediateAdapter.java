@@ -96,6 +96,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         for (RenderLayer layer : this.activeLayers) {
             for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
                 bufferBuilder.end();//.release();
+                bufferBuilder.clear();
             }
         }
 
