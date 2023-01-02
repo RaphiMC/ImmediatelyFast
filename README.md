@@ -7,7 +7,7 @@ replacement for other more aggressive optimization mods such as Exordium or Enha
 
 ## Installation
 
-The mod is requires the Fabric loader and is compatible with Minecraft 1.19 - 1.19.3.
+The mod requires the Fabric loader and is compatible with Minecraft 1.19 - 1.19.3.
 
 You can download the mod from [Modrinth](https://modrinth.com/mod/immediatelyfast)
 or [Curseforge](https://www.curseforge.com/minecraft/mc-mods/immediatelyfast)
