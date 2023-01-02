@@ -62,7 +62,7 @@ public class LayeringCorrectingVertexConsumer implements VertexConsumer {
      * Increases the Z offset by a small amount.
      */
     public static void incrementZOffset() {
-        Z_OFFSET += 0.0001F;
+        Z_OFFSET += 0.001F;
     }
 
     /**
