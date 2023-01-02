@@ -1,7 +1,6 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormat;
 import net.raphimc.immediatelyfast.util.ImmediateUtil;
 
 public class LayeringCorrectingVertexConsumer implements VertexConsumer {
@@ -9,19 +8,14 @@ public class LayeringCorrectingVertexConsumer implements VertexConsumer {
     private static float Z_OFFSET = 0F; // Fix Z layering issues with overlapping 2D elements
 
     private final VertexConsumer delegate;
-    private final VertexFormat.DrawMode drawMode;
-    private int vertexCount = 0;
-    private float zOffset;
 
-    public LayeringCorrectingVertexConsumer(final VertexConsumer delegate, final VertexFormat.DrawMode drawMode) {
+    public LayeringCorrectingVertexConsumer(final VertexConsumer delegate) {
         this.delegate = delegate;
-        this.drawMode = drawMode;
-        this.zOffset = getNextZOffset();
     }
 
     @Override
     public VertexConsumer vertex(double x, double y, double z) {
-        return this.delegate.vertex(x, y, z + this.zOffset);
+        return this.delegate.vertex(x, y, z + Z_OFFSET);
     }
 
     @Override
@@ -52,10 +46,6 @@ public class LayeringCorrectingVertexConsumer implements VertexConsumer {
     @Override
     public void next() {
         this.delegate.next();
-        this.vertexCount++;
-        if (!ImmediateUtil.sharedVerticesComparator(this.drawMode.size) && this.vertexCount % this.drawMode.size == 0) {
-            this.zOffset = getNextZOffset();
-        }
     }
 
     @Override
@@ -69,10 +59,17 @@ public class LayeringCorrectingVertexConsumer implements VertexConsumer {
     }
 
 
-    public static float getNextZOffset() {
-        return Z_OFFSET += 0.0001F;
+    /**
+     * Increases the Z offset by a small amount.
+     */
+    public static void incrementZOffset() {
+        Z_OFFSET += 0.0001F;
     }
 
+    /**
+     * Resets the Z offset to 0.
+     * Called at the end of the frame.
+     */
     public static void resetZOffset() {
         Z_OFFSET = 0F;
     }
