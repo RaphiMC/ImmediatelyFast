@@ -44,10 +44,10 @@ public abstract class MixinItemRenderer {
             final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
             color = ColorHelper.Argb.mixColor(color, argb);
             final VertexConsumer vertexConsumer = BatchingBuffers.ITEM_OVERLAY_CONSUMER.getBuffer(BatchingRenderLayers.GUI_QUAD);
-            vertexConsumer.vertex(x, y, 0).color(color).next();
-            vertexConsumer.vertex(x, y + height, 0).color(color).next();
-            vertexConsumer.vertex(x + width, y + height, 0).color(color).next();
-            vertexConsumer.vertex(x + width, y, 0).color(color).next();
+            vertexConsumer.vertex(x, y, 0F).color(color).next();
+            vertexConsumer.vertex(x, y + height, 0F).color(color).next();
+            vertexConsumer.vertex(x + width, y + height, 0F).color(color).next();
+            vertexConsumer.vertex(x + width, y, 0F).color(color).next();
         }
     }
 
