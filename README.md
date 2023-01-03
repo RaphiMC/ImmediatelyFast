@@ -1,4 +1,7 @@
-# ImmediatelyFast
+<div align="center">
+  <img src="https://raw.githubusercontent.com/RaphiMC/ImmediatelyFast/1.19.3/src/main/resources/assets/immediatelyfast/icon.png" width="150">
+  <h1>ImmediatelyFast</h1>
+</div>
 
 ImmediatelyFast is an open source Fabric mod which improves the immediate mode rendering performance of the client.
 
@@ -10,8 +13,8 @@ replacement for other more aggressive optimization mods such as Exordium or Enha
 The mod requires the Fabric loader and is compatible with Minecraft 1.19 - 1.19.3.
 
 You can download the mod from [Modrinth](https://modrinth.com/mod/immediatelyfast)
-or [Curseforge](https://www.curseforge.com/minecraft/mc-mods/immediatelyfast)
-or [Github](https://github.com/RaphiMC/ImmediatelyFast/releases/latest).
+or [CurseForge](https://www.curseforge.com/minecraft/mc-mods/immediatelyfast)
+or [GitHub](https://github.com/RaphiMC/ImmediatelyFast/releases/latest).
 
 ## Optimizations
 
@@ -93,7 +96,7 @@ ImmediatelyFast is structured to interfere with mods as little as possible.
 It should work fine with most if not all mods and modpacks.
 
 Known incompatibilities:
-- Optifabric
+- OptiFabric
 
 If you encounter any issues, please report them on
 the [issue tracker](https://github.com/RaphiMC/ImmediatelyFast/issues) or feel free to join
