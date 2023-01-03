@@ -4,8 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.ColorHelper;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
-import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
+import net.raphimc.immediatelyfast.feature.batching.*;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +31,7 @@ public abstract class MixinDrawableHelper {
             final float[] shaderColor = RenderSystem.getShaderColor();
             final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
             color = ColorHelper.Argb.mixColor(color, argb);
-            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD);
+            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
             vertexConsumer.vertex(matrix, x1, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, 0F).color(color).next();
@@ -49,7 +48,7 @@ public abstract class MixinDrawableHelper {
             final int g = (int) (shaderColor[1] * 255);
             final int b = (int) (shaderColor[2] * 255);
             final int a = (int) (shaderColor[3] * 255);
-            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(RenderSystem.getShaderTexture(0)));
+            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(RenderSystem.getShaderTexture(0), BlendFuncDepthFunc.current()));
             vertexConsumer.vertex(matrix, x0, y1, z).texture(u0, v1).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x1, y0, z).texture(u1, v0).color(r, g, b, a).next();
