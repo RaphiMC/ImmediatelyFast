@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "nukeduck.armorchroma.GuiArmor")
+@Mixin(targets = "nukeduck.armorchroma.GuiArmor", remap = false)
 @Pseudo
 public abstract class MixinArmorChroma_GuiArmor {
 
