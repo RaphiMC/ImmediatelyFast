@@ -14,7 +14,7 @@ public abstract class MixinArmorChroma_GuiArmor {
     @Unique
     private boolean wasTextureBatching;
 
-    @Inject(method = "drawMaskedIcon", at = @At("HEAD"))
+    @Inject(method = "draw", at = @At("HEAD"))
     private void if$endTextureBatching(CallbackInfo ci) {
         if (BatchingBuffers.isTextureBatching()) {
             BatchingBuffers.endTextureBatching();
@@ -22,7 +22,7 @@ public abstract class MixinArmorChroma_GuiArmor {
         }
     }
 
-    @Inject(method = "drawMaskedIcon", at = @At("RETURN"))
+    @Inject(method = "draw", at = @At("RETURN"))
     private void if$beginTextureBatching(CallbackInfo ci) {
         if (this.wasTextureBatching) {
             BatchingBuffers.beginTextureBatching();
