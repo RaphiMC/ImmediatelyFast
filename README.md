@@ -94,8 +94,17 @@ ImmediatelyFast is structured to interfere with mods as little as possible.
 It should work fine with most if not all mods and modpacks.
 
 Known incompatibilities:
+
 - OptiFabric
 
 If you encounter any issues, please report them on
 the [issue tracker](https://github.com/RaphiMC/ImmediatelyFast/issues) or feel free to join
 my [Discord](https://discord.gg/dCzT9XHEWu).
+
+---
+
+Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals click the image below and use code **RaphiMC** at checkout for 15% off your first month!
+
+[![Kinetic Hosting](https://cdn.discordapp.com/attachments/1060267870321393716/1060987925325688963/RaphiMC.png)](https://billing.kinetichosting.net/aff.php?aff=47)
+
+---
