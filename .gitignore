@@ -11,7 +11,8 @@ classes/
 
 # idea
 
-.idea/
+/.idea/*
+!/.idea/copyright/
 *.iml
 *.ipr
 *.iws
