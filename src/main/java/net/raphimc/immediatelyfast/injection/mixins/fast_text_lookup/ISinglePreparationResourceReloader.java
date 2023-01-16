@@ -15,23 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.feature.core;
+package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
-public class ImmediatelyFastConfig {
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.SinglePreparationResourceReloader;
+import net.minecraft.util.profiler.Profiler;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-    // Regular config values
-    public boolean font_atlas_resizing = true;
-    public boolean map_atlas_generation = true;
-    public boolean hud_batching = true;
-    public boolean fast_text_lookup = true;
+@Mixin(SinglePreparationResourceReloader.class)
+public interface ISinglePreparationResourceReloader {
 
-    // Cosmetic config values
-    public boolean dont_add_info_into_debug_hud = false;
+    @Invoker
+    <T> T invokePrepare(ResourceManager manager, Profiler profiler);
 
-    // Experimental config values
-    // None yet
-
-    // Debug config values
-    public boolean debug_only_and_not_recommended_disable_universal_batching = false;
+    @Invoker
+    void invokeApply(Object prepared, ResourceManager manager, Profiler profiler);
 
 }
