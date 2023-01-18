@@ -36,7 +36,7 @@ public abstract class MixinVertexBuffer {
     @Unique
     private int indexBufferSize;
 
-    @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
+    @Redirect(method = "configureVertexFormat", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
         if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
@@ -46,7 +46,7 @@ public abstract class MixinVertexBuffer {
         }
     }
 
-    @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
+    @Redirect(method = "configureIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
