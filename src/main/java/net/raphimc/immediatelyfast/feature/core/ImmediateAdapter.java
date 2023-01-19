@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static net.raphimc.immediatelyfast.util.ImmediateUtil.sharedVerticesComparator;
+
 public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
     /**
@@ -56,7 +58,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
         final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
-        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
+        if (bufferBuilder.isBuilding() && sharedVerticesComparator(layer.getDrawMode().size)) {
             throw new IllegalStateException("Tried to write shared vertices into the same buffer");
         }
 
@@ -119,7 +121,8 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
         for (RenderLayer layer : this.activeLayers) {
             for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.end().release();
+                bufferBuilder.end();//.release();
+                bufferBuilder.clear();
             }
         }
 
@@ -134,7 +137,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     protected abstract void _draw(RenderLayer layer);
 
     protected BufferBuilder getOrCreateBufferBuilder(final RenderLayer layer) {
-        if (!layer.areVerticesNotShared()) {
+        if (sharedVerticesComparator(layer.getDrawMode().size)) {
             return this.addNewFallbackBuffer(layer);
         } else if (this.layerBuffers.containsKey(layer)) {
             return this.layerBuffers.get(layer);
@@ -160,5 +163,4 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
         return bufferBuilder;
     }
-
 }
