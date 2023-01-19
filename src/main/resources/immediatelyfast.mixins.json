@@ -10,6 +10,7 @@
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
     "fast_buffer_upload.MixinVertexBuffer",
+    "fast_buffer_upload.MixinVertexFormat",
     "fast_text_lookup.ISinglePreparationResourceReloader",
     "fast_text_lookup.MixinFontManager",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
@@ -28,5 +29,7 @@
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "mixins": [
+  ]
 }
