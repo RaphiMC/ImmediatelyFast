@@ -32,7 +32,7 @@ public abstract class MixinRenderLayer {
             "method_36436" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
             "method_37348" /*TEXT_SEE_THROUGH*/,
             "method_37347" /*TEXT_INTENSITY_SEE_THROUGH*/
-    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5)
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, remap = false)
     private static boolean if$changeTranslucency(boolean value) {
         return false;
     }
