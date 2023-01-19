@@ -38,7 +38,7 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = "uploadInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;" +
             "glBufferData(ILjava/nio/ByteBuffer;I)V"))
-    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
+    private void optimizeUploading(int target, ByteBuffer data, int usage) {
         if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
