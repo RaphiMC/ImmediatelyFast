@@ -57,6 +57,12 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.hud_batching && packageName.startsWith("hud_batching")) {
             return false;
         }
+        if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
+            return false;
+        }
+        if (!ImmediatelyFast.config.fast_buffer_upload && packageName.startsWith("fast_buffer_upload")) {
+            return false;
+        }
 
         return true;
     }
