@@ -28,8 +28,6 @@ import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Coerce;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = InGameHud.class, priority = 500)
 public abstract class MixinInGameHud {
@@ -103,15 +101,8 @@ public abstract class MixinInGameHud {
     })
     private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final int x, final Operation<Void> operation) {
         BatchingBuffers.beginHudBatching();
-        matrices.push();
         operation.call(instance, matrices, x);
-        matrices.pop();
         BatchingBuffers.endHudBatching();
-    }
-
-    @Inject(method = "renderExperienceBar", at = @At(value = "CONSTANT", args = "intValue=8453920"))
-    private void if$fixTextOverlappingIssue(MatrixStack matrices, int x, CallbackInfo ci) {
-        matrices.translate(0, 0, 0.001F);
     }
 
 }
