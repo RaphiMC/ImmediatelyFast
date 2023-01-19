@@ -17,13 +17,13 @@
 ## Optimizations
 
 ImmediatelyFast generally optimizes all immediate mode rendering by using a custom buffer implementation which batches
-draw calls.  
+draw calls and uploads data to the GPU in a more efficient way.  
 The following parts of the immediate mode rendering code are optimized:
 
 - Entities
-- Block entities (Especially signs)
+- Block entities
 - Particles
-- Text rendering (Especially with high-res font texture packs)
+- Text rendering
 - GUI/HUD
 - Immediate mode rendering of other mods (ImmersivePortals benefits a lot from this)
 
@@ -32,9 +32,12 @@ The following parts of the rendering code are optimized with a more efficient im
 
 - Map rendering
 - HUD rendering
+- Text rendering
 
 ## Performance
-Here are some performance comparisons of areas the mod optimizes particularly well (Using IF 1.1.1 on Minecraft 1.19.3):
+Here are some performance comparisons of areas the mod optimizes particularly well:
+
+If other mods are listed in the table this means that this mod also optimizes that part of the game.
 
 Test Hardware: Ryzen 5 1600, 32GB DDR4, GTX 1060
 
@@ -44,49 +47,56 @@ is the bottleneck (Most likely the case if your GPU isn't ancient or you use ver
 Slower CPUs will benefit more from this mod than really fast CPUs.
 
 ### Entity Rendering
-Generally FPS should be 2x higher on busy servers.
+Generally FPS should be around **2x higher** on busy servers. [Tested using IF 1.1.7 on 1.19.3]
 
-#### Iris Disclaimer
-Iris is supported but defeats some of ImmediatelyFast's optimizations, as Iris replaces the Entity rendering engine with
-its own one.
-Installing both together is supported and won't cause issues and ImmediatelyFast will still optimize other
-parts of the rendering code which aren't optimized by Iris. If you only use Iris for the Entity rendering
-optimizations, you can replace it with ImmediatelyFast instead.
-
-Tested on a spigot server with 1000 cows in a 3x3 box on screen.
+_Tested on a spigot server with 1000 cows in a 3x3 box on screen._
 
 | Other mods      | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
 |-----------------|-------------------------|----------------------|-------------|
-| None            | 18 FPS                  | 46 FPS               | 2.56x       |
-| Sodium          | 22 FPS                  | 58 FPS               | 2.64x       |
-| Iris and Sodium | 60 FPS                  | 58 FPS               | 0.97x       |
+| None            | 16 FPS                  | 60 FPS               | 3.75x       |
+| Sodium          | 21 FPS                  | 82 FPS               | 3.90x       |
+| Iris and Sodium | 60 FPS                  | 76 FPS               | 1.27x       |
 
 ### Map Rendering
-Generally FPS should be 5x higher when there are many maps on screen.
+Generally FPS should be around **5x higher** when there are many maps on screen. [Tested using IF 1.1.1 on 1.19.3]
 
-Tested on a fabric server with the [Image2Map](https://modrinth.com/mod/image2map) mod and around 930 maps on screen.
+_Tested on a fabric server with the [Image2Map](https://modrinth.com/mod/image2map) mod and around 930 maps on screen._
 
 | Other mods      | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
 |-----------------|-------------------------|----------------------|-------------|
 | None            | 50 FPS                  | 310 FPS              | 6.20x       |
 | Sodium          | 47 FPS                  | 320 FPS              | 6.81x       |
-| Iris and Sodium | 53 FPS                  | 290 FPS              | 5.47x       |
 
 ### HUD Rendering
-Generally FPS should be around 30% higher in almost all scenarios.
+Generally FPS should be around **40% higher** in almost all scenarios. [Tested using IF 1.1.7 on 1.19.3]
 
-#### Exordium Disclaimer
-Exordium is supported but defeats some of ImmediatelyFast's optimizations, as Exordium replaces the HUD rendering with
-a buffered non-immediate implementation.
-Installing both together is supported and won't cause issues, it will even improve performance further.
-
-Tested on a spigot server with different HUD elements on screen (Scoreboard, Potion effect overlay, Bossbars, Filled Chat, Extra hearts, Full Hotbar).
+_Tested on a spigot server with different HUD elements on screen (Scoreboard, Potion effect overlay, Bossbars, Filled Chat, Extra hearts, Full Hotbar)._
 
 | Other mods          | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
 |---------------------|-------------------------|----------------------|-------------|
-| None                | 225 FPS                 | 330 FPS              | 1.47x       |
-| Sodium              | 270 FPS                 | 490 FPS              | 1.81x       |
-| Iris and Sodium     | 270 FPS                 | 460 FPS              | 1.70x       |
+| None                | 250 FPS                 | 380 FPS              | 1.52x       |
+| Sodium              | 335 FPS                 | 630 FPS              | 1.88x       |
+| Exordium and Sodium | 740 FPS                 | 840 FPS              | 1.14x       |
+
+### Text Rendering
+Generally FPS should be around **2x higher** when there are many signs or holograms around you. [Tested using IF 1.1.7 on 1.19.3]
+
+_Tested on a spigot server with 200 signs (Filled with text) on screen._
+
+| Other mods      | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
+|-----------------|-------------------------|----------------------|-------------|
+| None            | 70 FPS                  | 125 FPS              | 1.79x       |
+| Sodium          | 110 FPS                 | 300 FPS              | 2.73x       |
+
+### Block-Entity Rendering
+Generally FPS should be around **20% higher** when there are many block entities around you. [Tested using IF 1.1.7 on 1.19.3]
+
+_Tested on a spigot server with 400 chests on screen._
+
+| Other mods      | Without ImmediatelyFast | With ImmediatelyFast | Improvement |
+|-----------------|-------------------------|----------------------|-------------|
+| None            | 170 FPS                 | 205 FPS              | 1.20x       |
+| Sodium          | 315 FPS                 | 410 FPS              | 1.30x       |
 
 ## Compatibility
 
