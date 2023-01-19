@@ -36,17 +36,24 @@ public abstract class MixinVertexBuffer {
     @Unique
     private int indexBufferSize;
 
-    @Redirect(method = "uploadInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;" +
-            "glBufferData(ILjava/nio/ByteBuffer;I)V"))
-    private void optimizeUploading(int target, ByteBuffer data, int usage) {
-        if (data.remaining() > this.indexBufferSize) {
-            this.indexBufferSize = data.remaining();
-            RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
-        } else if (data.remaining() > this.vertexBufferSize) {
+    @Redirect(method = "uploadInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V", ordinal = 0))
+    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
+        if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
         } else {
             GL15C.glBufferSubData(target, 0, data);
         }
     }
+
+    @Redirect(method = "uploadInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V", ordinal = 1))
+    private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
+        if (data.remaining() > this.indexBufferSize) {
+            this.indexBufferSize = data.remaining();
+            RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
+        } else {
+            GL15C.glBufferSubData(target, 0, data);
+        }
+    }
+
 }
