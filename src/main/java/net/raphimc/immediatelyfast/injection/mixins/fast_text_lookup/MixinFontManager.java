@@ -88,7 +88,7 @@ public abstract class MixinFontManager {
         };
     }
 
-    @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"))
+    @ModifyArg(method = {"createTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;)V"))
     private Function<Identifier, FontStorage> if$overrideFontStorage(Function<Identifier, FontStorage> original) {
         return id -> {
             // Fast path for default font
