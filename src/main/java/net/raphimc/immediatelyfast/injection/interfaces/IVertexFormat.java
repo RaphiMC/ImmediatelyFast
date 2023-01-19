@@ -15,24 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.feature.core;
+package net.raphimc.immediatelyfast.injection.interfaces;
 
-public class ImmediatelyFastConfig {
+public interface IVertexFormat {
+    void setUpState();
+    void setUpStateInternal();
 
-    // Regular config values
-    public boolean font_atlas_resizing = true;
-    public boolean map_atlas_generation = true;
-    public boolean hud_batching = true;
-    public boolean fast_text_lookup = true;
-    public boolean fast_buffer_upload = true;
-
-    // Cosmetic config values
-    public boolean dont_add_info_into_debug_hud = false;
-
-    // Experimental config values
-    // None yet
-
-    // Debug config values
-    public boolean debug_only_and_not_recommended_disable_universal_batching = false;
-
+    void clearState();
+    void clearStateInternal();
 }
