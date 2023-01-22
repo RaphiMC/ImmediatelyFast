@@ -24,6 +24,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.JumpingMount;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -89,11 +90,13 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbar(FLnet/minecraft/client/util/math/MatrixStack;)V"),
     })
     private void if$Batching(@Coerce final Object instance, final float tickDelta, final MatrixStack matrices, final Operation<Void> operation) {
-        BatchingBuffers.beginHudBatching();
-        BatchingBuffers.beginItemBatching();
-        operation.call(instance, tickDelta, matrices);
-        BatchingBuffers.endHudBatching();
-        BatchingBuffers.endItemBatching();
+        if (ImmediatelyFast.config.experimental_item_hud_batching) {
+            BatchingBuffers.beginHudBatching();
+            BatchingBuffers.beginItemBatching();
+            operation.call(instance, tickDelta, matrices);
+            BatchingBuffers.endHudBatching();
+            BatchingBuffers.endItemBatching();
+        }
     }
 
     @WrapOperation(method = "render", at = {

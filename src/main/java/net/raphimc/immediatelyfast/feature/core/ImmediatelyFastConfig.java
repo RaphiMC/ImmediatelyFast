@@ -30,7 +30,7 @@ public class ImmediatelyFastConfig {
     public boolean dont_add_info_into_debug_hud = false;
 
     // Experimental config values
-    // None yet
+    public boolean experimental_item_hud_batching = false;
 
     // Debug config values
     public boolean debug_only_and_not_recommended_disable_universal_batching = false;
