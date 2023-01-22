@@ -96,6 +96,8 @@ public abstract class MixinInGameHud {
             operation.call(instance, tickDelta, matrices);
             BatchingBuffers.endHudBatching();
             BatchingBuffers.endItemBatching();
+        } else {
+            operation.call(instance, tickDelta, matrices);
         }
     }
 
