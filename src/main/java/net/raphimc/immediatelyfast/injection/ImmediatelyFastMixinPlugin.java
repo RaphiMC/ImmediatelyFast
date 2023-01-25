@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -34,6 +35,13 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         this.mixinPackage = mixinPackage + ".";
 
         ImmediatelyFast.loadConfig();
+
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            if (FabricLoader.getInstance().isModLoaded("slight-gui-modifications")) {
+                ImmediatelyFast.LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
+                ImmediatelyFast.config.hud_batching = false;
+            }
+        }
     }
 
     @Override
