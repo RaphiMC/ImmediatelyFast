@@ -36,6 +36,9 @@
   "recommends": {
     "sodium": "*"
   },
+  "conflicts": {
+    "slight-gui-modifications": "*"
+  },
   "breaks": {
     "optifabric": "*"
   },

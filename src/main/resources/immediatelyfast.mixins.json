@@ -7,6 +7,7 @@
   "client": [
     "core.MixinBufferBuilder",
     "core.MixinDebugHud",
+    "core.MixinRenderLayer",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
     "fast_buffer_upload.MixinVertexBuffer",
@@ -16,7 +17,6 @@
     "hud_batching.MixinDebugHud",
     "hud_batching.MixinInGameHud",
     "hud_batching.MixinMinecraftClient",
-    "hud_batching.MixinRenderLayer",
     "hud_batching.compat.MixinArmorChroma_GuiArmor",
     "hud_batching.consumer.MixinDrawableHelper",
     "hud_batching.consumer.MixinItemRenderer",
