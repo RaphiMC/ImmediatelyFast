@@ -88,6 +88,11 @@ public abstract class MixinFontManager {
         };
     }
 
+    @Inject(method = "setIdOverrides", at = @At("RETURN"))
+    private void if$rebuildOverriddenFontStorages(CallbackInfo ci) {
+        this.if$rebuildOverriddenFontStorages();
+    }
+
     @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"))
     private Function<Identifier, FontStorage> if$overrideFontStorage(Function<Identifier, FontStorage> original) {
         return id -> {
@@ -113,7 +118,7 @@ public abstract class MixinFontManager {
     private void if$rebuildOverriddenFontStorages() {
         this.overriddenFontStorages.clear();
         this.overriddenFontStorages.putAll(this.fontStorages);
-        for (Identifier value : this.idOverrides.values()) {
+        for (Identifier value : this.idOverrides.keySet()) {
             this.overriddenFontStorages.put(value, this.method_27542(value));
         }
 
