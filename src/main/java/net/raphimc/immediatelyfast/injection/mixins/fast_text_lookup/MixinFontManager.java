@@ -118,8 +118,8 @@ public abstract class MixinFontManager {
     private void if$rebuildOverriddenFontStorages() {
         this.overriddenFontStorages.clear();
         this.overriddenFontStorages.putAll(this.fontStorages);
-        for (Identifier value : this.idOverrides.keySet()) {
-            this.overriddenFontStorages.put(value, this.method_27542(value));
+        for (Identifier key : this.idOverrides.keySet()) {
+            this.overriddenFontStorages.put(key, this.method_27542(key));
         }
 
         this.defaultFontStorage = this.overriddenFontStorages.get(MinecraftClient.DEFAULT_FONT_ID);
