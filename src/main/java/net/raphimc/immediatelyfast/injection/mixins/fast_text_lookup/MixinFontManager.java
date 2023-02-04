@@ -93,7 +93,15 @@ public abstract class MixinFontManager {
         this.if$rebuildOverriddenFontStorages();
     }
 
-    @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"))
+    // 1.19.0 injection
+    @SuppressWarnings({"MixinAnnotationTarget", "UnresolvedMixinReference", "InvalidInjectorMethodSignature"})
+    @ModifyArg(method = {"createTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;)V"), require = 0)
+    private Function<Identifier, FontStorage> if$overrideFontStorage2(Function<Identifier, FontStorage> original) {
+        return this.if$overrideFontStorage(original);
+    }
+
+    // 1.19.2 injection
+    @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"), require = 0)
     private Function<Identifier, FontStorage> if$overrideFontStorage(Function<Identifier, FontStorage> original) {
         return id -> {
             // Fast path for default font
