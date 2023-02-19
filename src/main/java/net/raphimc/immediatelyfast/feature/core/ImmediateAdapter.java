@@ -26,6 +26,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.raphimc.immediatelyfast.compat.IrisCompat;
 
 import java.util.Collections;
 import java.util.Map;
@@ -73,7 +74,11 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         }
 
         if (!bufferBuilder.isBuilding()) {
-            bufferBuilder.begin(layer.getDrawMode(), layer.getVertexFormat());
+            if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
+                IrisCompat.iris$beginWithoutExtending.accept(bufferBuilder, layer.getDrawMode(), layer.getVertexFormat());
+            } else {
+                bufferBuilder.begin(layer.getDrawMode(), layer.getVertexFormat());
+            }
             this.activeLayers.add(layer);
         }
         return bufferBuilder;
@@ -109,9 +114,17 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
             this.drawCurrentLayer();
         }
 
+        if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
+            IrisCompat.renderWithExtendedVertexFormat.accept(false);
+        }
+
         this.activeLayers.remove(layer);
         this._draw(layer);
         this.fallbackBuffers.remove(layer);
+
+        if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
+            IrisCompat.renderWithExtendedVertexFormat.accept(true);
+        }
     }
 
     @Override
