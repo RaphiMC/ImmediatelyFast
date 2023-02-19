@@ -40,7 +40,6 @@ public class BatchingRenderLayers {
     public static final BiFunction<Integer, BlendFuncDepthFunc, RenderLayer> COLORED_TEXTURE = memoize((id, blendFuncDepthFunc) -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
         RenderSystem.enableBlend();
         RenderSystem.enableTexture();
-        RenderSystem.enableDepthTest();
         blendFuncDepthFunc.apply();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
@@ -54,7 +53,6 @@ public class BatchingRenderLayers {
     public static final Function<BlendFuncDepthFunc, RenderLayer> FILLED_QUAD = memoize(blendFuncDepthFunc -> new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
         RenderSystem.enableBlend();
         RenderSystem.disableTexture();
-        RenderSystem.enableDepthTest();
         blendFuncDepthFunc.apply();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
