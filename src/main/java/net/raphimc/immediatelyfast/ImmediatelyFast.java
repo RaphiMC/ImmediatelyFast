@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,10 @@ public class ImmediatelyFast implements ClientModInitializer {
     public void onInitializeClient() {
         FabricLoader.getInstance().getModContainer("immediatelyfast").ifPresent(modContainer -> {
             LOGGER.info("Loading ImmediatelyFast " + modContainer.getMetadata().getVersion().getFriendlyString());
+        });
+        FabricLoader.getInstance().getModContainer("iris").ifPresent(modContainer -> {
+            LOGGER.info("Found Iris " + modContainer.getMetadata().getVersion().getFriendlyString() + ". Enabling compatibility.");
+            IrisCompat.init();
         });
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
