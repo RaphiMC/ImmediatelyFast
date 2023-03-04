@@ -107,6 +107,7 @@ It should work fine with most if not all mods and modpacks.
 Known incompatibilities:
 
 - OptiFabric
+- VulkanMod
 
 If you encounter any issues, please report them on the [Issue Tracker](https://github.com/RaphiMC/ImmediatelyFast/issues).
 
