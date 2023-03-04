@@ -40,7 +40,8 @@
     "slight-gui-modifications": "*"
   },
   "breaks": {
-    "optifabric": "*"
+    "optifabric": "*",
+    "vulkanmod": "*"
   },
   "custom": {
     "modmenu": {

@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.compat;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import net.lenni0451.reflect.accessor.FieldAccessor;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormat;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -40,23 +41,8 @@ public class IrisCompat {
             final Class<?> immediateStateClass = Class.forName("net.coderbot.iris.vertices.ImmediateState");
             final Class<?> extendingBufferBuilderClass = Class.forName("net.coderbot.iris.vertices.ExtendingBufferBuilder");
 
-            final MethodHandle isRenderingLevelMH = lookup.findStaticGetter(immediateStateClass, "isRenderingLevel", boolean.class);
-            isRenderingLevel = () -> {
-                try {
-                    return (boolean) isRenderingLevelMH.invokeExact();
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            };
-
-            final MethodHandle renderWithExtendedVertexFormatMH = lookup.findStaticSetter(immediateStateClass, "renderWithExtendedVertexFormat", boolean.class);
-            renderWithExtendedVertexFormat = (value) -> {
-                try {
-                    renderWithExtendedVertexFormatMH.invokeExact(value);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            };
+            isRenderingLevel = FieldAccessor.makeGetter(BooleanSupplier.class, null, immediateStateClass.getDeclaredField("isRenderingLevel"));
+            renderWithExtendedVertexFormat = FieldAccessor.makeSetter(BooleanConsumer.class, null, immediateStateClass.getDeclaredField("renderWithExtendedVertexFormat"));
 
             final MethodHandle iris$beginWithoutExtendingMH = lookup.findVirtual(extendingBufferBuilderClass, "iris$beginWithoutExtending", MethodType.methodType(void.class, VertexFormat.DrawMode.class, VertexFormat.class));
             final CallSite iris$beginWithoutExtendingCallSite = LambdaMetafactory.metafactory(lookup, "accept", MethodType.methodType(TriConsumer.class), MethodType.methodType(void.class, Object.class, Object.class, Object.class), iris$beginWithoutExtendingMH, iris$beginWithoutExtendingMH.type());
