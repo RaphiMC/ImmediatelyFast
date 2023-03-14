@@ -17,14 +17,18 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL14C;
 
-public record BlendFuncDepthFunc(boolean DEPTH_TEST, int GL_BLEND_SRC_RGB, int GL_BLEND_SRC_ALPHA, int GL_BLEND_DST_RGB, int GL_BLEND_DST_ALPHA, int GL_DEPTH_FUNC) {
+import java.util.Stack;
+
+public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND_SRC_RGB, int GL_BLEND_SRC_ALPHA, int GL_BLEND_DST_RGB, int GL_BLEND_DST_ALPHA, int GL_DEPTH_FUNC) {
+
+    private static final Stack<BlendFuncDepthFunc> STACK = new Stack<>();
 
     public static BlendFuncDepthFunc current() {
         return new BlendFuncDepthFunc(
+                GL11C.glGetBoolean(GL11C.GL_BLEND),
                 GL11C.glGetBoolean(GL14C.GL_DEPTH_TEST),
                 GL11C.glGetInteger(GL14C.GL_BLEND_SRC_RGB),
                 GL11C.glGetInteger(GL14C.GL_BLEND_SRC_ALPHA),
@@ -35,13 +39,24 @@ public record BlendFuncDepthFunc(boolean DEPTH_TEST, int GL_BLEND_SRC_RGB, int G
     }
 
     public void apply() {
-        RenderSystem.blendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
-        if (DEPTH_TEST) {
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(GL_DEPTH_FUNC);
+        STACK.push(current());
+
+        if (BLEND) {
+            GL11C.glEnable(GL11C.GL_BLEND);
+            GL14C.glBlendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
         } else {
-            RenderSystem.disableDepthTest();
+            GL11C.glDisable(GL11C.GL_BLEND);
         }
+        if (DEPTH_TEST) {
+            GL11C.glEnable(GL11C.GL_DEPTH_TEST);
+            GL11C.glDepthFunc(GL_DEPTH_FUNC);
+        } else {
+            GL11C.glDisable(GL11C.GL_DEPTH_TEST);
+        }
+    }
+
+    public void revert() {
+        STACK.pop().apply();
     }
 
 }
