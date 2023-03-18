@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-@Mixin(value = ArmorFeatureRenderer.class, priority = 1500)
+@Mixin(value = ArmorFeatureRenderer.class, priority = 500)
 public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extends BipedEntityModel<T>, A extends BipedEntityModel<T>> extends FeatureRenderer<T, M> {
 
     @Shadow
