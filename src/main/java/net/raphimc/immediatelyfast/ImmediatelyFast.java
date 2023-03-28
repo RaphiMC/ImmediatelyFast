@@ -23,6 +23,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
+import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -37,16 +38,19 @@ public class ImmediatelyFast implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("ImmediatelyFast");
     public static final Unsafe UNSAFE = getUnsafe();
     public static ImmediatelyFastConfig config;
+    public static ImmediatelyFastRuntimeConfig runtimeConfig;
 
     @Override
     public void onInitializeClient() {
         FabricLoader.getInstance().getModContainer("immediatelyfast").ifPresent(modContainer -> {
             LOGGER.info("Loading ImmediatelyFast " + modContainer.getMetadata().getVersion().getFriendlyString());
         });
-        FabricLoader.getInstance().getModContainer("iris").ifPresent(modContainer -> {
-            LOGGER.info("Found Iris " + modContainer.getMetadata().getVersion().getFriendlyString() + ". Enabling compatibility.");
-            IrisCompat.init();
-        });
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            FabricLoader.getInstance().getModContainer("iris").ifPresent(modContainer -> {
+                LOGGER.info("Found Iris " + modContainer.getMetadata().getVersion().getFriendlyString() + ". Enabling compatibility.");
+                IrisCompat.init();
+            });
+        }
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
 
@@ -67,6 +71,11 @@ public class ImmediatelyFast implements ClientModInitializer {
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
+        resetRuntimeConfig();
+    }
+
+    public static void resetRuntimeConfig() {
+        runtimeConfig = new ImmediatelyFastRuntimeConfig(config);
     }
 
     private static Unsafe getUnsafe() {

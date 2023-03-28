@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -35,15 +36,17 @@ public abstract class MixinArmorChroma_GuiArmor {
 
     @Inject(method = "draw", at = @At("HEAD"))
     private void if$endTextureBatching(CallbackInfo ci) {
-        if (BatchingBuffers.isTextureBatching()) {
-            BatchingBuffers.endTextureBatching();
-            this.wasTextureBatching = true;
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
+            if (BatchingBuffers.isTextureBatching()) {
+                BatchingBuffers.endTextureBatching();
+                this.wasTextureBatching = true;
+            }
         }
     }
 
     @Inject(method = "draw", at = @At("RETURN"))
     private void if$beginTextureBatching(CallbackInfo ci) {
-        if (this.wasTextureBatching) {
+        if (this.wasTextureBatching && ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginTextureBatching();
             this.wasTextureBatching = false;
         }
