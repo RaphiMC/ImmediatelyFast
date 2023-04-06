@@ -111,10 +111,18 @@ Known incompatibilities:
 
 If you encounter any issues, please report them on the [Issue Tracker](https://github.com/RaphiMC/ImmediatelyFast/issues).
 
+## Partners
+
+YourKit supports open source projects with innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/),
+[YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/),
+and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
+
+[![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com)
+
 ---
 
 Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals click the image below and use code **RaphiMC** at checkout for 15% off your first month!
 
 [![Kinetic Hosting](https://cdn.discordapp.com/attachments/1060267870321393716/1060987925325688963/RaphiMC.png)](https://billing.kinetichosting.net/aff.php?aff=47)
-
----
