@@ -20,7 +20,6 @@
     "hud_batching.MixinDebugHud",
     "hud_batching.MixinInGameHud",
     "hud_batching.compat.MixinArmorChroma_GuiArmor",
-    "hud_batching.compat.MixinPlayerListHud",
     "hud_batching.consumer.MixinDrawableHelper",
     "hud_batching.consumer.MixinItemRenderer",
     "hud_batching.consumer.MixinTextRenderer",
