@@ -86,7 +86,7 @@ public class BatchingBuffers {
             ImmediatelyFast.LOGGER.warn("Texture batching was already active! endTextureBatching() was not called before beginTextureBatching(). This will cause rendering issues.");
             TEXTURE_BATCH.close();
         }
-        TEXTURE_CONSUMER = TEXT_BATCH;
+        TEXTURE_CONSUMER = TEXTURE_BATCH;
     }
 
     public static void endTextureBatching() {
