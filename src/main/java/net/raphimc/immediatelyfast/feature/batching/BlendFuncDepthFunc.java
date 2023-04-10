@@ -17,8 +17,8 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL14C;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import java.util.Stack;
 
@@ -28,13 +28,13 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
 
     public static BlendFuncDepthFunc current() {
         return new BlendFuncDepthFunc(
-                GL11C.glGetBoolean(GL11C.GL_BLEND),
-                GL11C.glGetBoolean(GL14C.GL_DEPTH_TEST),
-                GL11C.glGetInteger(GL14C.GL_BLEND_SRC_RGB),
-                GL11C.glGetInteger(GL14C.GL_BLEND_SRC_ALPHA),
-                GL11C.glGetInteger(GL14C.GL_BLEND_DST_RGB),
-                GL11C.glGetInteger(GL14C.GL_BLEND_DST_ALPHA),
-                GL11C.glGetInteger(GL11C.GL_DEPTH_FUNC)
+                GlStateManager.BLEND.capState.state,
+                GlStateManager.DEPTH.capState.state,
+                GlStateManager.BLEND.srcFactorRGB,
+                GlStateManager.BLEND.srcFactorAlpha,
+                GlStateManager.BLEND.dstFactorRGB,
+                GlStateManager.BLEND.dstFactorAlpha,
+                GlStateManager.DEPTH.func
         );
     }
 
@@ -42,16 +42,16 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
         STACK.push(current());
 
         if (BLEND) {
-            GL11C.glEnable(GL11C.GL_BLEND);
-            GL14C.glBlendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
         } else {
-            GL11C.glDisable(GL11C.GL_BLEND);
+            RenderSystem.disableBlend();
         }
         if (DEPTH_TEST) {
-            GL11C.glEnable(GL11C.GL_DEPTH_TEST);
-            GL11C.glDepthFunc(GL_DEPTH_FUNC);
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(GL_DEPTH_FUNC);
         } else {
-            GL11C.glDisable(GL11C.GL_DEPTH_TEST);
+            RenderSystem.disableDepthTest();
         }
     }
 
