@@ -36,7 +36,6 @@ public abstract class MixinInGameHud {
     @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusBars(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderMountHealth(Lnet/minecraft/client/util/math/MatrixStack;)V"),
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/BossBarHud;render(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SubtitlesHud;render(Lnet/minecraft/client/util/math/MatrixStack;)V"),
@@ -57,6 +56,18 @@ public abstract class MixinInGameHud {
         BatchingBuffers.beginHudBatching();
         operation.call(instance, matrices, currentTick, mouseX, mouseY);
         BatchingBuffers.endHudBatching();
+    }
+
+    @WrapOperation(method = "render", at = {
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"),
+    })
+    private void if$StatusOverlayBatching(@Coerce final Object instance, final MatrixStack matrices, final Operation<Void> operation) {
+        BatchingBuffers.beginHudBatching();
+        operation.call(instance, matrices);
+        // https://github.com/A5b84/status-effect-bars draws fill over texture
+        BatchingBuffers.endTextureBatching();
+        BatchingBuffers.endFillBatching();
+        BatchingBuffers.endTextBatching();
     }
 
     @WrapOperation(method = "render", at = {
