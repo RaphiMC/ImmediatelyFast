@@ -5,3 +5,9 @@ accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjg
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
 accessible class net/minecraft/client/render/MapRenderer$MapTexture
+
+accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendFuncState;
+accessible class com/mojang/blaze3d/platform/GlStateManager$BlendFuncState
+accessible field com/mojang/blaze3d/platform/GlStateManager DEPTH Lcom/mojang/blaze3d/platform/GlStateManager$DepthTestState;
+accessible class com/mojang/blaze3d/platform/GlStateManager$DepthTestState
+accessible field com/mojang/blaze3d/platform/GlStateManager$CapabilityTracker state Z
