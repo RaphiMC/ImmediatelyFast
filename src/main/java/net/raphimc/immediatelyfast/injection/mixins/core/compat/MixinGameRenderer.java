@@ -70,7 +70,7 @@ public abstract class MixinGameRenderer {
             }
         }
 
-        if (modified) {
+        if (modified && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
             ImmediatelyFast.LOGGER.warn("Core shader modifications detected. Temporarily disabling some parts of ImmediatelyFast.");
             ImmediatelyFast.runtimeConfig.hud_batching = false;
             ImmediatelyFast.runtimeConfig.universal_batching_text = false;
