@@ -1,6 +1,10 @@
 accessWidener v1 named
 #https://fabricmc.net/wiki/tutorial:accesswideners
 
+accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible method net/minecraft/client/font/FontStorage$GlyphPair getGlyph (Z)Lnet/minecraft/client/font/Glyph;
+accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
+
 accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
