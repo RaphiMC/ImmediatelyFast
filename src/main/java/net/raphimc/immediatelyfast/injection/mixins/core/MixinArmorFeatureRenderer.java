@@ -30,7 +30,6 @@ import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.trim.ArmorTrim;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -61,22 +60,20 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     }
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
-    private void if$renderTrimsSeparate(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
-        if (livingEntity.world.getEnabledFeatures().contains(FeatureFlags.UPDATE_1_20)) {
-            this.if$renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.CHEST, i, this.getModel(EquipmentSlot.CHEST));
-            this.if$renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.LEGS, i, this.getModel(EquipmentSlot.LEGS));
-            this.if$renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.FEET, i, this.getModel(EquipmentSlot.FEET));
-            this.if$renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.HEAD, i, this.getModel(EquipmentSlot.HEAD));
-        }
+    private void renderTrimsSeparate(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
+        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.CHEST, i, this.getModel(EquipmentSlot.CHEST));
+        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.LEGS, i, this.getModel(EquipmentSlot.LEGS));
+        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.FEET, i, this.getModel(EquipmentSlot.FEET));
+        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.HEAD, i, this.getModel(EquipmentSlot.HEAD));
     }
 
     @Redirect(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/trim/ArmorTrim;getTrim(Lnet/minecraft/registry/DynamicRegistryManager;Lnet/minecraft/item/ItemStack;)Ljava/util/Optional;"))
-    private Optional<ArmorTrim> if$renderTrimsSeparate(DynamicRegistryManager registryManager, ItemStack stack) {
+    private Optional<ArmorTrim> renderTrimsSeparate(DynamicRegistryManager registryManager, ItemStack stack) {
         return Optional.empty();
     }
 
     @Unique
-    private void if$renderTrim(final MatrixStack matrices, final VertexConsumerProvider vertexConsumers, final T entity, final EquipmentSlot armorSlot, final int light, final A model) {
+    private void renderTrim(final MatrixStack matrices, final VertexConsumerProvider vertexConsumers, final T entity, final EquipmentSlot armorSlot, final int light, final A model) {
         final ItemStack itemStack = entity.getEquippedStack(armorSlot);
         if (itemStack.getItem() instanceof ArmorItem armorItem) {
             if (armorItem.getSlotType() == armorSlot) {

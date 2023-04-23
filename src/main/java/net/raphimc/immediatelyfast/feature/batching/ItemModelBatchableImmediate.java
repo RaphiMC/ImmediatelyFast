@@ -20,7 +20,6 @@ package net.raphimc.immediatelyfast.feature.batching;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.screen.PlayerScreenHandler;
 import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 
 public class ItemModelBatchableImmediate extends BatchableImmediate {
@@ -43,11 +42,7 @@ public class ItemModelBatchableImmediate extends BatchableImmediate {
 
     @Override
     public void draw() {
-        RenderSystem.getModelViewStack().push();
-        RenderSystem.getModelViewStack().loadIdentity();
-        RenderSystem.applyModelViewMatrix();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
         RenderSystem.enableBlend();
         if (this.guiDepthLighting) {
             DiffuseLighting.enableGuiDepthLighting();
@@ -59,8 +54,6 @@ public class ItemModelBatchableImmediate extends BatchableImmediate {
             DiffuseLighting.enableGuiDepthLighting();
         }
         RenderSystem.disableBlend();
-        RenderSystem.getModelViewStack().pop();
-        RenderSystem.applyModelViewMatrix();
     }
 
 }

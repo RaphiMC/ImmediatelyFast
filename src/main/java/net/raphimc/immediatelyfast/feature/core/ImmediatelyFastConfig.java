@@ -24,6 +24,7 @@ public class ImmediatelyFastConfig {
     public boolean font_atlas_resizing = true;
     public boolean map_atlas_generation = true;
     public boolean hud_batching = true;
+    public boolean item_hud_batching = true;
     public boolean fast_text_lookup = true;
     public boolean fast_buffer_upload = true;
 
@@ -33,7 +34,6 @@ public class ImmediatelyFastConfig {
 
     // Experimental config values
     private String EXPERIMENTAL_INFO = "----- Experimental config values below (Rendering glitches may occur) -----";
-    public boolean experimental_item_hud_batching = false;
     public boolean experimental_disable_error_checking = false;
     public boolean experimental_disable_resource_pack_conflict_handling = false;
 

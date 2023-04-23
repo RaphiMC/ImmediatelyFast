@@ -31,13 +31,13 @@ public abstract class MixinFontStorage {
     private final GlyphRenderer[] fastGlyphRendererCache = new GlyphRenderer[65536];
 
     @Inject(method = "setFonts", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;clear()V", ordinal = 0, remap = false))
-    private void if$clearArrayCaches(List<Font> fonts, CallbackInfo ci) {
+    private void clearArrayCaches(List<Font> fonts, CallbackInfo ci) {
         Arrays.fill(this.fastGlyphCache, null);
         Arrays.fill(this.fastGlyphRendererCache, null);
     }
 
     @Inject(method = "getGlyph", at = @At("HEAD"), cancellable = true)
-    private void if$fastGlyphCache(int codePoint, boolean validateAdvance, CallbackInfoReturnable<Glyph> cir) {
+    private void fastGlyphCache(int codePoint, boolean validateAdvance, CallbackInfoReturnable<Glyph> cir) {
         if (codePoint >= 0 && codePoint < this.fastGlyphCache.length) {
             Glyph glyph = this.fastGlyphCache[codePoint];
             if (glyph == null) {
@@ -49,7 +49,7 @@ public abstract class MixinFontStorage {
     }
 
     @Inject(method = "getGlyphRenderer(I)Lnet/minecraft/client/font/GlyphRenderer;", at = @At("HEAD"), cancellable = true)
-    private void if$fastGlyphRendererCache(int codePoint, CallbackInfoReturnable<GlyphRenderer> cir) {
+    private void fastGlyphRendererCache(int codePoint, CallbackInfoReturnable<GlyphRenderer> cir) {
         if (codePoint >= 0 && codePoint < this.fastGlyphRendererCache.length) {
             GlyphRenderer glyphRenderer = this.fastGlyphRendererCache[codePoint];
             if (glyphRenderer == null) {

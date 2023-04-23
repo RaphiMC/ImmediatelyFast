@@ -66,7 +66,7 @@ public abstract class MixinFontManager {
     private FontStorage unicodeFontStorage;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void if$hookReloader(TextureManager manager, CallbackInfo ci) {
+    private void hookReloader(TextureManager manager, CallbackInfo ci) {
         this.resourceReloadListener = new SinglePreparationResourceReloader<Map<Identifier, List<Font>>>() {
             private final ResourceReloader delegate = resourceReloadListener;
 
@@ -78,7 +78,7 @@ public abstract class MixinFontManager {
             @Override
             protected void apply(Map<Identifier, List<Font>> prepared, ResourceManager manager, Profiler profiler) {
                 ((ISinglePreparationResourceReloader) this.delegate).invokeApply(prepared, manager, profiler);
-                if$rebuildOverriddenFontStorages();
+                rebuildOverriddenFontStorages();
             }
 
             @Override
@@ -89,12 +89,12 @@ public abstract class MixinFontManager {
     }
 
     @Inject(method = "setIdOverrides", at = @At("RETURN"))
-    private void if$rebuildOverriddenFontStorages(CallbackInfo ci) {
-        this.if$rebuildOverriddenFontStorages();
+    private void rebuildOverriddenFontStorages(CallbackInfo ci) {
+        this.rebuildOverriddenFontStorages();
     }
 
     @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"))
-    private Function<Identifier, FontStorage> if$overrideFontStorage(Function<Identifier, FontStorage> original) {
+    private Function<Identifier, FontStorage> overrideFontStorage(Function<Identifier, FontStorage> original) {
         return id -> {
             // Fast path for default font
             if (MinecraftClient.DEFAULT_FONT_ID.equals(id) && this.defaultFontStorage != null) {
@@ -115,7 +115,7 @@ public abstract class MixinFontManager {
     }
 
     @Unique
-    private void if$rebuildOverriddenFontStorages() {
+    private void rebuildOverriddenFontStorages() {
         this.overriddenFontStorages.clear();
         this.overriddenFontStorages.putAll(this.fontStorages);
         for (Identifier key : this.idOverrides.keySet()) {

@@ -35,7 +35,7 @@ public abstract class MixinArmorChroma_GuiArmor {
     private boolean wasTextureBatching;
 
     @Inject(method = "draw", at = @At("HEAD"))
-    private void if$endTextureBatching(CallbackInfo ci) {
+    private void endTextureBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             if (BatchingBuffers.isTextureBatching()) {
                 BatchingBuffers.endTextureBatching();
@@ -45,7 +45,7 @@ public abstract class MixinArmorChroma_GuiArmor {
     }
 
     @Inject(method = "draw", at = @At("RETURN"))
-    private void if$beginTextureBatching(CallbackInfo ci) {
+    private void beginTextureBatching(CallbackInfo ci) {
         if (this.wasTextureBatching && ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginTextureBatching();
             this.wasTextureBatching = false;

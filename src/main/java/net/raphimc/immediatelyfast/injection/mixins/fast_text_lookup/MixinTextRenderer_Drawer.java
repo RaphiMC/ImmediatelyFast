@@ -27,7 +27,7 @@ public abstract class MixinTextRenderer_Drawer {
     private FontStorage lastFontStorage;
 
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
-    private VertexConsumer if$reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
+    private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
         if (this.lastRenderLayer == renderLayer) {
             return this.lastVertexConsumer;
         }
@@ -37,7 +37,7 @@ public abstract class MixinTextRenderer_Drawer {
     }
 
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;getFontStorage(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;"))
-    private FontStorage if$reduceGetFontStorageCalls(TextRenderer instance, Identifier id) {
+    private FontStorage reduceGetFontStorageCalls(TextRenderer instance, Identifier id) {
         if (this.lastFont == id) {
             return this.lastFontStorage;
         }
