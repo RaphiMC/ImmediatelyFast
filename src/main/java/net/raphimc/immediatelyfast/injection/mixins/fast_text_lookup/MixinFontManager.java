@@ -19,36 +19,27 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.Font;
 import net.minecraft.client.font.FontManager;
 import net.minecraft.client.font.FontStorage;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.resource.SinglePreparationResourceReloader;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 @Mixin(value = FontManager.class, priority = 500)
 public abstract class MixinFontManager {
 
-    @Mutable
     @Shadow
     @Final
-    private ResourceReloader resourceReloadListener;
-
-    @Shadow
-    @Final
-    Map<Identifier, FontStorage> fontStorages;
+    private Map<Identifier, FontStorage> fontStorages;
 
     @Shadow
     private Map<Identifier, Identifier> idOverrides;
@@ -65,31 +56,13 @@ public abstract class MixinFontManager {
     @Unique
     private FontStorage unicodeFontStorage;
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void hookReloader(TextureManager manager, CallbackInfo ci) {
-        this.resourceReloadListener = new SinglePreparationResourceReloader<Map<Identifier, List<Font>>>() {
-            private final ResourceReloader delegate = resourceReloadListener;
-
-            @Override
-            protected Map<Identifier, List<Font>> prepare(ResourceManager manager, Profiler profiler) {
-                return ((ISinglePreparationResourceReloader) this.delegate).invokePrepare(manager, profiler);
-            }
-
-            @Override
-            protected void apply(Map<Identifier, List<Font>> prepared, ResourceManager manager, Profiler profiler) {
-                ((ISinglePreparationResourceReloader) this.delegate).invokeApply(prepared, manager, profiler);
-                rebuildOverriddenFontStorages();
-            }
-
-            @Override
-            public String getName() {
-                return this.delegate.getName();
-            }
-        };
+    @Inject(method = "reload(Lnet/minecraft/client/font/FontManager$ProviderIndex;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
+    private void rebuildOverriddenFontStoragesOnReload(CallbackInfo ci) {
+        this.rebuildOverriddenFontStorages();
     }
 
     @Inject(method = "setIdOverrides", at = @At("RETURN"))
-    private void rebuildOverriddenFontStorages(CallbackInfo ci) {
+    private void rebuildOverriddenFontStoragesOnChange(CallbackInfo ci) {
         this.rebuildOverriddenFontStorages();
     }
 

@@ -79,7 +79,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
             if (armorItem.getSlotType() == armorSlot) {
                 this.getContextModel().copyBipedStateTo(model);
                 this.setVisible(model, armorSlot);
-                ArmorTrim.getTrim(entity.world.getRegistryManager(), itemStack).ifPresent((trim) -> {
+                ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), itemStack).ifPresent((trim) -> {
                     this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, itemStack.hasGlint(), model, this.usesInnerModel(armorSlot), 1.0F, 1.0F, 1.0F);
                 });
             }

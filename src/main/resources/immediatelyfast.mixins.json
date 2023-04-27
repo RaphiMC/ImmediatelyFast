@@ -16,7 +16,6 @@
     "fast_buffer_upload.MixinVertexBuffer",
     "fast_text_lookup.ISinglePreparationResourceReloader",
     "fast_text_lookup.MixinFontManager",
-    "fast_text_lookup.MixinFontStorage",
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
     "hud_batching.MixinInGameHud",
