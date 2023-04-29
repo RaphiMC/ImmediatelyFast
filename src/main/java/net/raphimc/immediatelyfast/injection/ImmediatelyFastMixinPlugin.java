@@ -75,6 +75,12 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (packageName.startsWith("hud_batching.compat.armorchroma") && !FabricLoader.getInstance().isModLoaded("armorchroma")) {
+            return false;
+        } else if (packageName.startsWith("hud_batching.compat.appleskin") && !FabricLoader.getInstance().isModLoaded("appleskin")) {
+            return false;
+        }
+
         return true;
     }
 

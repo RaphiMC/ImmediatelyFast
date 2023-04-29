@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.armorchroma;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,27 +27,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("UnresolvedMixinReference")
 @Mixin(targets = "nukeduck.armorchroma.GuiArmor", remap = false)
-@Pseudo
 public abstract class MixinArmorChroma_GuiArmor {
 
     @Unique
-    private boolean wasTextureBatching;
+    private boolean wasHudBatching;
 
     @Inject(method = "draw", at = @At("HEAD"))
-    private void if$endTextureBatching(CallbackInfo ci) {
+    private void if$endHudBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             if (BatchingBuffers.isTextureBatching()) {
-                BatchingBuffers.endTextureBatching();
-                this.wasTextureBatching = true;
+                BatchingBuffers.endHudBatching();
+                this.wasHudBatching = true;
             }
         }
     }
 
     @Inject(method = "draw", at = @At("RETURN"))
-    private void if$beginTextureBatching(CallbackInfo ci) {
-        if (this.wasTextureBatching && ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginTextureBatching();
-            this.wasTextureBatching = false;
+    private void if$beginHudBatching(CallbackInfo ci) {
+        if (this.wasHudBatching) {
+            BatchingBuffers.beginHudBatching();
+            this.wasHudBatching = false;
         }
     }
 
