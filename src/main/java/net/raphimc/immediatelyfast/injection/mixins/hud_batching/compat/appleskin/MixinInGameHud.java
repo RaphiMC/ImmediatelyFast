@@ -15,40 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.appleskin;
 
+import net.minecraft.client.gui.hud.InGameHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "nukeduck.armorchroma.GuiArmor", remap = false)
-@Pseudo
-public abstract class MixinArmorChroma_GuiArmor {
+@Mixin(value = InGameHud.class, priority = 1500)
+public abstract class MixinInGameHud {
 
     @Unique
-    private boolean wasTextureBatching;
+    private boolean wasHudBatching;
 
-    @Inject(method = "draw", at = @At("HEAD"))
-    private void endTextureBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            if (BatchingBuffers.isTextureBatching()) {
-                BatchingBuffers.endTextureBatching();
-                this.wasTextureBatching = true;
-            }
+    @Inject(method = "renderStatusBars", at = @At(value = "CONSTANT", args = "stringValue=food", shift = At.Shift.BEFORE))
+    private void endHudBatching(CallbackInfo ci) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isTextureBatching()) {
+            BatchingBuffers.endHudBatching();
+            this.wasHudBatching = true;
         }
     }
 
-    @Inject(method = "draw", at = @At("RETURN"))
-    private void beginTextureBatching(CallbackInfo ci) {
-        if (this.wasTextureBatching && ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginTextureBatching();
-            this.wasTextureBatching = false;
+    @Inject(method = "renderStatusBars", at = @At(value = "CONSTANT", args = "stringValue=food", shift = At.Shift.BY, by = 2))
+    private void beginHudBatching(CallbackInfo ci) {
+        if (this.wasHudBatching) {
+            BatchingBuffers.beginHudBatching();
+            this.wasHudBatching = false;
         }
     }
 
