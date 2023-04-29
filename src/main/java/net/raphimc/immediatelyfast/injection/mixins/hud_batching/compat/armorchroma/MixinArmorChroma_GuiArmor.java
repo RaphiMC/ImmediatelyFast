@@ -36,11 +36,9 @@ public abstract class MixinArmorChroma_GuiArmor {
 
     @Inject(method = "draw", at = @At("HEAD"))
     private void if$endHudBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            if (BatchingBuffers.isTextureBatching()) {
-                BatchingBuffers.endHudBatching();
-                this.wasHudBatching = true;
-            }
+        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isTextureBatching()) {
+            BatchingBuffers.endHudBatching();
+            this.wasHudBatching = true;
         }
     }
 
