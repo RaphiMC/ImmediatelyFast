@@ -21,6 +21,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.BakedModel;
@@ -53,8 +54,8 @@ public abstract class MixinDrawContext {
     @Final
     private MinecraftClient client;
 
-    @Inject(method = "fill(IIIIII)V", at = @At("HEAD"), cancellable = true)
-    private void fillIntoBuffer(int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
+    @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
+    private void fillIntoBuffer(RenderLayer layer, int x1, int x2, int y1, int y2, int z, int color, CallbackInfo ci) {
         if (BatchingBuffers.FILL_CONSUMER != null) {
             ci.cancel();
             if (x1 < x2) {
@@ -72,13 +73,11 @@ public abstract class MixinDrawContext {
             final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
             color = ColorHelper.Argb.mixColor(color, argb);
 
-            RenderSystem.enableBlend();
-            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(layer);
             vertexConsumer.vertex(matrix, x1, y2, z).color(color).next();
             vertexConsumer.vertex(matrix, x2, y2, z).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, z).color(color).next();
             vertexConsumer.vertex(matrix, x1, y1, z).color(color).next();
-            RenderSystem.disableBlend();
         }
     }
 

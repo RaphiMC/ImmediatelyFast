@@ -40,7 +40,7 @@ public abstract class MixinVertexBuffer {
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
         if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
-            RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
+            RenderSystem.glBufferData(target, data, usage);
         } else {
             GL15C.glBufferSubData(target, 0, data);
         }
@@ -50,7 +50,7 @@ public abstract class MixinVertexBuffer {
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
-            RenderSystem.glBufferData(target, data, GL15C.GL_DYNAMIC_DRAW);
+            RenderSystem.glBufferData(target, data, usage);
         } else {
             GL15C.glBufferSubData(target, 0, data);
         }

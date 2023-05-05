@@ -44,12 +44,6 @@ public class BatchingRenderLayers {
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
     }, blendFuncDepthFunc::revert));
 
-    public static final Function<BlendFuncDepthFunc, RenderLayer> FILLED_QUAD = memoize(blendFuncDepthFunc -> new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
-        blendFuncDepthFunc.apply();
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-    }, blendFuncDepthFunc::revert));
-
 
     public static <A> Function<A, RenderLayer> memoizeTemp(final Function<A, RenderLayer> function) {
         return new Function<>() {
