@@ -55,7 +55,7 @@ public abstract class MixinDrawContext {
     private MinecraftClient client;
 
     @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
-    private void fillIntoBuffer(RenderLayer layer, int x1, int x2, int y1, int y2, int z, int color, CallbackInfo ci) {
+    private void fillIntoBuffer(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
         if (BatchingBuffers.FILL_CONSUMER != null) {
             ci.cancel();
             if (x1 < x2) {
@@ -82,7 +82,7 @@ public abstract class MixinDrawContext {
     }
 
     @Inject(method = "drawTexturedQuad(Lnet/minecraft/util/Identifier;IIIIIFFFF)V", at = @At("HEAD"), cancellable = true)
-    private void drawTexturedQuadIntoBuffer(Identifier texture, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1, CallbackInfo ci) {
+    private void drawTexturedQuadIntoBuffer(Identifier texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, CallbackInfo ci) {
         if (BatchingBuffers.TEXTURE_CONSUMER != null) {
             ci.cancel();
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
@@ -92,15 +92,15 @@ public abstract class MixinDrawContext {
             final int b = (int) (shaderColor[2] * 255);
             final int a = (int) (shaderColor[3] * 255);
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFunc.current()));
-            vertexConsumer.vertex(matrix, x0, y1, z).texture(u0, v1).color(r, g, b, a).next();
+            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a).next();
+            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a).next();
+            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a).next();
-            vertexConsumer.vertex(matrix, x1, y0, z).texture(u1, v0).color(r, g, b, a).next();
-            vertexConsumer.vertex(matrix, x0, y0, z).texture(u0, v0).color(r, g, b, a).next();
         }
     }
 
     @Inject(method = "drawTexturedQuad(Lnet/minecraft/util/Identifier;IIIIIFFFFFFFF)V", at = @At("HEAD"), cancellable = true)
-    private void drawTexturedQuadIntoBuffer(Identifier texture, int x0, int x1, int y0, int y1, int z, float u0, float u1, float v0, float v1, float red, float green, float blue, float alpha, CallbackInfo ci) {
+    private void drawTexturedQuadIntoBuffer(Identifier texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha, CallbackInfo ci) {
         if (BatchingBuffers.TEXTURE_CONSUMER != null) {
             ci.cancel();
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
@@ -110,10 +110,10 @@ public abstract class MixinDrawContext {
 
             RenderSystem.enableBlend();
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFunc.current()));
-            vertexConsumer.vertex(matrix, x0, y1, z).texture(u0, v1).color(color).next();
+            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(color).next();
+            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(color).next();
+            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(color).next();
             vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(color).next();
-            vertexConsumer.vertex(matrix, x1, y0, z).texture(u1, v0).color(color).next();
-            vertexConsumer.vertex(matrix, x0, y0, z).texture(u0, v0).color(color).next();
             RenderSystem.disableBlend();
         }
     }
