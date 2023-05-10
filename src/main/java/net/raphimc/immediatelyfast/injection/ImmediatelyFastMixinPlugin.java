@@ -18,13 +18,13 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
@@ -44,7 +44,7 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             }
         }
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_os_conflict_handling) {
-            if (MinecraftClient.IS_SYSTEM_MAC) {
+            if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
                 ImmediatelyFast.LOGGER.warn("macOS detected. Force disabling Fast Buffer Upload optimization.");
                 ImmediatelyFast.config.fast_buffer_upload = false;
             }
