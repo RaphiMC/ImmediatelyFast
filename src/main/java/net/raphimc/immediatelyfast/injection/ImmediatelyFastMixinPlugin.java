@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -40,6 +41,12 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             if (FabricLoader.getInstance().isModLoaded("slight-gui-modifications")) {
                 ImmediatelyFast.LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
                 ImmediatelyFast.config.hud_batching = false;
+            }
+        }
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_os_conflict_handling) {
+            if (MinecraftClient.IS_SYSTEM_MAC) {
+                ImmediatelyFast.LOGGER.warn("macOS detected. Force disabling Fast Buffer Upload optimization.");
+                ImmediatelyFast.config.fast_buffer_upload = false;
             }
         }
     }
