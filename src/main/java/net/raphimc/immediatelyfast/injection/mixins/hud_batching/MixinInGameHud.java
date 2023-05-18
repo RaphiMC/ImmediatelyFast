@@ -64,6 +64,8 @@ public abstract class MixinInGameHud {
             BatchingBuffers.endTextureBatching();
             BatchingBuffers.endFillBatching();
             BatchingBuffers.endTextBatching();
+            BatchingBuffers.endItemModelBatching();
+            BatchingBuffers.endItemOverlayBatching();
         } else {
             operation.call(instance, matrices);
         }
@@ -125,12 +127,10 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbar(FLnet/minecraft/client/util/math/MatrixStack;)V"),
     })
     private void if$Batching(@Coerce final Object instance, final float tickDelta, final MatrixStack matrices, final Operation<Void> operation) {
-        if (ImmediatelyFast.config.experimental_item_hud_batching && ImmediatelyFast.runtimeConfig.hud_batching) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
-            BatchingBuffers.beginItemBatching();
             operation.call(instance, tickDelta, matrices);
             BatchingBuffers.endHudBatching();
-            BatchingBuffers.endItemBatching();
         } else {
             operation.call(instance, tickDelta, matrices);
         }
