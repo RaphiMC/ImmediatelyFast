@@ -65,6 +65,8 @@ public abstract class MixinInGameHud {
             BatchingBuffers.endTextureBatching();
             BatchingBuffers.endFillBatching();
             BatchingBuffers.endTextBatching();
+            BatchingBuffers.endItemModelBatching();
+            BatchingBuffers.endItemOverlayBatching();
         } else {
             operation.call(instance, drawContext);
         }
@@ -126,12 +128,10 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHotbar(FLnet/minecraft/client/gui/DrawContext;)V"),
     })
     private void batching(@Coerce final Object instance, final float tickDelta, final DrawContext drawContext, final Operation<Void> operation) {
-        if (ImmediatelyFast.config.item_hud_batching && ImmediatelyFast.runtimeConfig.hud_batching) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
-            BatchingBuffers.beginItemBatching();
             operation.call(instance, tickDelta, drawContext);
             BatchingBuffers.endHudBatching();
-            BatchingBuffers.endItemBatching();
         } else {
             operation.call(instance, tickDelta, drawContext);
         }
