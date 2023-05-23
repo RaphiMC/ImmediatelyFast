@@ -47,7 +47,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     protected abstract void setVisible(A bipedModel, EquipmentSlot slot);
 
     @Shadow
-    protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, boolean glint, A model, boolean leggings, float red, float green, float blue);
+    protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, A bipedEntityModel, boolean bl);
 
     @Shadow
     protected abstract boolean usesInnerModel(EquipmentSlot slot);
@@ -79,8 +79,8 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
             if (armorItem.getSlotType() == armorSlot) {
                 this.getContextModel().copyBipedStateTo(model);
                 this.setVisible(model, armorSlot);
-                ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), itemStack).ifPresent((trim) -> {
-                    this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, itemStack.hasGlint(), model, this.usesInnerModel(armorSlot), 1.0F, 1.0F, 1.0F);
+                ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), itemStack).ifPresent(trim -> {
+                    this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, model, this.usesInnerModel(armorSlot));
                 });
             }
         }
