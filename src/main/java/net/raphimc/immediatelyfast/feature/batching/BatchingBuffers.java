@@ -62,20 +62,16 @@ public class BatchingBuffers {
         beginFillBatching();
         beginTextureBatching();
         beginTextBatching();
-        if (ImmediatelyFast.config.item_hud_batching) {
-            beginItemModelBatching();
-            beginItemOverlayBatching();
-        }
+        beginItemModelBatching();
+        beginItemOverlayBatching();
     }
 
     public static void endHudBatching() {
         endFillBatching();
         endTextureBatching();
         endTextBatching();
-        if (ImmediatelyFast.config.item_hud_batching) {
-            endItemModelBatching();
-            endItemOverlayBatching();
-        }
+        endItemModelBatching();
+        endItemOverlayBatching();
     }
 
     @Deprecated

@@ -53,7 +53,9 @@ public abstract class MixinGameRenderer {
             "rendertype_text_background_see_through",
             "rendertype_text_intensity",
             "rendertype_text_intensity_see_through",
-            "rendertype_text_see_through"
+            "rendertype_text_see_through",
+            "rendertype_entity_translucent_cull",
+            "rendertype_item_entity_translucent_cull"
     );
 
     @Inject(method = "loadPrograms", at = @At("RETURN"))

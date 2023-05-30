@@ -24,7 +24,6 @@ public class ImmediatelyFastConfig {
     public boolean font_atlas_resizing = true;
     public boolean map_atlas_generation = true;
     public boolean hud_batching = true;
-    public boolean item_hud_batching = true;
     public boolean fast_text_lookup = true;
     public boolean fast_buffer_upload = true;
 
