@@ -33,7 +33,6 @@ public class ImmediatelyFastConfig {
 
     // Experimental config values
     private String EXPERIMENTAL_INFO = "----- Experimental config values below (Rendering glitches may occur) -----";
-    public boolean experimental_item_hud_batching = false;
     public boolean experimental_disable_error_checking = false;
     public boolean experimental_disable_resource_pack_conflict_handling = false;
 
