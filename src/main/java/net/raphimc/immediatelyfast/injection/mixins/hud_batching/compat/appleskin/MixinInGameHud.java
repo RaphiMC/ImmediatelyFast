@@ -34,7 +34,7 @@ public abstract class MixinInGameHud {
 
     @Inject(method = "renderStatusBars", at = @At(value = "CONSTANT", args = "stringValue=food", shift = At.Shift.BEFORE))
     private void endHudBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isTextureBatching()) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isHudBatching()) {
             BatchingBuffers.endHudBatching();
             this.wasHudBatching = true;
         }

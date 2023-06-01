@@ -42,30 +42,13 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;render(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;renderSpectatorMenu(Lnet/minecraft/client/util/math/MatrixStack;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHeldItemTooltip(Lnet/minecraft/client/util/math/MatrixStack;)V"),
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"),
     })
     private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final Operation<Void> operation) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
             operation.call(instance, matrices);
             BatchingBuffers.endHudBatching();
-        } else {
-            operation.call(instance, matrices);
-        }
-    }
-
-    @WrapOperation(method = "render", at = {
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/util/math/MatrixStack;)V"),
-    })
-    private void if$StatusOverlayBatching(@Coerce final Object instance, final MatrixStack matrices, final Operation<Void> operation) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginHudBatching();
-            operation.call(instance, matrices);
-            // https://github.com/A5b84/status-effect-bars draws fill over texture
-            BatchingBuffers.endTextureBatching();
-            BatchingBuffers.endFillBatching();
-            BatchingBuffers.endTextBatching();
-            BatchingBuffers.endItemModelBatching();
-            BatchingBuffers.endItemOverlayBatching();
         } else {
             operation.call(instance, matrices);
         }
