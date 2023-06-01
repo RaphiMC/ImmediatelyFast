@@ -42,6 +42,7 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;render(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;renderSpectatorMenu(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHeldItemTooltip(Lnet/minecraft/client/gui/DrawContext;)V"),
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;render(Lnet/minecraft/client/gui/DrawContext;)V"),
     })
     private void batching(@Coerce final Object instance, final DrawContext drawContext, final Operation<Void> operation) {
@@ -49,24 +50,6 @@ public abstract class MixinInGameHud {
             BatchingBuffers.beginHudBatching();
             operation.call(instance, drawContext);
             BatchingBuffers.endHudBatching();
-        } else {
-            operation.call(instance, drawContext);
-        }
-    }
-
-    @WrapOperation(method = "render", at = {
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/gui/DrawContext;)V"),
-    })
-    private void statusOverlayBatching(@Coerce final Object instance, final DrawContext drawContext, final Operation<Void> operation) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginHudBatching();
-            operation.call(instance, drawContext);
-            // https://github.com/A5b84/status-effect-bars draws fill over texture
-            BatchingBuffers.endTextureBatching();
-            BatchingBuffers.endFillBatching();
-            BatchingBuffers.endTextBatching();
-            BatchingBuffers.endItemModelBatching();
-            BatchingBuffers.endItemOverlayBatching();
         } else {
             operation.call(instance, drawContext);
         }
