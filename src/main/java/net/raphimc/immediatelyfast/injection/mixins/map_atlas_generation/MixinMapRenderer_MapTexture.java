@@ -83,7 +83,7 @@ public abstract class MixinMapRenderer_MapTexture {
         this.atlasTexture = ((IMapRenderer) mapRenderer).getMapAtlasTexture(packedLocation >> 16);
     }
 
-    @Redirect(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/client/texture/NativeImageBackedTexture"))
+    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
     private NativeImageBackedTexture dontAllocateTexture(int width, int height, boolean useMipmaps) {
         if (this.atlasTexture != null) {
             return DUMMY_TEXTURE;
