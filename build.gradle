@@ -23,8 +23,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    include(implementation("com.github.LlamaLad7:MixinExtras:0.1.1"))
-    annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
+    annotationProcessor(include(implementation("com.github.LlamaLad7:MixinExtras:0.2.0-beta.8")))
     include(implementation("net.lenni0451:Reflect:1.1.0"))
 }
 
