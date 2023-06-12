@@ -72,9 +72,11 @@ public class BatchingBuffers {
         FILL_CONSUMER = null;
         TEXTURE_CONSUMER = null;
         TEXT_CONSUMER = null;
+        final RenderSystemState renderSystemState = RenderSystemState.current();
         HUD_BATCH.draw();
         endItemModelBatching();
         endItemOverlayBatching();
+        renderSystemState.apply();
     }
 
     public static boolean isHudBatching() {
