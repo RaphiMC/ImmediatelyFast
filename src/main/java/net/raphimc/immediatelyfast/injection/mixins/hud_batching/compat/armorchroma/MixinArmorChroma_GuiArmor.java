@@ -19,7 +19,6 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.armorch
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
-import net.raphimc.immediatelyfast.feature.batching.RenderSystemState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,9 +37,7 @@ public abstract class MixinArmorChroma_GuiArmor {
     @Inject(method = "draw", at = @At("HEAD"))
     private void if$endHudBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isHudBatching()) {
-            final RenderSystemState renderSystemState = RenderSystemState.current();
             BatchingBuffers.endHudBatching();
-            renderSystemState.apply();
             this.wasHudBatching = true;
         }
     }
