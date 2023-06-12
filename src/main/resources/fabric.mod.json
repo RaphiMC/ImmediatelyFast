@@ -18,9 +18,6 @@
   "entrypoints": {
     "client": [
       "net.raphimc.immediatelyfast.ImmediatelyFast"
-    ],
-    "preLaunch": [
-      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ]
   },
   "accessWidener": "immediatelyfast.accesswidener",
