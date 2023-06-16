@@ -27,18 +27,17 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.trim.ArmorTrim;
-import net.minecraft.registry.DynamicRegistryManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(value = ArmorFeatureRenderer.class, priority = 500)
 public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extends BipedEntityModel<T>, A extends BipedEntityModel<T>> extends FeatureRenderer<T, M> {
@@ -49,41 +48,30 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     @Shadow
     protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, A bipedEntityModel, boolean bl);
 
-    @Shadow
-    protected abstract boolean usesInnerModel(EquipmentSlot slot);
-
-    @Shadow
-    protected abstract A getModel(EquipmentSlot slot);
+    @Unique
+    private final List<Runnable> trimRenderers = new ArrayList<>();
 
     public MixinArmorFeatureRenderer(FeatureRendererContext<T, M> context) {
         super(context);
     }
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
-    private void renderTrimsSeparate(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
-        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.CHEST, i, this.getModel(EquipmentSlot.CHEST));
-        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.LEGS, i, this.getModel(EquipmentSlot.LEGS));
-        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.FEET, i, this.getModel(EquipmentSlot.FEET));
-        this.renderTrim(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.HEAD, i, this.getModel(EquipmentSlot.HEAD));
+    private void renderTrimsSeparate(CallbackInfo ci) {
+        this.trimRenderers.forEach(Runnable::run);
+        this.trimRenderers.clear();
     }
 
-    @Redirect(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/trim/ArmorTrim;getTrim(Lnet/minecraft/registry/DynamicRegistryManager;Lnet/minecraft/item/ItemStack;)Ljava/util/Optional;"))
-    private Optional<ArmorTrim> renderTrimsSeparate(DynamicRegistryManager registryManager, ItemStack stack) {
-        return Optional.empty();
-    }
-
-    @Unique
-    private void renderTrim(final MatrixStack matrices, final VertexConsumerProvider vertexConsumers, final T entity, final EquipmentSlot armorSlot, final int light, final A model) {
-        final ItemStack itemStack = entity.getEquippedStack(armorSlot);
-        if (itemStack.getItem() instanceof ArmorItem armorItem) {
-            if (armorItem.getSlotType() == armorSlot) {
-                this.getContextModel().copyBipedStateTo(model);
-                this.setVisible(model, armorSlot);
-                ArmorTrim.getTrim(entity.getWorld().getRegistryManager(), itemStack).ifPresent(trim -> {
-                    this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, model, this.usesInnerModel(armorSlot));
-                });
-            }
-        }
+    /**
+     * @author RK_01
+     * @reason Render armor trims in a separate pass
+     */
+    @Overwrite
+    private void method_48483(ArmorItem armorItem, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, A model, boolean leggings, ArmorTrim trim) {
+        this.trimRenderers.add(() -> {
+            this.getContextModel().copyBipedStateTo(model);
+            this.setVisible(model, armorItem.getSlotType());
+            this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, model, leggings);
+        });
     }
 
 }
