@@ -4,11 +4,11 @@ plugins {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-compileJava.options.encoding = "UTF-8"
+compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
 group = project.maven_group
+archivesBaseName = project.maven_name
+version = project.maven_version
 
 repositories {
     mavenCentral()
