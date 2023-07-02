@@ -40,6 +40,6 @@ public class ImmediatelyFastConfig {
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";
     public boolean debug_only_and_not_recommended_disable_universal_batching = false;
     public boolean debug_only_and_not_recommended_disable_mod_conflict_handling = false;
-    public boolean debug_only_and_not_recommended_disable_os_conflict_handling = false;
+    public boolean debug_only_and_not_recommended_disable_hardware_conflict_handling = false;
 
 }

@@ -76,7 +76,7 @@ public abstract class MixinGameRenderer {
             ImmediatelyFast.LOGGER.warn("Core shader modifications detected. Temporarily disabling some parts of ImmediatelyFast.");
             ImmediatelyFast.runtimeConfig.hud_batching = false;
         } else {
-            ImmediatelyFast.resetRuntimeConfig();
+            ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
         }
     }
 
