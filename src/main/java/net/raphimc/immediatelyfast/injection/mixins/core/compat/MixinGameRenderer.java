@@ -77,7 +77,7 @@ public abstract class MixinGameRenderer {
             ImmediatelyFast.runtimeConfig.hud_batching = false;
             ImmediatelyFast.runtimeConfig.universal_batching_text = false;
         } else {
-            ImmediatelyFast.resetRuntimeConfig();
+            ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
         }
     }
 

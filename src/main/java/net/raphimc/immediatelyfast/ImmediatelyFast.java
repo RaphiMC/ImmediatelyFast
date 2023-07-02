@@ -19,11 +19,13 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
+import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -51,6 +53,17 @@ public class ImmediatelyFast implements ClientModInitializer {
                 IrisCompat.init();
             });
         }
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+            if (ImmediatelyFast.config.fast_buffer_upload) {
+                RenderSystem.recordRenderCall(() -> {
+                    final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
+                    if (gpuVendor != null && gpuVendor.toLowerCase().contains("intel")) {
+                        LOGGER.warn("Intel GPU detected. Force disabling Fast Buffer Upload optimization.");
+                        ImmediatelyFast.runtimeConfig.fast_buffer_upload = false;
+                    }
+                });
+            }
+        }
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
 
@@ -71,10 +84,9 @@ public class ImmediatelyFast implements ClientModInitializer {
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
-        resetRuntimeConfig();
     }
 
-    public static void resetRuntimeConfig() {
+    public static void createRuntimeConfig() {
         runtimeConfig = new ImmediatelyFastRuntimeConfig(config);
     }
 
