@@ -19,8 +19,9 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.lwjgl.opengl.GL15C;
+import org.lwjgl.opengl.GL30C;
+import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,21 +40,25 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
-        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || data.remaining() > this.vertexBufferSize) {
+        if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
         } else {
-            GL15C.glBufferSubData(target, 0, data);
+            final long addr = GL30C.nglMapBufferRange(target, 0, data.remaining(), GL30C.GL_MAP_WRITE_BIT | GL30C.GL_MAP_INVALIDATE_BUFFER_BIT);
+            MemoryUtil.memCopy(MemoryUtil.memAddress(data), addr, data.remaining());
+            GL15C.glUnmapBuffer(target);
         }
     }
 
     @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
-        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || data.remaining() > this.indexBufferSize) {
+        if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
         } else {
-            GL15C.glBufferSubData(target, 0, data);
+            final long addr = GL30C.nglMapBufferRange(target, 0, data.remaining(), GL30C.GL_MAP_WRITE_BIT | GL30C.GL_MAP_INVALIDATE_BUFFER_BIT);
+            MemoryUtil.memCopy(MemoryUtil.memAddress(data), addr, data.remaining());
+            GL15C.glUnmapBuffer(target);
         }
     }
 

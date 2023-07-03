@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
@@ -41,12 +40,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             if (ImmediatelyFast.config.hud_batching && FabricLoader.getInstance().isModLoaded("slight-gui-modifications")) {
                 ImmediatelyFast.LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
                 ImmediatelyFast.config.hud_batching = false;
-            }
-        }
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
-            if (ImmediatelyFast.config.fast_buffer_upload && System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
-                ImmediatelyFast.LOGGER.warn("macOS detected. Force disabling Fast Buffer Upload optimization.");
-                ImmediatelyFast.config.fast_buffer_upload = false;
             }
         }
 
