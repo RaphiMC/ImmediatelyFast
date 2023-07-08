@@ -8,6 +8,7 @@ accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/mi
 accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
+accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
 accessible class net/minecraft/client/render/MapRenderer$MapTexture
 
 accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendFuncState;
