@@ -38,9 +38,16 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
         );
     }
 
-    public void apply() {
+    public void saveAndApply() {
         STACK.push(current());
+        this.apply();
+    }
 
+    public void revert() {
+        STACK.pop().apply();
+    }
+
+    private void apply() {
         if (BLEND) {
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
@@ -53,10 +60,6 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
         } else {
             RenderSystem.disableDepthTest();
         }
-    }
-
-    public void revert() {
-        STACK.pop().apply();
     }
 
 }
