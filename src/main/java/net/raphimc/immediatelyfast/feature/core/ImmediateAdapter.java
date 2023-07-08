@@ -56,19 +56,24 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
-        final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
-        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
-            throw new IllegalStateException("Tried to write shared vertices into the same buffer");
-        }
-
+        final Optional<RenderLayer> newLayer = layer.asOptional();
         if (!this.drawFallbackLayersFirst) {
-            final Optional<RenderLayer> newLayer = layer.asOptional();
             if (!this.currentLayer.equals(newLayer)) {
                 if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(this.currentLayer.get())) {
                     this.drawFallbackLayersFirst = true;
                 }
             }
-            this.currentLayer = newLayer;
+        }
+
+        // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81
+        if (this.isTextRenderLayer(layer) && this.currentLayer.isPresent() && this.isTextRenderLayer(this.currentLayer.get()) && !this.currentLayer.equals(newLayer)) {
+            this.drawCurrentLayer();
+        }
+        this.currentLayer = newLayer;
+
+        final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
+        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
+            throw new IllegalStateException("Tried to write shared vertices into the same buffer");
         }
 
         if (!bufferBuilder.isBuilding()) {
@@ -172,6 +177,10 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         final BufferBuilder bufferBuilder = BufferBuilderPool.get();
         this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
         return bufferBuilder;
+    }
+
+    protected boolean isTextRenderLayer(final RenderLayer layer) {
+        return layer.name.startsWith("text");
     }
 
 }
