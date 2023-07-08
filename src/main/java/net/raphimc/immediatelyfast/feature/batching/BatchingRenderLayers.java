@@ -38,14 +38,14 @@ import static net.minecraft.util.Util.memoize;
 public class BatchingRenderLayers {
 
     public static final BiFunction<Integer, BlendFuncDepthFunc, RenderLayer> COLORED_TEXTURE = memoize((id, blendFuncDepthFunc) -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
-        blendFuncDepthFunc.apply();
+        blendFuncDepthFunc.saveAndApply();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
     }, blendFuncDepthFunc::revert));
 
     public static final Function<BlendFuncDepthFunc, RenderLayer> FILLED_QUAD = memoize(blendFuncDepthFunc -> new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
-        blendFuncDepthFunc.apply();
+        blendFuncDepthFunc.saveAndApply();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
     }, blendFuncDepthFunc::revert));
