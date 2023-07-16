@@ -64,11 +64,6 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
                 }
             }
         }
-
-        // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81
-        if (this.isTextRenderLayer(layer) && this.currentLayer.isPresent() && this.isTextRenderLayer(this.currentLayer.get()) && !this.currentLayer.equals(newLayer)) {
-            this.drawCurrentLayer();
-        }
         this.currentLayer = newLayer;
 
         final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
@@ -177,10 +172,6 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         final BufferBuilder bufferBuilder = BufferBuilderPool.get();
         this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
         return bufferBuilder;
-    }
-
-    protected boolean isTextRenderLayer(final RenderLayer layer) {
-        return layer.name.startsWith("text");
     }
 
 }

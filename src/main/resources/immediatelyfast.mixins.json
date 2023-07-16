@@ -12,6 +12,7 @@
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
     "core.compat.MixinGameRenderer",
+    "core.compat.MixinTextRenderer_Drawer",
     "disable_error_checking.MixinGL11",
     "fast_buffer_upload.MixinVertexBuffer",
     "fast_text_lookup.ISinglePreparationResourceReloader",
