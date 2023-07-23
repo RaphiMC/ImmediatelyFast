@@ -83,6 +83,13 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            if (mixinName.equals("core.MixinArmorFeatureRenderer") && FabricLoader.getInstance().isModLoaded("showmeyourskin")) {
+                ImmediatelyFast.LOGGER.warn("Show Me Your Skin detected. Disabling separate armor trim pass optimization.");
+                return false;
+            }
+        }
+
         return true;
     }
 
