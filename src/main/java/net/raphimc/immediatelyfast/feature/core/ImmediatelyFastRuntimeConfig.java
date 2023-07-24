@@ -22,11 +22,13 @@ public class ImmediatelyFastRuntimeConfig {
     public boolean hud_batching;
     public boolean fast_buffer_upload;
     public boolean universal_batching_text;
+    public boolean legacy_fast_buffer_upload;
 
     public ImmediatelyFastRuntimeConfig(final ImmediatelyFastConfig config) {
         this.hud_batching = config.hud_batching;
         this.fast_buffer_upload = config.fast_buffer_upload;
         this.universal_batching_text = true;
+        this.legacy_fast_buffer_upload = false;
     }
 
 }
