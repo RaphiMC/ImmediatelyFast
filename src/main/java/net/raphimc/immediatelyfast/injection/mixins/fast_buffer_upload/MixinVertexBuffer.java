@@ -19,18 +19,26 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.lwjgl.opengl.GL15C;
-import org.lwjgl.opengl.GL30C;
-import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.ByteBuffer;
 
 @Mixin(value = VertexBuffer.class, priority = 500)
 public abstract class MixinVertexBuffer {
+
+    @Shadow
+    private int vertexBufferId;
+
+    @Shadow
+    private int indexBufferId;
 
     @Unique
     private int vertexBufferSize;
@@ -43,10 +51,12 @@ public abstract class MixinVertexBuffer {
         if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() < ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+            ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.vertexBufferId, data);
+        } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+            GL15C.glBufferSubData(target, 0, data);
         } else {
-            final long addr = GL30C.nglMapBufferRange(target, 0, data.remaining(), GL30C.GL_MAP_WRITE_BIT | GL30C.GL_MAP_INVALIDATE_BUFFER_BIT);
-            MemoryUtil.memCopy(MemoryUtil.memAddress(data), addr, data.remaining());
-            GL15C.glUnmapBuffer(target);
+            RenderSystem.glBufferData(target, data, usage);
         }
     }
 
@@ -55,10 +65,19 @@ public abstract class MixinVertexBuffer {
         if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() < ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+            ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.indexBufferId, data);
+        } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+            GL15C.glBufferSubData(target, 0, data);
         } else {
-            final long addr = GL30C.nglMapBufferRange(target, 0, data.remaining(), GL30C.GL_MAP_WRITE_BIT | GL30C.GL_MAP_INVALIDATE_BUFFER_BIT);
-            MemoryUtil.memCopy(MemoryUtil.memAddress(data), addr, data.remaining());
-            GL15C.glUnmapBuffer(target);
+            RenderSystem.glBufferData(target, data, usage);
+        }
+    }
+
+    @Inject(method = "upload", at = @At("RETURN"))
+    private void flushBuffers(CallbackInfo ci) {
+        if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
+            ImmediatelyFast.persistentMappedStreamingBuffer.flush();
         }
     }
 
