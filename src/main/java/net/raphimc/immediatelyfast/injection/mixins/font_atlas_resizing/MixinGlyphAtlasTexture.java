@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.font_atlas_resizing;
 
 import net.minecraft.client.font.GlyphAtlasTexture;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
@@ -33,12 +34,12 @@ public abstract class MixinGlyphAtlasTexture {
 
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
     private int modifyGlyphAtlasTextureSize(int original) {
-        return 2048;
+        return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048 : 256;
     }
 
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
     private float modifyGlyphAtlasTextureSize(float original) {
-        return 2048F;
+        return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048F : 256F;
     }
 
 }
