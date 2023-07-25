@@ -18,6 +18,8 @@
 package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.Font;
+import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.Resource;
@@ -32,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,10 +77,31 @@ public abstract class MixinGameRenderer {
 
         if (modified && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
             ImmediatelyFast.LOGGER.warn("Core shader modifications detected. Temporarily disabling some parts of ImmediatelyFast.");
+            if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
+                ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
+                this.reloadFontStorages();
+            }
+
             ImmediatelyFast.runtimeConfig.hud_batching = false;
             ImmediatelyFast.runtimeConfig.universal_batching_text = false;
         } else {
+            if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing && ImmediatelyFast.config.font_atlas_resizing) {
+                ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
+                this.reloadFontStorages();
+            }
+
             ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
+            ImmediatelyFast.runtimeConfig.universal_batching_text = true;
+        }
+    }
+
+    @Unique
+    private void reloadFontStorages() {
+        // Force reload the font storages to rebuild the font atlas textures
+        for (FontStorage storage : MinecraftClient.getInstance().fontManager.fontStorages.values()) {
+            final List<Font> fonts = new ArrayList<>(storage.fonts);
+            storage.fonts.clear();
+            storage.setFonts(fonts);
         }
     }
 
