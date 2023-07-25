@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
 import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -45,7 +46,10 @@ public abstract class MixinTextRenderer_Drawer {
 
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
-        if (this.lastRenderLayer == renderLayer) {
+        // The buffer got drawn while rendering the text, so we need to reset the cached data
+        final boolean isBufferInvalid = this.lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.isBuilding();
+
+        if (!isBufferInvalid && this.lastRenderLayer == renderLayer) {
             return this.lastVertexConsumer;
         }
 
