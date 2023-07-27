@@ -74,10 +74,10 @@ public class ImmediatelyFast implements ClientModInitializer {
         if (ImmediatelyFast.config.fast_buffer_upload) {
             RenderSystem.recordRenderCall(() -> {
                 final GLCapabilities cap = GL.getCapabilities();
-                if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage) {
+                if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
                     persistentMappedStreamingBuffer = new PersistentMappedStreamingBuffer(config.fast_buffer_upload_size_mb * 1024 * 1024);
                 } else {
-                    LOGGER.warn("Your GPU doesn't support ARB_direct_state_access and/or ARB_buffer_storage. Falling back to legacy fast buffer upload method.");
+                    LOGGER.warn("Your GPU doesn't support ARB_direct_state_access and/or ARB_buffer_storage and/or glMemoryBarrier. Falling back to legacy fast buffer upload method.");
                     if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling && ImmediatelyFast.config.fast_buffer_upload) {
                         final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
                         if (gpuVendor != null && !gpuVendor.toLowerCase().contains("nvidia")) {
