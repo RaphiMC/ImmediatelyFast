@@ -17,10 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.fast_buffer_upload;
 
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL30C;
-import org.lwjgl.opengl.GL44C;
-import org.lwjgl.opengl.GL45C;
+import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
@@ -65,6 +62,7 @@ public class PersistentMappedStreamingBuffer {
         for (Batch batch : this.batches) {
             GL45C.glCopyNamedBufferSubData(this.id, batch.destinationId, batch.offset, 0, batch.size);
         }
+        GL42C.glMemoryBarrier(GL42C.GL_BUFFER_UPDATE_BARRIER_BIT);
         this.batches.clear();
     }
 
