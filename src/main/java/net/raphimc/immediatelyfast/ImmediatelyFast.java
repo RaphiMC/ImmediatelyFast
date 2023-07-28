@@ -59,17 +59,6 @@ public class ImmediatelyFast implements ClientModInitializer {
                 IrisCompat.init();
             });
         }
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
-            if (ImmediatelyFast.config.fast_buffer_upload) {
-                RenderSystem.recordRenderCall(() -> {
-                    final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
-                    if (gpuVendor != null && gpuVendor.toLowerCase().contains("intel")) {
-                        LOGGER.warn("Intel GPU detected. Force disabling Fast Buffer Upload optimization.");
-                        ImmediatelyFast.runtimeConfig.fast_buffer_upload = false;
-                    }
-                });
-            }
-        }
 
         if (ImmediatelyFast.config.fast_buffer_upload) {
             RenderSystem.recordRenderCall(() -> {
