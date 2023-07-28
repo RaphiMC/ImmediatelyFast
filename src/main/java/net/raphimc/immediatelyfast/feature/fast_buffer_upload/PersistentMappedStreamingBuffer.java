@@ -30,8 +30,9 @@ public class PersistentMappedStreamingBuffer {
     private final int id;
     private final long size;
     private final long addr;
-    private final List<Batch> batches = new ArrayList<>();
 
+    private final List<Batch> batches = new ArrayList<>();
+    private long batchOffset;
     private long offset;
 
     public PersistentMappedStreamingBuffer(final long size) {
@@ -58,10 +59,11 @@ public class PersistentMappedStreamingBuffer {
             this.flush();
             GL11C.glFinish();
             this.offset = 0;
+            this.batchOffset = 0;
         }
 
         MemoryUtil.memCopy(MemoryUtil.memAddress(data), this.addr + this.offset, dataSize);
-        this.batches.add(new Batch(destinationId, this.offset, dataSize));
+        this.batches.add(new Batch(destinationId, dataSize));
         this.offset += dataSize;
     }
 
@@ -69,16 +71,15 @@ public class PersistentMappedStreamingBuffer {
         if (this.batches.isEmpty()) return;
 
         if (ImmediatelyFast.config.fast_buffer_upload_explicit_flush) {
-            for (Batch batch : this.batches) {
-                GL45C.glFlushMappedNamedBufferRange(this.id, batch.offset, batch.size);
-            }
+            GL45C.glFlushMappedNamedBufferRange(this.id, this.batchOffset, this.offset - this.batchOffset);
             GL42C.glMemoryBarrier(GL44C.GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
         }
         for (Batch batch : this.batches) {
-            GL45C.glCopyNamedBufferSubData(this.id, batch.destinationId, batch.offset, 0, batch.size);
+            GL45C.glCopyNamedBufferSubData(this.id, batch.destinationId, this.batchOffset, 0, batch.size);
+            this.batchOffset += batch.size;
         }
-        GL42C.glMemoryBarrier(GL42C.GL_BUFFER_UPDATE_BARRIER_BIT);
         this.batches.clear();
+        GL42C.glMemoryBarrier(GL42C.GL_BUFFER_UPDATE_BARRIER_BIT);
     }
 
     public long getSize() {
@@ -89,7 +90,7 @@ public class PersistentMappedStreamingBuffer {
         return this.offset;
     }
 
-    private record Batch(int destinationId, long offset, int size) {
+    private record Batch(int destinationId, int size) {
     }
 
 }
