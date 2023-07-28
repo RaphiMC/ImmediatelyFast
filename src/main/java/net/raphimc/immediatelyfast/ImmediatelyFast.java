@@ -67,17 +67,26 @@ public class ImmediatelyFast implements ClientModInitializer {
             final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
             LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
+            final boolean isNvidia = gpuVendor != null && gpuVendor.toLowerCase().contains("nvidia");
+            final boolean isAmd = gpuVendor != null && gpuVendor.toLowerCase().contains("amd");
+            final boolean isIntel = gpuVendor != null && gpuVendor.toLowerCase().contains("intel");
+
             if (ImmediatelyFast.config.fast_buffer_upload) {
                 if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
+                    if (isAmd && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+                        // Explicit flush causes AMD GPUs to stall the pipeline a lot.
+                        LOGGER.warn("AMD GPU detected. Enabling coherent buffer mapping.");
+                        ImmediatelyFast.config.fast_buffer_upload_explicit_flush = false;
+                    }
+
                     persistentMappedStreamingBuffer = new PersistentMappedStreamingBuffer(config.fast_buffer_upload_size_mb * 1024 * 1024);
                 } else {
                     LOGGER.warn("Your GPU doesn't support ARB_direct_state_access and/or ARB_buffer_storage and/or glMemoryBarrier. Falling back to legacy fast buffer upload method.");
-                    if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling && ImmediatelyFast.config.fast_buffer_upload) {
-                        if (gpuVendor != null && !gpuVendor.toLowerCase().contains("nvidia")) {
-                            LOGGER.warn("Non NVIDIA GPU detected. Force disabling fast buffer upload optimization.");
-                        } else {
-                            ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload = true;
-                        }
+                    if (!isNvidia && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+                        // Legacy fast buffer upload causes a lot of graphical issues on non NVIDIA GPUs.
+                        LOGGER.warn("Non NVIDIA GPU detected. Force disabling fast buffer upload optimization.");
+                    } else {
+                        ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload = true;
                     }
                 }
             }
