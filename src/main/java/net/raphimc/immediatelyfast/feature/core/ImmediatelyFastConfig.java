@@ -26,7 +26,8 @@ public class ImmediatelyFastConfig {
     public boolean hud_batching = true;
     public boolean fast_text_lookup = true;
     public boolean fast_buffer_upload = true;
-    public long fast_buffer_upload_size_mb = 128;
+    public long fast_buffer_upload_size_mb = 256;
+    public boolean fast_buffer_upload_explicit_flush = true;
 
     // Cosmetic config values
     private String COSMETIC_INFO = "----- Cosmetic only config values below (Does not optimize anything) -----";

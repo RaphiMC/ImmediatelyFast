@@ -51,7 +51,7 @@ public abstract class MixinVertexBuffer {
         if (data.remaining() > this.vertexBufferSize) {
             this.vertexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() < ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
             ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.vertexBufferId, data);
         } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
             GL15C.glBufferSubData(target, 0, data);
@@ -65,7 +65,7 @@ public abstract class MixinVertexBuffer {
         if (data.remaining() > this.indexBufferSize) {
             this.indexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() < ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
             ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.indexBufferId, data);
         } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
             GL15C.glBufferSubData(target, 0, data);
