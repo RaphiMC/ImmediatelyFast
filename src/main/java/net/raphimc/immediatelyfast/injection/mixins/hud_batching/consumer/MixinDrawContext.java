@@ -43,7 +43,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = DrawContext.class, priority = 1500)
+@Mixin(value = DrawContext.class, priority = 500)
 public abstract class MixinDrawContext {
 
     @Shadow
