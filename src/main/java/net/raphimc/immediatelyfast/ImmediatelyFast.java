@@ -91,9 +91,9 @@ public class ImmediatelyFast implements ClientModInitializer {
                 }
             }
         });
-    }
 
-    //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
+        //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
+    }
 
     public static void loadConfig() {
         final File configFile = FabricLoader.getInstance().getConfigDir().resolve("immediatelyfast.json").toFile();
