@@ -67,9 +67,9 @@ public class ImmediatelyFast implements ClientModInitializer {
             final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
             LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
-            final boolean isNvidia = gpuVendor != null && gpuVendor.equalsIgnoreCase("NVIDIA Corporation");
-            final boolean isAmd = gpuVendor != null && gpuVendor.equalsIgnoreCase("ATI Technologies");
-            final boolean isIntel = gpuVendor != null && gpuVendor.equalsIgnoreCase("INTEL");
+            final boolean isNvidia = gpuVendor != null && gpuVendor.toLowerCase().startsWith("nvidia corporation");
+            final boolean isAmd = gpuVendor != null && gpuVendor.toLowerCase().startsWith("ati technologies");
+            final boolean isIntel = gpuVendor != null && gpuVendor.toLowerCase().startsWith("intel");
 
             if (ImmediatelyFast.config.fast_buffer_upload) {
                 if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
