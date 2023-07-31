@@ -68,7 +68,7 @@ public class ImmediatelyFast implements ClientModInitializer {
             LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
             final boolean isNvidia = gpuVendor != null && gpuVendor.toLowerCase().contains("nvidia");
-            final boolean isAmd = gpuVendor != null && gpuVendor.toLowerCase().contains("amd");
+            final boolean isAmd = gpuVendor != null && gpuVendor.toLowerCase().contains("ati");
             final boolean isIntel = gpuVendor != null && gpuVendor.toLowerCase().contains("intel");
 
             if (ImmediatelyFast.config.fast_buffer_upload) {
