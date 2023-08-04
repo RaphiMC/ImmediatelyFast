@@ -23,6 +23,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PersistentMappedStreamingBuffer {
@@ -30,14 +31,18 @@ public class PersistentMappedStreamingBuffer {
     private final int id;
     private final long size;
     private final long addr;
+    private final long syncSectionSize;
 
     private final List<Batch> batches = new ArrayList<>();
+    private final long[] fences = new long[8];
     private long batchOffset;
     private long offset;
 
     public PersistentMappedStreamingBuffer(final long size) {
         this.id = GL45C.glCreateBuffers();
         this.size = size;
+        this.syncSectionSize = size / this.fences.length;
+        Arrays.fill(this.fences, -1L);
 
         int flags = GL30C.GL_MAP_WRITE_BIT | GL44C.GL_MAP_PERSISTENT_BIT;
         if (ImmediatelyFast.config.fast_buffer_upload_explicit_flush) {
@@ -55,16 +60,47 @@ public class PersistentMappedStreamingBuffer {
         if (dataSize > this.size) {
             throw new RuntimeException("Data size is bigger than buffer size");
         }
+        if (dataSize <= 0) {
+            throw new RuntimeException("Data is empty");
+        }
+
+        int oldFenceIdx = (int) (this.offset / this.syncSectionSize);
+        if (oldFenceIdx >= this.fences.length) {
+            oldFenceIdx = this.fences.length - 1;
+        }
+
         if (this.offset + dataSize > this.size) {
             this.flush();
-            GL11C.glFinish();
+            if (dataSize >= this.offset) {
+                final long fence = this.fences[oldFenceIdx];
+                if (fence != -1) {
+                    GL32C.glClientWaitSync(fence, GL32C.GL_SYNC_FLUSH_COMMANDS_BIT, GL32C.GL_TIMEOUT_IGNORED);
+                } else {
+                    GL32C.glFinish();
+                }
+            } else if (this.fences[oldFenceIdx] == -1) {
+                this.fences[oldFenceIdx] = GL32C.glFenceSync(GL32C.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+            }
+
+            oldFenceIdx = -1;
             this.offset = 0;
             this.batchOffset = 0;
         }
 
+        final long newOffset = this.offset + dataSize;
+        final int newFenceIdx = (int) ((newOffset - 1) / this.syncSectionSize);
+
+        long fence = -1;
+        for (int i = newFenceIdx; i > oldFenceIdx && fence == -1; i--) {
+            fence = this.fences[i];
+        }
+        if (fence != -1) {
+            GL32C.glClientWaitSync(fence, GL32C.GL_SYNC_FLUSH_COMMANDS_BIT, GL32C.GL_TIMEOUT_IGNORED);
+        }
+
         MemoryUtil.memCopy(MemoryUtil.memAddress(data), this.addr + this.offset, dataSize);
         this.batches.add(new Batch(destinationId, dataSize));
-        this.offset += dataSize;
+        this.offset = newOffset;
     }
 
     public void flush() {
@@ -74,12 +110,27 @@ public class PersistentMappedStreamingBuffer {
             GL45C.glFlushMappedNamedBufferRange(this.id, this.batchOffset, this.offset - this.batchOffset);
             GL42C.glMemoryBarrier(GL44C.GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
         }
+        final int oldFenceIdx = (int) (this.batchOffset / this.syncSectionSize);
         for (Batch batch : this.batches) {
             GL45C.glCopyNamedBufferSubData(this.id, batch.destinationId, this.batchOffset, 0, batch.size);
             this.batchOffset += batch.size;
         }
         this.batches.clear();
         GL42C.glMemoryBarrier(GL42C.GL_BUFFER_UPDATE_BARRIER_BIT);
+
+        final int nextFenceIdx = (int) (this.batchOffset / this.syncSectionSize);
+        final int newFenceIdx = (int) ((this.batchOffset - 1) / this.syncSectionSize);
+        for (int i = oldFenceIdx; i <= newFenceIdx; i++) {
+            final long fence = this.fences[i];
+            if (fence != -1) {
+                GL32C.glDeleteSync(fence);
+                this.fences[i] = -1;
+            }
+        }
+
+        if (oldFenceIdx != nextFenceIdx) {
+            this.fences[oldFenceIdx] = GL32C.glFenceSync(GL32C.GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        }
     }
 
     public long getSize() {
