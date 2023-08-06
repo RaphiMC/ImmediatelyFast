@@ -48,10 +48,11 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
-        if (data.remaining() > this.vertexBufferSize) {
-            this.vertexBufferSize = data.remaining();
+        final int dataSize = data.remaining();
+        if (dataSize > this.vertexBufferSize) {
+            this.vertexBufferSize = dataSize;
             RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && dataSize > 0 && dataSize <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
             ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.vertexBufferId, data);
         } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
             GL15C.glBufferSubData(target, 0, data);
@@ -62,10 +63,11 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
-        if (data.remaining() > this.indexBufferSize) {
-            this.indexBufferSize = data.remaining();
+        final int dataSize = data.remaining();
+        if (dataSize > this.indexBufferSize) {
+            this.indexBufferSize = dataSize;
             RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && data.remaining() <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
+        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && dataSize > 0 && dataSize <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
             ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.indexBufferId, data);
         } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
             GL15C.glBufferSubData(target, 0, data);
