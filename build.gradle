@@ -1,14 +1,14 @@
 plugins {
-    id "fabric-loom" version "1.0-SNAPSHOT"
-    id "io.github.juuxel.loom-quiltflower" version "1.7.3"
+    id "fabric-loom" version "1.2-SNAPSHOT"
+    id "io.github.juuxel.loom-vineflower" version "1.11.0"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-compileJava.options.encoding = "UTF-8"
+compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
 group = project.maven_group
+archivesBaseName = project.maven_name
+version = project.maven_version
 
 repositories {
     mavenCentral()
@@ -23,9 +23,8 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    include(implementation("com.github.LlamaLad7:MixinExtras:0.1.1"))
-    annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
-    include(implementation("net.lenni0451:Reflect:1.1.0"))
+    annotationProcessor(include(implementation("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
+    include(implementation("net.lenni0451:Reflect:1.2.1"))
 }
 
 loom {

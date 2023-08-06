@@ -22,6 +22,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.profiler.ProfileResult;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,9 +35,13 @@ public abstract class MixinMinecraftClient {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;drawProfilerResults(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/profiler/ProfileResult;)V"),
     })
     private void if$Batching(@Coerce final Object instance, final MatrixStack matrices, final ProfileResult profileResult, final Operation<Void> operation) {
-        BatchingBuffers.beginHudBatching();
-        operation.call(instance, matrices, profileResult);
-        BatchingBuffers.endHudBatching();
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
+            BatchingBuffers.beginHudBatching();
+            operation.call(instance, matrices, profileResult);
+            BatchingBuffers.endHudBatching();
+        } else {
+            operation.call(instance, matrices, profileResult);
+        }
     }
 
 }

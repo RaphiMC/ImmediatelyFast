@@ -19,10 +19,16 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
+import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
+import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GLCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -36,17 +42,63 @@ public class ImmediatelyFast implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("ImmediatelyFast");
     public static final Unsafe UNSAFE = getUnsafe();
+    public static String VERSION;
     public static ImmediatelyFastConfig config;
+    public static ImmediatelyFastRuntimeConfig runtimeConfig;
+
+    public static PersistentMappedStreamingBuffer persistentMappedStreamingBuffer;
 
     @Override
     public void onInitializeClient() {
-        FabricLoader.getInstance().getModContainer("immediatelyfast").ifPresent(modContainer -> {
-            LOGGER.info("Loading ImmediatelyFast " + modContainer.getMetadata().getVersion().getFriendlyString());
+        VERSION = FabricLoader.getInstance().getModContainer("immediatelyfast").orElseThrow(NullPointerException::new).getMetadata().getVersion().getFriendlyString();
+        LOGGER.info("Loading ImmediatelyFast " + VERSION);
+
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            FabricLoader.getInstance().getModContainer("iris").ifPresent(modContainer -> {
+                LOGGER.info("Found Iris " + modContainer.getMetadata().getVersion().getFriendlyString() + ". Enabling compatibility.");
+                IrisCompat.init();
+            });
+        }
+
+        RenderSystem.recordRenderCall(() -> {
+            final GLCapabilities cap = GL.getCapabilities();
+            final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
+            final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
+            final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
+            LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
+
+            boolean isNvidia = false;
+            boolean isAmd = false;
+            boolean isIntel = false;
+            if (gpuVendor != null) {
+                final String gpuVendorLower = gpuVendor.toLowerCase();
+
+                isNvidia = gpuVendorLower.startsWith("nvidia");
+                isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
+                isIntel = gpuVendorLower.startsWith("intel");
+            }
+
+            if (ImmediatelyFast.config.fast_buffer_upload) {
+                if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
+                    if (isAmd && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+                        // Explicit flush causes AMD GPUs to stall the pipeline a lot.
+                        LOGGER.warn("AMD GPU detected. Enabling coherent buffer mapping.");
+                        ImmediatelyFast.config.fast_buffer_upload_explicit_flush = false;
+                    }
+
+                    persistentMappedStreamingBuffer = new PersistentMappedStreamingBuffer(config.fast_buffer_upload_size_mb * 1024 * 1024);
+                } else {
+                    LOGGER.warn("Your GPU doesn't support ARB_direct_state_access and/or ARB_buffer_storage and/or glMemoryBarrier. Falling back to legacy fast buffer upload method.");
+                    if (!isNvidia && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+                        // Legacy fast buffer upload causes a lot of graphical issues on non NVIDIA GPUs.
+                        LOGGER.warn("Non NVIDIA GPU detected. Force disabling fast buffer upload optimization.");
+                    } else {
+                        ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload = true;
+                    }
+                }
+            }
         });
-        FabricLoader.getInstance().getModContainer("iris").ifPresent(modContainer -> {
-            LOGGER.info("Found Iris " + modContainer.getMetadata().getVersion().getFriendlyString() + ". Enabling compatibility.");
-            IrisCompat.init();
-        });
+
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
 
@@ -67,6 +119,10 @@ public class ImmediatelyFast implements ClientModInitializer {
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
+    }
+
+    public static void createRuntimeConfig() {
+        runtimeConfig = new ImmediatelyFastRuntimeConfig(config);
     }
 
     private static Unsafe getUnsafe() {

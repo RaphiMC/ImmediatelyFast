@@ -1,9 +1,17 @@
 accessWidener v1 named
 #https://fabricmc.net/wiki/tutorial:accesswideners
 
+accessible class net/minecraft/client/font/TextRenderer$Drawer
+accessible method net/minecraft/client/font/FontStorage$GlyphPair getGlyph (Z)Lnet/minecraft/client/font/Glyph;
+accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
+accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
+accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/Map;
+accessible field net/minecraft/client/font/FontStorage fonts Ljava/util/List;
+
 accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
+accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
 accessible class net/minecraft/client/render/MapRenderer$MapTexture
 
 accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendFuncState;

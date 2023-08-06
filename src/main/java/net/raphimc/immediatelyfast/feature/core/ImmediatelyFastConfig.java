@@ -26,6 +26,8 @@ public class ImmediatelyFastConfig {
     public boolean hud_batching = true;
     public boolean fast_text_lookup = true;
     public boolean fast_buffer_upload = true;
+    public long fast_buffer_upload_size_mb = 256;
+    public boolean fast_buffer_upload_explicit_flush = true;
 
     // Cosmetic config values
     private String COSMETIC_INFO = "----- Cosmetic only config values below (Does not optimize anything) -----";
@@ -33,12 +35,13 @@ public class ImmediatelyFastConfig {
 
     // Experimental config values
     private String EXPERIMENTAL_INFO = "----- Experimental config values below (Rendering glitches may occur) -----";
-    public boolean experimental_item_hud_batching = false;
     public boolean experimental_disable_error_checking = false;
+    public boolean experimental_disable_resource_pack_conflict_handling = false;
 
     // Debug config values
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";
     public boolean debug_only_and_not_recommended_disable_universal_batching = false;
     public boolean debug_only_and_not_recommended_disable_mod_conflict_handling = false;
+    public boolean debug_only_and_not_recommended_disable_hardware_conflict_handling = false;
 
 }

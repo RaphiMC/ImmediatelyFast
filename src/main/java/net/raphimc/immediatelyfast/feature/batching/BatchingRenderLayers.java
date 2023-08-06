@@ -38,42 +38,17 @@ import static net.minecraft.util.Util.memoize;
 public class BatchingRenderLayers {
 
     public static final BiFunction<Integer, BlendFuncDepthFunc, RenderLayer> COLORED_TEXTURE = memoize((id, blendFuncDepthFunc) -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
-        RenderSystem.enableBlend();
-        RenderSystem.enableTexture();
-        blendFuncDepthFunc.apply();
+        blendFuncDepthFunc.saveAndApply();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-    }, () -> {
-        RenderSystem.disableDepthTest();
-        RenderSystem.disableBlend();
-        RenderSystem.disableTexture();
-    }));
+    }, blendFuncDepthFunc::revert));
 
     public static final Function<BlendFuncDepthFunc, RenderLayer> FILLED_QUAD = memoize(blendFuncDepthFunc -> new ImmediatelyFastRenderLayer("filled_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
-        RenderSystem.enableBlend();
-        RenderSystem.disableTexture();
-        blendFuncDepthFunc.apply();
+        blendFuncDepthFunc.saveAndApply();
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    }, () -> {
-        RenderSystem.disableDepthTest();
-        RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
-    }));
-
-    public static final RenderLayer GUI_QUAD = new ImmediatelyFastRenderLayer("gui_quad", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR, false, () -> {
-        RenderSystem.enableBlend();
-        RenderSystem.disableTexture();
-        RenderSystem.disableDepthTest();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-    }, () -> {
-        RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
-        RenderSystem.enableDepthTest();
-    });
+    }, blendFuncDepthFunc::revert));
 
 
     public static <A> Function<A, RenderLayer> memoizeTemp(final Function<A, RenderLayer> function) {

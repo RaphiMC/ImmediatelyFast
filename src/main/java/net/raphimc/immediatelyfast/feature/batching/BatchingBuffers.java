@@ -51,88 +51,39 @@ public class BatchingBuffers {
     /*
      * The batching buffers which hold the vertex data of the batch.
      */
-    private static final BatchableImmediate FILL_BATCH = new BatchableImmediate();
-    private static final BatchableImmediate TEXTURE_BATCH = new BatchableImmediate();
-    private static final BatchableImmediate TEXT_BATCH = new BatchableImmediate();
+    private static final BatchableImmediate HUD_BATCH = new BatchableImmediate();
     private static final BatchableImmediate LIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(true);
     private static final BatchableImmediate UNLIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(false);
     private static final BatchableImmediate ITEM_OVERLAY_BATCH = new BatchableImmediate();
 
     public static void beginHudBatching() {
-        beginFillBatching();
-        beginTextureBatching();
-        beginTextBatching();
-    }
-
-    public static void endHudBatching() {
-        endFillBatching();
-        endTextureBatching();
-        endTextBatching();
-    }
-
-    public static void beginItemBatching() {
+        if (HUD_BATCH.hasActiveLayers()) {
+            ImmediatelyFast.LOGGER.warn("HUD batching was already active! endHudBatching() was not called before beginHudBatching(). This will cause rendering issues.");
+            HUD_BATCH.close();
+        }
+        FILL_CONSUMER = HUD_BATCH;
+        TEXTURE_CONSUMER = HUD_BATCH;
+        TEXT_CONSUMER = HUD_BATCH;
         beginItemModelBatching();
         beginItemOverlayBatching();
     }
 
-    public static void endItemBatching() {
+    public static void endHudBatching() {
+        FILL_CONSUMER = null;
+        TEXTURE_CONSUMER = null;
+        TEXT_CONSUMER = null;
+        final RenderSystemState renderSystemState = RenderSystemState.current();
+        HUD_BATCH.draw();
         endItemModelBatching();
         endItemOverlayBatching();
+        renderSystemState.apply();
     }
 
-
-    public static void beginTextureBatching() {
-        if (TEXTURE_BATCH.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("Texture batching was already active! endTextureBatching() was not called before beginTextureBatching(). This will cause rendering issues.");
-            TEXTURE_BATCH.close();
-        }
-        TEXTURE_CONSUMER = TEXTURE_BATCH;
+    public static boolean isHudBatching() {
+        return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
     }
 
-    public static void endTextureBatching() {
-        TEXTURE_CONSUMER = null;
-        TEXTURE_BATCH.draw();
-    }
-
-    public static boolean isTextureBatching() {
-        return TEXTURE_CONSUMER != null;
-    }
-
-    public static void beginFillBatching() {
-        if (FILL_BATCH.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("Fill batching was already active! endFillBatching() was not called before beginFillBatching(). This will cause rendering issues.");
-            FILL_BATCH.close();
-        }
-        FILL_CONSUMER = FILL_BATCH;
-    }
-
-    public static void endFillBatching() {
-        FILL_CONSUMER = null;
-        FILL_BATCH.draw();
-    }
-
-    public static boolean isFillBatching() {
-        return FILL_CONSUMER != null;
-    }
-
-    public static void beginTextBatching() {
-        if (TEXT_BATCH.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("Text batching was already active! endTextBatching() was not called before beginTextBatching(). This will cause rendering issues.");
-            TEXT_BATCH.close();
-        }
-        TEXT_CONSUMER = TEXT_BATCH;
-    }
-
-    public static void endTextBatching() {
-        TEXT_CONSUMER = null;
-        TEXT_BATCH.draw();
-    }
-
-    public static boolean isTextBatching() {
-        return TEXT_CONSUMER != null;
-    }
-
-    public static void beginItemModelBatching() {
+    private static void beginItemModelBatching() {
         if (LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("Item model batching was already active! endItemModelBatching() was not called before beginItemModelBatching(). This will cause rendering issues.");
             LIT_ITEM_MODEL_BATCH.close();
@@ -142,7 +93,7 @@ public class BatchingBuffers {
         UNLIT_ITEM_MODEL_CONSUMER = UNLIT_ITEM_MODEL_BATCH;
     }
 
-    public static void endItemModelBatching() {
+    private static void endItemModelBatching() {
         LIT_ITEM_MODEL_CONSUMER = null;
         UNLIT_ITEM_MODEL_CONSUMER = null;
 
@@ -150,11 +101,7 @@ public class BatchingBuffers {
         LIT_ITEM_MODEL_BATCH.draw();
     }
 
-    public static boolean isItemModelBatching() {
-        return LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null;
-    }
-
-    public static void beginItemOverlayBatching() {
+    private static void beginItemOverlayBatching() {
         if (ITEM_OVERLAY_BATCH.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("Item overlay batching was already active! endItemOverlayBatching() was not called before beginItemOverlayBatching(). This will cause rendering issues.");
             ITEM_OVERLAY_BATCH.close();
@@ -162,13 +109,9 @@ public class BatchingBuffers {
         ITEM_OVERLAY_CONSUMER = ITEM_OVERLAY_BATCH;
     }
 
-    public static void endItemOverlayBatching() {
+    private static void endItemOverlayBatching() {
         ITEM_OVERLAY_CONSUMER = null;
         ITEM_OVERLAY_BATCH.draw();
-    }
-
-    public static boolean isItemOverlayBatching() {
-        return ITEM_OVERLAY_CONSUMER != null;
     }
 
     /**

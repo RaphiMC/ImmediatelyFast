@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
@@ -37,11 +38,19 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         ImmediatelyFast.loadConfig();
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            if (FabricLoader.getInstance().isModLoaded("slight-gui-modifications")) {
+            if (ImmediatelyFast.config.hud_batching && FabricLoader.getInstance().isModLoaded("slight-gui-modifications")) {
                 ImmediatelyFast.LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
                 ImmediatelyFast.config.hud_batching = false;
             }
         }
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+            if (ImmediatelyFast.config.fast_buffer_upload && System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("mac")) {
+                ImmediatelyFast.LOGGER.warn("macOS detected. Force disabling Fast Buffer Upload optimization.");
+                ImmediatelyFast.config.fast_buffer_upload = false;
+            }
+        }
+
+        ImmediatelyFast.createRuntimeConfig();
     }
 
     @Override
@@ -72,6 +81,12 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
+            return false;
+        }
+
+        if (packageName.startsWith("hud_batching.compat.armorchroma") && !FabricLoader.getInstance().isModLoaded("armorchroma")) {
+            return false;
+        } else if (packageName.startsWith("hud_batching.compat.appleskin") && !FabricLoader.getInstance().isModLoaded("appleskin")) {
             return false;
         }
 

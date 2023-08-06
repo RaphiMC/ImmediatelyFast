@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = DrawableHelper.class, priority = 1500)
+@Mixin(value = DrawableHelper.class, priority = 500)
 public abstract class MixinDrawableHelper {
 
     @Inject(method = "fill(Lnet/minecraft/util/math/Matrix4f;IIIII)V", at = @At("HEAD"), cancellable = true)
@@ -50,11 +50,14 @@ public abstract class MixinDrawableHelper {
             final float[] shaderColor = RenderSystem.getShaderColor();
             final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
             color = ColorHelper.Argb.mixColor(color, argb);
+
+            RenderSystem.enableBlend();
             final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
             vertexConsumer.vertex(matrix, x1, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x1, y1, 0F).color(color).next();
+            RenderSystem.disableBlend();
         }
     }
 

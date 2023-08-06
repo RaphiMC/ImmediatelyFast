@@ -56,19 +56,19 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
-        final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
-        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
-            throw new IllegalStateException("Tried to write shared vertices into the same buffer");
-        }
-
+        final Optional<RenderLayer> newLayer = layer.asOptional();
         if (!this.drawFallbackLayersFirst) {
-            final Optional<RenderLayer> newLayer = layer.asOptional();
             if (!this.currentLayer.equals(newLayer)) {
                 if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(this.currentLayer.get())) {
                     this.drawFallbackLayersFirst = true;
                 }
             }
-            this.currentLayer = newLayer;
+        }
+        this.currentLayer = newLayer;
+
+        final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
+        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
+            throw new IllegalStateException("Tried to write shared vertices into the same buffer");
         }
 
         if (!bufferBuilder.isBuilding()) {

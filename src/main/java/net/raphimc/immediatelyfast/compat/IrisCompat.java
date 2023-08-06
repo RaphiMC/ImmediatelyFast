@@ -48,7 +48,7 @@ public class IrisCompat {
             final CallSite iris$beginWithoutExtendingCallSite = LambdaMetafactory.metafactory(lookup, "accept", MethodType.methodType(TriConsumer.class), MethodType.methodType(void.class, Object.class, Object.class, Object.class), iris$beginWithoutExtendingMH, iris$beginWithoutExtendingMH.type());
             iris$beginWithoutExtending = (TriConsumer<BufferBuilder, VertexFormat.DrawMode, VertexFormat>) iris$beginWithoutExtendingCallSite.getTarget().invoke();
         } catch (Throwable e) {
-            ImmediatelyFast.LOGGER.error("Failed to initialize Iris compatibility. Try updating Iris before reporting this on GitHub", e);
+            ImmediatelyFast.LOGGER.error("Failed to initialize Iris compatibility. Try updating Iris and ImmediatelyFast before reporting this on GitHub", e);
             System.exit(-1);
         }
     }

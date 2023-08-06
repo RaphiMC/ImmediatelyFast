@@ -29,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.ColorHelper;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
+import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFunc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -64,7 +65,7 @@ public abstract class MixinItemRenderer {
             final float[] shaderColor = RenderSystem.getShaderColor();
             final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
             color = ColorHelper.Argb.mixColor(color, argb);
-            final VertexConsumer vertexConsumer = BatchingBuffers.ITEM_OVERLAY_CONSUMER.getBuffer(BatchingRenderLayers.GUI_QUAD);
+            final VertexConsumer vertexConsumer = BatchingBuffers.ITEM_OVERLAY_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
             vertexConsumer.vertex(x, y, 0F).color(color).next();
             vertexConsumer.vertex(x, y + height, 0F).color(color).next();
             vertexConsumer.vertex(x + width, y + height, 0F).color(color).next();
