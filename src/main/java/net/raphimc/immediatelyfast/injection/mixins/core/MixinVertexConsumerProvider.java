@@ -23,7 +23,6 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
-import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -46,9 +45,8 @@ public interface MixinVertexConsumerProvider {
             return new VertexConsumerProvider.Immediate(fallbackBuffer, layerBuffers);
         }
 
-        if (!fallbackBuffer.equals(Tessellator.getInstance().getBuffer())) {
-            ((IBufferBuilder) fallbackBuffer).release();
-        }
+        // Don't free the fallback buffer. Who knows what else it might get used for outside of this method (https://github.com/RaphiMC/ImmediatelyFast/issues/101)
+
         return new BatchableImmediate(layerBuffers);
     }
 
