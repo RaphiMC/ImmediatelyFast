@@ -17,9 +17,9 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
 import org.lwjgl.opengl.GL15C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,39 +41,49 @@ public abstract class MixinVertexBuffer {
     private int indexBufferId;
 
     @Unique
-    private int vertexBufferSize;
+    private int vertexBufferSize = -1;
 
     @Unique
-    private int indexBufferSize;
+    private int indexBufferSize = -1;
 
     @Redirect(method = "configureVertexFormat", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
-        if (dataSize > this.vertexBufferSize) {
-            this.vertexBufferSize = dataSize;
-            RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && dataSize > 0 && dataSize <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
-            ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.vertexBufferId, data);
-        } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
-            GL15C.glBufferSubData(target, 0, data);
-        } else {
-            RenderSystem.glBufferData(target, data, usage);
+        if (dataSize == 0 && this.vertexBufferSize != -1) return;
+
+        if (dataSize <= this.vertexBufferSize) {
+            final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
+            if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
+                streamingBuffer.addUpload(this.vertexBufferId, data);
+                return;
+            } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+                GL15C.glBufferSubData(target, 0, data);
+                return;
+            }
         }
+
+        this.vertexBufferSize = dataSize;
+        GL15C.glBufferData(target, data, usage);
     }
 
     @Redirect(method = "configureIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
-        if (dataSize > this.indexBufferSize) {
-            this.indexBufferSize = dataSize;
-            RenderSystem.glBufferData(target, data, usage);
-        } else if (ImmediatelyFast.persistentMappedStreamingBuffer != null && dataSize > 0 && dataSize <= ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) {
-            ImmediatelyFast.persistentMappedStreamingBuffer.addUpload(this.indexBufferId, data);
-        } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
-            GL15C.glBufferSubData(target, 0, data);
-        } else {
-            RenderSystem.glBufferData(target, data, usage);
+        if (dataSize == 0 && this.indexBufferSize != -1) return;
+
+        if (dataSize <= this.indexBufferSize) {
+            final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
+            if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
+                streamingBuffer.addUpload(this.indexBufferId, data);
+                return;
+            } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+                GL15C.glBufferSubData(target, 0, data);
+                return;
+            }
         }
+
+        this.indexBufferSize = dataSize;
+        GL15C.glBufferData(target, data, usage);
     }
 
     @Inject(method = "upload", at = @At("RETURN"))
