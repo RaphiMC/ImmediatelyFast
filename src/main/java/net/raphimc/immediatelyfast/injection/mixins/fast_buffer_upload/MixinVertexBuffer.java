@@ -17,10 +17,13 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BufferBuilder;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
 import org.lwjgl.opengl.GL15C;
+import org.lwjgl.opengl.GL45C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -46,24 +49,41 @@ public abstract class MixinVertexBuffer {
     @Unique
     private int indexBufferSize = -1;
 
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glGenBuffers()I", remap = false))
+    private int allocateOptimizableBuffer() {
+        if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
+            return GL45C.glCreateBuffers();
+        } else {
+            return GL15C.glGenBuffers();
+        }
+    }
+
     @Redirect(method = "configureVertexFormat", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
-    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
+    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage, @Local BufferBuilder.DrawArrayParameters parameters) {
         final int dataSize = data.remaining();
         if (dataSize == 0 && this.vertexBufferSize != -1) return;
 
+        final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
         if (dataSize <= this.vertexBufferSize) {
-            final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
             if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
                 streamingBuffer.addUpload(this.vertexBufferId, data);
                 return;
-            } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+            } else if (streamingBuffer == null && ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
                 GL15C.glBufferSubData(target, 0, data);
                 return;
             }
         }
 
         this.vertexBufferSize = dataSize;
-        GL15C.glBufferData(target, data, usage);
+        if (streamingBuffer != null) {
+            GL15C.glDeleteBuffers(this.vertexBufferId);
+            this.vertexBufferId = GL45C.glCreateBuffers();
+            GL45C.glNamedBufferStorage(this.vertexBufferId, data, 0);
+            GL15C.glBindBuffer(GL15C.GL_ARRAY_BUFFER, this.vertexBufferId);
+            parameters.format().setupState();
+        } else {
+            GL15C.glBufferData(target, data, usage);
+        }
     }
 
     @Redirect(method = "configureIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
@@ -71,19 +91,26 @@ public abstract class MixinVertexBuffer {
         final int dataSize = data.remaining();
         if (dataSize == 0 && this.indexBufferSize != -1) return;
 
+        final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
         if (dataSize <= this.indexBufferSize) {
-            final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
             if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
                 streamingBuffer.addUpload(this.indexBufferId, data);
                 return;
-            } else if (ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
+            } else if (streamingBuffer == null && ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload) {
                 GL15C.glBufferSubData(target, 0, data);
                 return;
             }
         }
 
         this.indexBufferSize = dataSize;
-        GL15C.glBufferData(target, data, usage);
+        if (streamingBuffer != null) {
+            GL15C.glDeleteBuffers(this.indexBufferId);
+            this.indexBufferId = GL45C.glCreateBuffers();
+            GL45C.glNamedBufferStorage(this.indexBufferId, data, 0);
+            GL15C.glBindBuffer(GL15C.GL_ELEMENT_ARRAY_BUFFER, this.indexBufferId);
+        } else {
+            GL15C.glBufferData(target, data, usage);
+        }
     }
 
     @Inject(method = "upload", at = @At("RETURN"))
