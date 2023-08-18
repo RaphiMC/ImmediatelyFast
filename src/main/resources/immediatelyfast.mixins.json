@@ -11,6 +11,7 @@
     "core.MixinRenderLayer",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
+    "core.MixinWindow",
     "core.compat.MixinGameRenderer",
     "core.compat.MixinTextRenderer",
     "core.compat.MixinTextRenderer_Drawer",

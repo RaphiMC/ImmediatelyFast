@@ -19,16 +19,12 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GLCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -59,45 +55,6 @@ public class ImmediatelyFast implements ClientModInitializer {
                 IrisCompat.init();
             });
         }
-
-        RenderSystem.recordRenderCall(() -> {
-            final GLCapabilities cap = GL.getCapabilities();
-            final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
-            final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
-            final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
-            LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
-
-            boolean isNvidia = false;
-            boolean isAmd = false;
-            boolean isIntel = false;
-            if (gpuVendor != null) {
-                final String gpuVendorLower = gpuVendor.toLowerCase();
-
-                isNvidia = gpuVendorLower.startsWith("nvidia");
-                isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
-                isIntel = gpuVendorLower.startsWith("intel");
-            }
-
-            if (ImmediatelyFast.config.fast_buffer_upload) {
-                if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
-                    if (isAmd && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
-                        // Explicit flush causes AMD GPUs to stall the pipeline a lot.
-                        LOGGER.warn("AMD GPU detected. Enabling coherent buffer mapping.");
-                        ImmediatelyFast.config.fast_buffer_upload_explicit_flush = false;
-                    }
-
-                    persistentMappedStreamingBuffer = new PersistentMappedStreamingBuffer(config.fast_buffer_upload_size_mb * 1024 * 1024);
-                } else {
-                    LOGGER.warn("Your GPU doesn't support ARB_direct_state_access and/or ARB_buffer_storage and/or glMemoryBarrier. Falling back to legacy fast buffer upload method.");
-                    if (!isNvidia && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
-                        // Legacy fast buffer upload causes a lot of graphical issues on non NVIDIA GPUs.
-                        LOGGER.warn("Non NVIDIA GPU detected. Force disabling fast buffer upload optimization.");
-                    } else {
-                        ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload = true;
-                    }
-                }
-            }
-        });
 
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
