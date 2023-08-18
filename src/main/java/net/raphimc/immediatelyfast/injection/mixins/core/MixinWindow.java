@@ -51,7 +51,7 @@ public abstract class MixinWindow {
         }
 
         if (ImmediatelyFast.config.fast_buffer_upload) {
-            if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
+            if (!isIntel && cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0) {
                 if (isAmd && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
                     // Explicit flush causes AMD GPUs to stall the pipeline a lot.
                     ImmediatelyFast.LOGGER.warn("AMD GPU detected. Enabling coherent buffer mapping.");
