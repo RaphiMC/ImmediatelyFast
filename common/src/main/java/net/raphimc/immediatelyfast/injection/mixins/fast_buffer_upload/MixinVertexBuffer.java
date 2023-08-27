@@ -49,7 +49,7 @@ public abstract class MixinVertexBuffer {
     @Unique
     private int indexBufferSize = -1;
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glGenBuffers()I"))
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glGenBuffers()I", remap = false))
     private int allocateOptimizableBuffer() {
         if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
             return GL45C.glCreateBuffers();
