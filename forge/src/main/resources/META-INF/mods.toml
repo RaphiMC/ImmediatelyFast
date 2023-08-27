@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[45,)"
+issueTrackerURL = "https://github.com/RaphiMC/ImmediatelyFast/issues"
+license = "LGPL-3.0"
+
+[[mods]]
+modId = "immediatelyfast"
+version = "${version}"
+displayName = "ImmediatelyFast"
+authors = "RK_01"
+description = '''
+Speed up and optimize immediate mode rendering in Minecraft
+'''
+logoFile = "assets/immediatelyfast/icon.png"
+
+[[dependencies.immediatelyfast]]
+modId = "forge"
+mandatory = true
+versionRange = "[45,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.immediatelyfast]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.4]"
+ordering = "NONE"
+side = "CLIENT"
