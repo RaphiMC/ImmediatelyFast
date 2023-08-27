@@ -37,6 +37,7 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "debug_only_and_not_recommended_disable_universal_batching" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching;
             case "debug_only_and_not_recommended_disable_mod_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling;
             case "debug_only_and_not_recommended_disable_hardware_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
+            case "debug_only_print_additional_error_information" -> ImmediatelyFast.config.debug_only_print_additional_error_information;
             default -> defaultValue;
         };
     }
