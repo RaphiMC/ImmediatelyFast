@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -117,6 +118,17 @@ public abstract class MixinVertexBuffer {
     private void flushBuffers(CallbackInfo ci) {
         if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
             ImmediatelyFast.persistentMappedStreamingBuffer.flush();
+        }
+    }
+
+    // RenderSystem.glDeleteBuffers for some reason allocates a buffer with size 0 before deleting the buffer, but only if the game is running on linux
+    // This causes an error (modification of immutable buffer storage) with the buffer storage flags
+    @Redirect(method = "close", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glDeleteBuffers(I)V"))
+    private void deleteBufferProperly(int buffer) {
+        if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
+            GL15C.glDeleteBuffers(buffer);
+        } else {
+            RenderSystem.glDeleteBuffers(buffer);
         }
     }
 
