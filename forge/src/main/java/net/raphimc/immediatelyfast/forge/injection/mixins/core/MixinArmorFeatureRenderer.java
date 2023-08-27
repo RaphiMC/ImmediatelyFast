@@ -47,7 +47,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     protected abstract void setVisible(A bipedModel, EquipmentSlot slot);
 
     @Shadow
-    protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, Model model, boolean bl);
+    protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, Model model, boolean leggings);
 
     @Unique
     private final List<Runnable> trimRenderers = new ArrayList<>();
