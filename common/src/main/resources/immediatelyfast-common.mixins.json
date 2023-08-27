@@ -7,6 +7,7 @@
   "client": [
     "core.MixinBufferBuilder",
     "core.MixinDebugHud",
+    "core.MixinGlDebug",
     "core.MixinRenderLayer",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
