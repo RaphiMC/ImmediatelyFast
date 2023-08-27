@@ -1,50 +1,69 @@
 plugins {
-    id "fabric-loom" version "1.2-SNAPSHOT"
-    id "io.github.juuxel.loom-vineflower" version "1.11.0"
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "io.github.pacifistmc.forgix" version "1.2.6"
+    id "dev.architectury.loom" version "1.2-SNAPSHOT" apply false
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
+forgix {
+    group = "net.raphimc.immediatelyfast."
+    mergedJarName = "${project.name}.jar"
+    outputDir = "build/libs"
+}
+
+architectury {
+    minecraft = project.minecraft_version
+}
+
+subprojects {
+    apply plugin: "java-library"
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        withSourcesJar()
+    }
+}
+
+configure(subprojects.findAll { it.name != "api" }) {
+    apply plugin: "architectury-plugin"
+    apply plugin: "dev.architectury.loom"
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
+    }
+}
+
+apply plugin: "architectury-plugin"
 
 group = project.maven_group
-archivesBaseName = project.maven_name
 version = project.maven_version
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "Jitpack"
-        url = "https://jitpack.io"
+tasks.register("build") {
+    dependsOn(subprojects.collect {
+        it.build
+    })
+}
+
+tasks.register("createFinalJar", Zip) {
+    def inputFile = file("build/libs/${project.name}.jar")
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        [zipTree(inputFile), zipTree(project(":api").jar.archiveFile.get())]
     }
+    archiveFileName = "${project.name}-${project.version}.jar"
+    destinationDirectory = inputFile.parentFile
 }
 
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    annotationProcessor(include(implementation("com.github.llamalad7.mixinextras:mixinextras-fabric:0.2.0-beta.9")))
-    include(implementation("net.lenni0451:Reflect:1.2.1"))
+tasks.register("removeForgixJar", Delete) {
+    delete file("build/libs/${project.name}.jar")
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/immediatelyfast.accesswidener")
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
-    }
-}
-
-java {
-    withSourcesJar()
-}
-
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
-    }
-}
+build.finalizedBy("mergeJars")
+mergeJars.finalizedBy("createFinalJar")
+createFinalJar.finalizedBy("removeForgixJar")
