@@ -11,7 +11,7 @@ authors = "RK_01"
 description = '''
 Speed up and optimize immediate mode rendering in Minecraft
 '''
-logoFile = "assets/immediatelyfast/icon.png"
+logoFile = "immediatelyfast-icon.png"
 
 [[dependencies.immediatelyfast]]
 modId = "forge"
