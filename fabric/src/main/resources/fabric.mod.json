@@ -37,7 +37,8 @@
     "vulkanmod": "*"
   },
   "breaks": {
-    "optifabric": "*"
+    "optifabric": "*",
+    "memoryleakfix": "<=1.1.1"
   },
   "custom": {
     "modmenu": {
