@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.render.MapRenderer;
 import net.minecraft.client.render.VertexConsumer;
@@ -38,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(value = MapRenderer.MapTexture.class, priority = 1100) // TODO: Workaround for Porting-Lib which relies on the LVT to be intact
+@Mixin(value = MapRenderer.MapTexture.class, priority = 1100) // Workaround for Porting-Lib which relies on the LVT to be intact
 public abstract class MixinMapRenderer_MapTexture {
 
     @Shadow
@@ -48,6 +49,10 @@ public abstract class MixinMapRenderer_MapTexture {
     @Shadow
     @Final
     private NativeImageBackedTexture texture;
+
+    @Shadow
+    @Final
+    MapRenderer field_2047;
 
     @Unique
     private static final NativeImageBackedTexture DUMMY_TEXTURE;
@@ -69,27 +74,23 @@ public abstract class MixinMapRenderer_MapTexture {
         }
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/lang/Object;<init>()V", shift = At.Shift.AFTER, remap = false))
-    private void initAtlasParameters(MapRenderer mapRenderer, int id, MapState state, CallbackInfo ci) {
-        final int packedLocation = ((IMapRenderer) mapRenderer).getAtlasMapping(id);
+    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
+    private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(int width, int height, boolean useMipmaps, @Local int id) {
+        final int packedLocation = ((IMapRenderer) this.field_2047).getAtlasMapping(id);
         if (packedLocation == -1) {
             ImmediatelyFast.LOGGER.warn("Map " + id + " is not in an atlas");
             // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
-            return;
+            return new NativeImageBackedTexture(width, height, useMipmaps);
         }
 
         this.atlasX = ((packedLocation >> 8) & 0xFF) * MAP_SIZE;
         this.atlasY = (packedLocation & 0xFF) * MAP_SIZE;
-        this.atlasTexture = ((IMapRenderer) mapRenderer).getMapAtlasTexture(packedLocation >> 16);
-    }
-
-    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
-    private NativeImageBackedTexture dontAllocateTexture(int width, int height, boolean useMipmaps) {
-        if (this.atlasTexture != null) {
-            return DUMMY_TEXTURE;
-        } else {
-            return new NativeImageBackedTexture(width, height, useMipmaps);
+        this.atlasTexture = ((IMapRenderer) this.field_2047).getMapAtlasTexture(packedLocation >> 16);
+        if (this.atlasTexture == null) {
+            throw new IllegalStateException("getMapAtlasTexture returned null for packedLocation " + packedLocation + " (map " + id + ")");
         }
+
+        return DUMMY_TEXTURE;
     }
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureManager;registerDynamicTexture(Ljava/lang/String;Lnet/minecraft/client/texture/NativeImageBackedTexture;)Lnet/minecraft/util/Identifier;"))
