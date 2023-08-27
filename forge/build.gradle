@@ -49,6 +49,9 @@ jar {
     } {
         exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
     }
+    from("../common/src/main/resources/assets/immediatelyfast/icon.png") {
+        rename { "immediatelyfast-icon.png" }
+    }
 }
 
 sourcesJar {
