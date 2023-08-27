@@ -1,0 +1,22 @@
+architectury {
+    common("fabric")
+    common("forge")
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/immediatelyfast.accesswidener")
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    compileOnly(project(":api"))
+
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    implementation("net.lenni0451:Reflect:${rootProject.reflect_version}")
+}
+
+jar {
+    from("../LICENSE") {
+        rename { "${it}_${rootProject.name}" }
+    }
+}
