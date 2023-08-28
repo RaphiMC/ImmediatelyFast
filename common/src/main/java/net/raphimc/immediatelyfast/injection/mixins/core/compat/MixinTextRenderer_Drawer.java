@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 import net.minecraft.client.font.Glyph;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +40,7 @@ public abstract class MixinTextRenderer_Drawer {
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/Glyph;getAdvance(Z)F"))
     private float fixNegativeAdvanceGlyphs(Glyph instance, boolean bold) {
         final float advance = instance.getAdvance(bold);
-        if (advance < 0) {
+        if (advance < 0 && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
             if (this.vertexConsumers instanceof VertexConsumerProvider.Immediate) {
                 ((VertexConsumerProvider.Immediate) this.vertexConsumers).drawCurrentLayer();
             }
