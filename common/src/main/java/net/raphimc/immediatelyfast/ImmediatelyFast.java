@@ -62,6 +62,7 @@ public class ImmediatelyFast {
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
+        //ImmediatelyFast.config.fast_buffer_upload = false; // Fast buffer upload causes renderdoc captures to explode in size
     }
 
     public static void windowInit() {
