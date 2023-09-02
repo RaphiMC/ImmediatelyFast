@@ -21,8 +21,8 @@ subprojects {
         java.toolchain.languageVersion = JavaLanguageVersion.of(17)
         compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
-        group = rootProject.maven_group
-        version = rootProject.maven_version
+        group = project.maven_group ?: rootProject.maven_group
+        version = project.maven_version ?: rootProject.maven_version
     }
 
     repositories {
