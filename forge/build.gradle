@@ -61,9 +61,9 @@ sourcesJar {
 }
 
 processResources {
-    inputs.property "version", rootProject.maven_version
+    inputs.property "version", project.version
 
     filesMatching("META-INF/mods.toml") {
-        expand "version": rootProject.maven_version
+        expand "version": project.version
     }
 }
