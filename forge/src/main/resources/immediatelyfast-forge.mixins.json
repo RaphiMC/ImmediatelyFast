@@ -6,6 +6,7 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "core.MixinArmorFeatureRenderer",
+    "hud_batching.MixinForgeGui",
     "hud_batching.consumer.MixinDrawContext"
   ],
   "injectors": {

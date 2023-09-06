@@ -27,6 +27,7 @@ configurations {
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.forge_version}")
 
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
     implementation(include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}"))
     include("net.lenni0451:Reflect:${rootProject.reflect_version}")
 
