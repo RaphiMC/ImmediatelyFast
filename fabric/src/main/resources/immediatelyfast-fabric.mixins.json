@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
+    "hud_batching.MixinInGameHud"
   ],
   "injectors": {
     "defaultRequire": 1
