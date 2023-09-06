@@ -51,7 +51,7 @@ public class PersistentMappedStreamingBuffer {
             flags |= GL44C.GL_MAP_COHERENT_BIT;
         }
 
-        GL45C.glNamedBufferStorage(this.id, size, (flags & ~GL30C.GL_MAP_FLUSH_EXPLICIT_BIT) | GL44C.GL_CLIENT_STORAGE_BIT);
+        GL45C.glNamedBufferStorage(this.id, size, flags & ~GL30C.GL_MAP_FLUSH_EXPLICIT_BIT);
         this.addr = GL45C.nglMapNamedBufferRange(this.id, 0L, size, flags | GL30C.GL_MAP_UNSYNCHRONIZED_BIT | GL30C.GL_MAP_INVALIDATE_RANGE_BIT);
     }
 
