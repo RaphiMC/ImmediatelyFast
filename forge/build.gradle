@@ -29,7 +29,7 @@ dependencies {
 
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
     implementation(include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}"))
-    include("net.lenni0451:Reflect:${rootProject.reflect_version}")
+    implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}"))
 
     common(project(":api")) { transitive false }
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
