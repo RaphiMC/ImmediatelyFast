@@ -24,7 +24,6 @@
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
     "hud_batching.MixinDebugHud",
-    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",
     "hud_batching.consumer.MixinDrawableHelper",
     "hud_batching.consumer.MixinItemRenderer",
