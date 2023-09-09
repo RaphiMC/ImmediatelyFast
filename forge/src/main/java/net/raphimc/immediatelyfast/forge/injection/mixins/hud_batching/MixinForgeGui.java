@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 @Mixin(ForgeGui.class)
 public abstract class MixinForgeGui {
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;forEach(Ljava/util/function/Consumer;)V"))
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;forEach(Ljava/util/function/Consumer;)V", remap = false))
     private void batching(final ImmutableList<NamedGuiOverlay> instance, final Consumer<NamedGuiOverlay> consumer) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             instance.forEach(overlay -> {
