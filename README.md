@@ -12,8 +12,7 @@
   <a href="https://curseforge.com/minecraft/mc-mods/immediatelyfast"><img src="https://cf.way2muchnoise.eu/full_686911_downloads.svg"></a>
 
   <p>ImmediatelyFast is an open source Minecraft mod which improves the immediate mode rendering performance of the client.
-  <br />It is designed to be lightweight and compatible with other mods. This makes it an ideal choice for modpacks or as a
-  <br />replacement for other more aggressive optimization mods such as Exordium or Enhanced Block Entities.</p>
+  <br />It is designed to be lightweight and compatible with other mods.</p>
 </div>
 
 ## Optimizations
