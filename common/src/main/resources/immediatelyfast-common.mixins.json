@@ -20,7 +20,6 @@
     "fast_text_lookup.MixinFontManager",
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
-    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
