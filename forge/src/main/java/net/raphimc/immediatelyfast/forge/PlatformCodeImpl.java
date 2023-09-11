@@ -21,6 +21,8 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.PlatformCode;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -37,6 +39,14 @@ public class PlatformCodeImpl {
         }
 
         return ModList.get().getModContainerById(mod).map(m -> m.getModInfo().getVersion().toString());
+    }
+
+    public static void checkModCompatibility() {
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            PlatformCode.getModVersion("optifine").ifPresent(version -> {
+                throw new IllegalStateException("Found OptiFine " + version + ". ImmediatelyFast is not compatible with OptiFine.");
+            });
+        }
     }
 
 }

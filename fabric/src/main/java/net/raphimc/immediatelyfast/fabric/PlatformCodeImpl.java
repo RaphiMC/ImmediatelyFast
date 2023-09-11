@@ -32,4 +32,7 @@ public class PlatformCodeImpl {
         return FabricLoader.getInstance().getModContainer(mod).map(m -> m.getMetadata().getVersion().getFriendlyString());
     }
 
+    public static void checkModCompatibility() {
+    }
+
 }
