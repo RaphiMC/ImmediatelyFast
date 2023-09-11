@@ -15,11 +15,6 @@
   "license": "LGPL-3.0",
   "icon": "assets/immediatelyfast/icon.png",
   "environment": "client",
-  "entrypoints": {
-    "client": [
-      "net.raphimc.immediatelyfast.fabric.ImmediatelyFastFabric"
-    ]
-  },
   "mixins": [
     "immediatelyfast-fabric.mixins.json",
     "immediatelyfast-common.mixins.json"

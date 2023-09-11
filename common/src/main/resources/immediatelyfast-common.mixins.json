@@ -9,6 +9,7 @@
     "core.MixinBufferBuilder",
     "core.MixinDebugHud",
     "core.MixinGlDebug",
+    "core.MixinMinecraftClient",
     "core.MixinRenderLayer",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",

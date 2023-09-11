@@ -15,25 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.fabric;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.MinecraftClient;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
-import net.raphimc.immediatelyfast.compat.IrisCompat;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class ImmediatelyFastFabric implements ClientModInitializer {
+@Mixin(MinecraftClient.class)
+public abstract class MixinMinecraftClient {
 
-    @Override
-    public void onInitializeClient() {
-        ImmediatelyFast.modInit();
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void initImmediatelyFast(CallbackInfo ci) {
+        ImmediatelyFast.lateInit();
+    }
 
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("iris").ifPresent(version -> {
-                ImmediatelyFast.LOGGER.info("Found Iris " + version + ". Enabling compatibility.");
-                IrisCompat.init();
-            });
-        }
+    @Inject(method = "joinWorld", at = @At("HEAD"))
+    private void callOnWorldJoin(CallbackInfo ci) {
+        ImmediatelyFast.onWorldJoin();
     }
 
 }

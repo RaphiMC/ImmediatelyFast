@@ -34,4 +34,9 @@ public class PlatformCode {
         throw new AssertionError();
     }
 
+    @ExpectPlatform
+    public static void checkModCompatibility() {
+        throw new AssertionError();
+    }
+
 }
