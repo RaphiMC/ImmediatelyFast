@@ -27,13 +27,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftClient.class)
 public abstract class MixinMinecraftClient {
 
-    @Inject(method = "onInitFinished", at = @At("HEAD"))
+    @Inject(method = "<init>", at = @At("RETURN"))
     private void initImmediatelyFast(CallbackInfo ci) {
         ImmediatelyFast.lateInit();
     }
 
     @Inject(method = "joinWorld", at = @At("HEAD"))
-    private void clearSignTextCache(CallbackInfo ci) {
+    private void callOnWorldJoin(CallbackInfo ci) {
         ImmediatelyFast.onWorldJoin();
     }
 
