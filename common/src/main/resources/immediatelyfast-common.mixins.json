@@ -8,6 +8,7 @@
     "core.MixinBufferBuilder",
     "core.MixinDebugHud",
     "core.MixinGlDebug",
+    "core.MixinMinecraftClient",
     "core.MixinRenderLayer",
     "core.MixinTextureManager",
     "core.MixinVertexConsumerProvider",
@@ -16,14 +17,15 @@
     "core.compat.MixinTextRenderer_Drawer",
     "disable_error_checking.MixinGL11",
     "fast_buffer_upload.MixinVertexBuffer",
-    "fast_text_lookup.ISinglePreparationResourceReloader",
     "fast_text_lookup.MixinFontManager",
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
-    "map_atlas_generation.MixinMapRenderer_MapTexture"
+    "map_atlas_generation.MixinMapRenderer_MapTexture",
+    "sign_text_buffering.MixinSignBlockEntityRenderer",
+    "sign_text_buffering.MixinSignText"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -19,10 +19,14 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.raphimc.immediatelyfast.apiimpl.ApiAccessImpl;
+import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
+import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
 import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11C;
@@ -35,6 +39,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
+import java.util.Objects;
 
 public class ImmediatelyFast {
 
@@ -45,6 +50,7 @@ public class ImmediatelyFast {
     public static ImmediatelyFastRuntimeConfig runtimeConfig;
 
     public static PersistentMappedStreamingBuffer persistentMappedStreamingBuffer;
+    public static SignTextCache signTextCache;
 
     public static void earlyInit() {
         if (config != null) return;
@@ -61,6 +67,9 @@ public class ImmediatelyFast {
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
+        VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
+        PlatformCode.checkModCompatibility();
+
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
         //ImmediatelyFast.config.fast_buffer_upload = false; // Fast buffer upload causes renderdoc captures to explode in size
     }
@@ -70,7 +79,7 @@ public class ImmediatelyFast {
         final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
         final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
         final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
-        LOGGER.info("Initializing IF on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
+        LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
         boolean isNvidia = false;
         boolean isAmd = false;
@@ -82,6 +91,9 @@ public class ImmediatelyFast {
             isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
             isIntel = gpuVendorLower.startsWith("intel");
         }
+
+        Objects.requireNonNull(config, "Config not loaded yet");
+        Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
 
         if (config.fast_buffer_upload) {
             if (cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0 && (!isIntel || config.debug_only_and_not_recommended_disable_hardware_conflict_handling)) {
@@ -102,11 +114,26 @@ public class ImmediatelyFast {
                 }
             }
         }
+
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {
+                ImmediatelyFast.LOGGER.info("Found Iris/Oculus " + version + ". Enabling compatibility.");
+                IrisCompat.init();
+            });
+        }
     }
 
-    public static void modInit() {
-        VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
-        LOGGER.info("Loading ImmediatelyFast " + VERSION);
+    public static void lateInit() {
+        if (config.experimental_sign_text_buffering) {
+            signTextCache = new SignTextCache();
+            ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(signTextCache);
+        }
+    }
+
+    public static void onWorldJoin() {
+        if (signTextCache != null) {
+            signTextCache.clearCache();
+        }
     }
 
     public static void loadConfig() {

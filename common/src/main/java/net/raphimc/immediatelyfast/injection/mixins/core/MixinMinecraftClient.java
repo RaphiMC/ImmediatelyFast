@@ -15,24 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.fabric;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.nio.file.Path;
-import java.util.Optional;
+@Mixin(MinecraftClient.class)
+public abstract class MixinMinecraftClient {
 
-public class PlatformCodeImpl {
-
-    public static Path getConfigDirectory() {
-        return FabricLoader.getInstance().getConfigDir();
+    @Inject(method = "onInitFinished", at = @At("HEAD"))
+    private void initImmediatelyFast(CallbackInfo ci) {
+        ImmediatelyFast.lateInit();
     }
 
-    public static Optional<String> getModVersion(final String mod) {
-        return FabricLoader.getInstance().getModContainer(mod).map(m -> m.getMetadata().getVersion().getFriendlyString());
-    }
-
-    public static void checkModCompatibility() {
+    @Inject(method = "joinWorld", at = @At("HEAD"))
+    private void clearSignTextCache(CallbackInfo ci) {
+        ImmediatelyFast.onWorldJoin();
     }
 
 }

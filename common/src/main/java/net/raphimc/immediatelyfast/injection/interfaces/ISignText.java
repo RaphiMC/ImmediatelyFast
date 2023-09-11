@@ -15,25 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.fabric;
+package net.raphimc.immediatelyfast.injection.interfaces;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
-import net.raphimc.immediatelyfast.compat.IrisCompat;
+public interface ISignText {
 
-public class ImmediatelyFastFabric implements ClientModInitializer {
+    boolean shouldCache();
 
-    @Override
-    public void onInitializeClient() {
-        ImmediatelyFast.modInit();
-
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("iris").ifPresent(version -> {
-                ImmediatelyFast.LOGGER.info("Found Iris " + version + ". Enabling compatibility.");
-                IrisCompat.init();
-            });
-        }
-    }
+    void setShouldCache(final boolean shouldCache);
 
 }

@@ -18,25 +18,7 @@
 package net.raphimc.immediatelyfast.forge;
 
 import net.minecraftforge.fml.common.Mod;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
-import net.raphimc.immediatelyfast.compat.IrisCompat;
 
 @Mod("immediatelyfast")
 public class ImmediatelyFastForge {
-
-    public ImmediatelyFastForge() {
-        ImmediatelyFast.modInit();
-
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("oculus").ifPresent(version -> {
-                ImmediatelyFast.LOGGER.info("Found Oculus " + version + ". Enabling compatibility.");
-                IrisCompat.init();
-            });
-            PlatformCode.getModVersion("optifine").ifPresent(version -> {
-                throw new IllegalStateException("Found Optifine " + version + ". ImmediatelyFast is not compatible with Optifine.");
-            });
-        }
-    }
-
 }

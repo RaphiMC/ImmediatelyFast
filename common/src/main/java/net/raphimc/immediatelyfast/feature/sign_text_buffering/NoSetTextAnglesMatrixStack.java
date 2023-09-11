@@ -15,21 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
+package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SinglePreparationResourceReloader;
-import net.minecraft.util.profiler.Profiler;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import net.minecraft.client.util.math.MatrixStack;
 
-@Mixin(SinglePreparationResourceReloader.class)
-public interface ISinglePreparationResourceReloader {
-
-    @Invoker
-    <T> T invokePrepare(ResourceManager manager, Profiler profiler);
-
-    @Invoker
-    void invokeApply(Object prepared, ResourceManager manager, Profiler profiler);
-
+public class NoSetTextAnglesMatrixStack extends MatrixStack {
 }
