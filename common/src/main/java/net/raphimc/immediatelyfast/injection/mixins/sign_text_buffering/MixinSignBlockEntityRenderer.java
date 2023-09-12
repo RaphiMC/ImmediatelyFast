@@ -105,7 +105,9 @@ public abstract class MixinSignBlockEntityRenderer {
 
                 ImmediatelyFast.signTextCache.slotCache.put(signText, slot);
             } else {
-                return; // No free slot, fallback to immediate mode rendering
+                ImmediatelyFast.LOGGER.warn("Failed to find a free slot for sign text (" + ImmediatelyFast.signTextCache.slotCache.size() + " sign texts in atlas). Falling back to immediate mode rendering.");
+                iSignText.setShouldCache(false);
+                return;
             }
         }
 
