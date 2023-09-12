@@ -6,6 +6,7 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "core.MixinArmorFeatureRenderer",
+    "core.MixinRenderLayer",
     "hud_batching.MixinInGameHud",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.consumer.MixinDrawContext"
