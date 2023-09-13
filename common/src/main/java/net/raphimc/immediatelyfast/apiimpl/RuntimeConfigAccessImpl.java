@@ -28,6 +28,7 @@ public class RuntimeConfigAccessImpl implements ConfigAccess {
             case "font_atlas_resizing" -> ImmediatelyFast.runtimeConfig.font_atlas_resizing;
             case "hud_batching" -> ImmediatelyFast.runtimeConfig.hud_batching;
             case "universal_batching_text" -> ImmediatelyFast.runtimeConfig.universal_batching_text;
+            case "fast_buffer_upload" -> ImmediatelyFast.runtimeConfig.fast_buffer_upload;
             case "legacy_fast_buffer_upload" -> ImmediatelyFast.runtimeConfig.legacy_fast_buffer_upload;
             default -> defaultValue;
         };
