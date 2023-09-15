@@ -36,45 +36,45 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinMapRenderer implements IMapRenderer {
 
     @Unique
-    private final Int2ObjectMap<MapAtlasTexture> mapAtlasTextures = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<MapAtlasTexture> immediatelyFast$mapAtlasTextures = new Int2ObjectOpenHashMap<>();
 
     @Unique
-    private final Int2IntMap mapIdToAtlasMapping = new Int2IntOpenHashMap();
+    private final Int2IntMap immediatelyFast$mapIdToAtlasMapping = new Int2IntOpenHashMap();
 
     @Inject(method = "clearStateTextures", at = @At("RETURN"))
     private void clearMapAtlasTextures(final CallbackInfo ci) {
-        for (MapAtlasTexture texture : this.mapAtlasTextures.values()) {
+        for (MapAtlasTexture texture : this.immediatelyFast$mapAtlasTextures.values()) {
             texture.close();
         }
 
-        this.mapAtlasTextures.clear();
-        this.mapIdToAtlasMapping.clear();
+        this.immediatelyFast$mapAtlasTextures.clear();
+        this.immediatelyFast$mapIdToAtlasMapping.clear();
     }
 
     @Inject(method = "getMapTexture", at = @At("HEAD"))
     private void createMapAtlasTexture(int id, MapState state, CallbackInfoReturnable<MapRenderer.MapTexture> cir) {
-        this.mapIdToAtlasMapping.computeIfAbsent(id, k -> {
-            for (MapAtlasTexture atlasTexture : this.mapAtlasTextures.values()) {
+        this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(id, k -> {
+            for (MapAtlasTexture atlasTexture : this.immediatelyFast$mapAtlasTextures.values()) {
                 final int location = atlasTexture.getNextMapLocation();
                 if (location != -1) {
                     return location;
                 }
             }
 
-            final MapAtlasTexture atlasTexture = new MapAtlasTexture(this.mapAtlasTextures.size());
-            this.mapAtlasTextures.put(atlasTexture.getId(), atlasTexture);
+            final MapAtlasTexture atlasTexture = new MapAtlasTexture(this.immediatelyFast$mapAtlasTextures.size());
+            this.immediatelyFast$mapAtlasTextures.put(atlasTexture.getId(), atlasTexture);
             return atlasTexture.getNextMapLocation();
         });
     }
 
     @Override
-    public MapAtlasTexture getMapAtlasTexture(int id) {
-        return this.mapAtlasTextures.get(id);
+    public MapAtlasTexture immediatelyFast$getMapAtlasTexture(int id) {
+        return this.immediatelyFast$mapAtlasTextures.get(id);
     }
 
     @Override
-    public int getAtlasMapping(int mapId) {
-        return this.mapIdToAtlasMapping.getOrDefault(mapId, -1);
+    public int immediatelyFast$getAtlasMapping(int mapId) {
+        return this.immediatelyFast$mapIdToAtlasMapping.getOrDefault(mapId, -1);
     }
 
 }

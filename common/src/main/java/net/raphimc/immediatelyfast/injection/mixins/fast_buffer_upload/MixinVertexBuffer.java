@@ -45,10 +45,10 @@ public abstract class MixinVertexBuffer {
     private int indexBufferId;
 
     @Unique
-    private int vertexBufferSize = -1;
+    private int immediatelyFast$vertexBufferSize = -1;
 
     @Unique
-    private int indexBufferSize = -1;
+    private int immediatelyFast$indexBufferSize = -1;
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_glGenBuffers()I"))
     private int allocateOptimizableBuffer() {
@@ -62,10 +62,10 @@ public abstract class MixinVertexBuffer {
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage, @Local BufferBuilder.DrawParameters parameters) {
         final int dataSize = data.remaining();
-        if (dataSize == 0 && this.vertexBufferSize != -1) return;
+        if (dataSize == 0 && this.immediatelyFast$vertexBufferSize != -1) return;
 
         final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
-        if (dataSize <= this.vertexBufferSize) {
+        if (dataSize <= this.immediatelyFast$vertexBufferSize) {
             if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
                 streamingBuffer.addUpload(this.vertexBufferId, data);
                 return;
@@ -75,7 +75,7 @@ public abstract class MixinVertexBuffer {
             }
         }
 
-        this.vertexBufferSize = dataSize;
+        this.immediatelyFast$vertexBufferSize = dataSize;
         if (streamingBuffer != null) {
             GL15C.glDeleteBuffers(this.vertexBufferId);
             this.vertexBufferId = GL45C.glCreateBuffers();
@@ -90,10 +90,10 @@ public abstract class MixinVertexBuffer {
     @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
-        if (dataSize == 0 && this.indexBufferSize != -1) return;
+        if (dataSize == 0 && this.immediatelyFast$indexBufferSize != -1) return;
 
         final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
-        if (dataSize <= this.indexBufferSize) {
+        if (dataSize <= this.immediatelyFast$indexBufferSize) {
             if (streamingBuffer != null && dataSize <= streamingBuffer.getSize()) {
                 streamingBuffer.addUpload(this.indexBufferId, data);
                 return;
@@ -103,7 +103,7 @@ public abstract class MixinVertexBuffer {
             }
         }
 
-        this.indexBufferSize = dataSize;
+        this.immediatelyFast$indexBufferSize = dataSize;
         if (streamingBuffer != null) {
             GL15C.glDeleteBuffers(this.indexBufferId);
             this.indexBufferId = GL45C.glCreateBuffers();
