@@ -19,8 +19,8 @@ package net.raphimc.immediatelyfast.injection.interfaces;
 
 public interface ISignText {
 
-    boolean shouldCache();
+    boolean immediatelyFast$shouldCache();
 
-    void setShouldCache(final boolean shouldCache);
+    void immediatelyFast$setShouldCache(final boolean shouldCache);
 
 }

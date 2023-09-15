@@ -64,14 +64,14 @@ public abstract class MixinSignBlockEntityRenderer {
     private void renderBufferedSignText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front, CallbackInfo ci) {
         if (matrices instanceof NoSetTextAnglesMatrixStack) return;
         final ISignText iSignText = (ISignText) signText;
-        if (!iSignText.shouldCache()) return;
+        if (!iSignText.immediatelyFast$shouldCache()) return;
 
         SignAtlasFramebuffer.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
-            final int width = this.getTextWidth(signText, lineWidth);
+            final int width = this.immediatelyFast$getTextWidth(signText, lineWidth);
             final int height = 4 * lineHeight;
             if (width <= 0 || height <= 0) {
-                iSignText.setShouldCache(false);
+                iSignText.immediatelyFast$setShouldCache(false);
                 return;
             }
             final int padding = signText.isGlowing() ? 2 : 0;
@@ -106,7 +106,7 @@ public abstract class MixinSignBlockEntityRenderer {
                 ImmediatelyFast.signTextCache.slotCache.put(signText, slot);
             } else {
                 ImmediatelyFast.LOGGER.warn("Failed to find a free slot for sign text (" + ImmediatelyFast.signTextCache.slotCache.size() + " sign texts in atlas). Falling back to immediate mode rendering.");
-                iSignText.setShouldCache(false);
+                iSignText.immediatelyFast$setShouldCache(false);
                 return;
             }
         }
@@ -142,7 +142,7 @@ public abstract class MixinSignBlockEntityRenderer {
     }
 
     @Unique
-    private int getTextWidth(final SignText signText, final int lineWidth) {
+    private int immediatelyFast$getTextWidth(final SignText signText, final int lineWidth) {
         final OrderedText[] orderedTexts = signText.getOrderedMessages(MinecraftClient.getInstance().shouldFilterText(), text -> {
             final List<OrderedText> list = this.textRenderer.wrapLines(text, lineWidth);
             return list.isEmpty() ? OrderedText.EMPTY : list.get(0);

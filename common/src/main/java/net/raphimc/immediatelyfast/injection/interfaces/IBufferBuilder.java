@@ -19,8 +19,8 @@ package net.raphimc.immediatelyfast.injection.interfaces;
 
 public interface IBufferBuilder {
 
-    boolean isReleased();
+    boolean immediatelyFast$isReleased();
 
-    void release();
+    void immediatelyFast$release();
 
 }

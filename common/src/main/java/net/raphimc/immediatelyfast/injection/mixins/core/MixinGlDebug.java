@@ -29,12 +29,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGlDebug {
 
     @Unique
-    private static long lastTime;
+    private static long immediatelyFast$lastTime;
 
     @Inject(method = "info", at = @At("RETURN"))
     private static void printAdditionalInfo(CallbackInfo ci) {
-        if (ImmediatelyFast.config.debug_only_print_additional_error_information && System.currentTimeMillis() - lastTime > 1000) {
-            lastTime = System.currentTimeMillis();
+        if (ImmediatelyFast.config.debug_only_print_additional_error_information && System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
+            immediatelyFast$lastTime = System.currentTimeMillis();
             Thread.dumpStack();
         }
     }

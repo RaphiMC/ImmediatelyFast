@@ -33,13 +33,13 @@ public abstract class MixinBufferBuilder implements IBufferBuilder {
     private ByteBuffer buffer;
 
     @Override
-    public boolean isReleased() {
+    public boolean immediatelyFast$isReleased() {
         return this.buffer == null;
     }
 
     @Override
-    public void release() {
-        if (!this.isReleased()) {
+    public void immediatelyFast$release() {
+        if (!this.immediatelyFast$isReleased()) {
             GlAllocationUtils.ALLOCATOR.free(MemoryUtil.memAddress0(this.buffer));
             this.buffer = null;
         }

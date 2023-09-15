@@ -50,7 +50,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, Model model, boolean leggings);
 
     @Unique
-    private final List<Runnable> trimRenderers = new ArrayList<>();
+    private final List<Runnable> immediatelyFast$trimRenderers = new ArrayList<>();
 
     public MixinArmorFeatureRenderer(FeatureRendererContext<T, M> context) {
         super(context);
@@ -58,8 +58,8 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
     private void renderTrimsSeparate(CallbackInfo ci) {
-        this.trimRenderers.forEach(Runnable::run);
-        this.trimRenderers.clear();
+        this.immediatelyFast$trimRenderers.forEach(Runnable::run);
+        this.immediatelyFast$trimRenderers.clear();
     }
 
     /**
@@ -68,7 +68,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
      */
     @Overwrite
     private void lambda$renderArmorPiece$0(ArmorItem armorItem, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Model model, boolean leggings, ArmorTrim trim) {
-        this.trimRenderers.add(() -> {
+        this.immediatelyFast$trimRenderers.add(() -> {
             this.getContextModel().copyBipedStateTo((BipedEntityModel<T>) model);
             this.setVisible((A) model, armorItem.getSlotType());
             this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, model, leggings);

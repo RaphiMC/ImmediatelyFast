@@ -59,28 +59,28 @@ public abstract class MixinSignText implements ISignText {
     private OrderedText[] orderedMessages;
 
     @Unique
-    private boolean shouldCache;
+    private boolean immediatelyFast$shouldCache;
 
     @Unique
-    private boolean checkedShouldCache;
+    private boolean immediatelyFast$checkedShouldCache;
 
     @Unique
-    private int cachedHashCode;
+    private int immediatelyFast$cachedHashCode;
 
     @Unique
-    private boolean calculatedHashCode;
+    private boolean immediatelyFast$calculatedHashCode;
 
     @Inject(method = "getOrderedMessages", at = @At("RETURN"))
     private void checkShouldCache(CallbackInfoReturnable<OrderedText[]> cir) {
-        if (!this.checkedShouldCache) {
-            this.checkedShouldCache = true;
-            this.shouldCache = true;
+        if (!this.immediatelyFast$checkedShouldCache) {
+            this.immediatelyFast$checkedShouldCache = true;
+            this.immediatelyFast$shouldCache = true;
             for (OrderedText orderedText : this.orderedMessages) {
-                if (!this.shouldCache) break;
+                if (!this.immediatelyFast$shouldCache) break;
 
                 orderedText.accept((index, style, codePoint) -> {
                     if (style.isObfuscated()) {
-                        this.shouldCache = false;
+                        this.immediatelyFast$shouldCache = false;
                         return false;
                     }
 
@@ -92,20 +92,20 @@ public abstract class MixinSignText implements ISignText {
 
     @Inject(method = "getOrderedMessages", at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/SignText;orderedMessages:[Lnet/minecraft/text/OrderedText;", opcode = Opcodes.PUTFIELD))
     private void invalidateCache(CallbackInfoReturnable<OrderedText[]> cir) {
-        this.shouldCache = false;
-        this.checkedShouldCache = false;
-        this.cachedHashCode = 0;
-        this.calculatedHashCode = false;
+        this.immediatelyFast$shouldCache = false;
+        this.immediatelyFast$checkedShouldCache = false;
+        this.immediatelyFast$cachedHashCode = 0;
+        this.immediatelyFast$calculatedHashCode = false;
     }
 
     @Override
-    public boolean shouldCache() {
-        return this.shouldCache;
+    public boolean immediatelyFast$shouldCache() {
+        return this.immediatelyFast$shouldCache;
     }
 
     @Override
-    public void setShouldCache(final boolean shouldCache) {
-        this.shouldCache = shouldCache;
+    public void immediatelyFast$setShouldCache(final boolean shouldCache) {
+        this.immediatelyFast$shouldCache = shouldCache;
     }
 
     @Override
@@ -118,15 +118,15 @@ public abstract class MixinSignText implements ISignText {
 
     @Override
     public int hashCode() {
-        if (!this.calculatedHashCode) {
-            this.calculatedHashCode = true;
+        if (!this.immediatelyFast$calculatedHashCode) {
+            this.immediatelyFast$calculatedHashCode = true;
             int result = Objects.hash(color, glowing);
             result = 31 * result + Arrays.hashCode(messages);
             result = 31 * result + Arrays.hashCode(filteredMessages);
-            this.cachedHashCode = result;
+            this.immediatelyFast$cachedHashCode = result;
         }
 
-        return this.cachedHashCode;
+        return this.immediatelyFast$cachedHashCode;
     }
 
 }

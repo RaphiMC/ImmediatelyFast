@@ -33,38 +33,38 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinTextRenderer_Drawer {
 
     @Unique
-    private RenderLayer lastRenderLayer;
+    private RenderLayer immediatelyFast$lastRenderLayer;
 
     @Unique
-    private VertexConsumer lastVertexConsumer;
+    private VertexConsumer immediatelyFast$lastVertexConsumer;
 
     @Unique
-    private Identifier lastFont;
+    private Identifier immediatelyFast$lastFont;
 
     @Unique
-    private FontStorage lastFontStorage;
+    private FontStorage immediatelyFast$lastFontStorage;
 
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
         // The buffer got drawn while rendering the text, so we need to reset the cached data
-        final boolean isBufferInvalid = this.lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.isBuilding();
+        final boolean isBufferInvalid = this.immediatelyFast$lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.isBuilding();
 
-        if (!isBufferInvalid && this.lastRenderLayer == renderLayer) {
-            return this.lastVertexConsumer;
+        if (!isBufferInvalid && this.immediatelyFast$lastRenderLayer == renderLayer) {
+            return this.immediatelyFast$lastVertexConsumer;
         }
 
-        this.lastRenderLayer = renderLayer;
-        return this.lastVertexConsumer = instance.getBuffer(renderLayer);
+        this.immediatelyFast$lastRenderLayer = renderLayer;
+        return this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderLayer);
     }
 
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;getFontStorage(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;"))
     private FontStorage reduceGetFontStorageCalls(TextRenderer instance, Identifier id) {
-        if (this.lastFont == id) {
-            return this.lastFontStorage;
+        if (this.immediatelyFast$lastFont == id) {
+            return this.immediatelyFast$lastFontStorage;
         }
 
-        this.lastFont = id;
-        return this.lastFontStorage = instance.getFontStorage(id);
+        this.immediatelyFast$lastFont = id;
+        return this.immediatelyFast$lastFontStorage = instance.getFontStorage(id);
     }
 
 }

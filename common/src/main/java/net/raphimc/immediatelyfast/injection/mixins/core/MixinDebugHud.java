@@ -39,12 +39,12 @@ public abstract class MixinDebugHud {
         cir.getReturnValue().add("ImmediatelyFast " + ImmediatelyFast.VERSION);
         cir.getReturnValue().add("Buffer Pool: " + BufferBuilderPool.getAllocatedSize());
         if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
-            cir.getReturnValue().add("Streaming Buffer: " + this.bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getOffset()) + "/" + this.bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) + " MiB");
+            cir.getReturnValue().add("Streaming Buffer: " + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getOffset()) + "/" + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) + " MiB");
         }
     }
 
     @Unique
-    private String bytesToMiB(long bytes) {
+    private String immediatelyFast$bytesToMiB(long bytes) {
         return String.format("%.0f", bytes / 1024F / 1024F);
     }
 
