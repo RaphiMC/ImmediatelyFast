@@ -42,23 +42,23 @@ public abstract class MixinFontStorage {
     protected abstract GlyphRenderer findGlyphRenderer(int codePoint);
 
     @Unique
-    private final Glyph[] fastGlyphCache = new Glyph[65536];
+    private final Glyph[] immediatelyFast$fastGlyphCache = new Glyph[65536];
 
     @Unique
-    private final GlyphRenderer[] fastGlyphRendererCache = new GlyphRenderer[65536];
+    private final GlyphRenderer[] immediatelyFast$fastGlyphRendererCache = new GlyphRenderer[65536];
 
     @Inject(method = "setFonts", at = @At(value = "INVOKE", target = "Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;clear()V", ordinal = 0, remap = false))
     private void clearArrayCaches(List<Font> fonts, CallbackInfo ci) {
-        Arrays.fill(this.fastGlyphCache, null);
-        Arrays.fill(this.fastGlyphRendererCache, null);
+        Arrays.fill(this.immediatelyFast$fastGlyphCache, null);
+        Arrays.fill(this.immediatelyFast$fastGlyphRendererCache, null);
     }
 
     @Inject(method = "getGlyph", at = @At("HEAD"), cancellable = true)
     private void fastGlyphCache(int codePoint, boolean validateAdvance, CallbackInfoReturnable<Glyph> cir) {
-        if (codePoint >= 0 && codePoint < this.fastGlyphCache.length) {
-            Glyph glyph = this.fastGlyphCache[codePoint];
+        if (codePoint >= 0 && codePoint < this.immediatelyFast$fastGlyphCache.length) {
+            Glyph glyph = this.immediatelyFast$fastGlyphCache[codePoint];
             if (glyph == null) {
-                glyph = this.fastGlyphCache[codePoint] = this.findGlyph(codePoint).getGlyph(validateAdvance);
+                glyph = this.immediatelyFast$fastGlyphCache[codePoint] = this.findGlyph(codePoint).getGlyph(validateAdvance);
             }
 
             cir.setReturnValue(glyph);
@@ -67,10 +67,10 @@ public abstract class MixinFontStorage {
 
     @Inject(method = "getGlyphRenderer(I)Lnet/minecraft/client/font/GlyphRenderer;", at = @At("HEAD"), cancellable = true)
     private void fastGlyphRendererCache(int codePoint, CallbackInfoReturnable<GlyphRenderer> cir) {
-        if (codePoint >= 0 && codePoint < this.fastGlyphRendererCache.length) {
-            GlyphRenderer glyphRenderer = this.fastGlyphRendererCache[codePoint];
+        if (codePoint >= 0 && codePoint < this.immediatelyFast$fastGlyphRendererCache.length) {
+            GlyphRenderer glyphRenderer = this.immediatelyFast$fastGlyphRendererCache[codePoint];
             if (glyphRenderer == null) {
-                glyphRenderer = this.fastGlyphRendererCache[codePoint] = this.findGlyphRenderer(codePoint);
+                glyphRenderer = this.immediatelyFast$fastGlyphRendererCache[codePoint] = this.findGlyphRenderer(codePoint);
             }
 
             cir.setReturnValue(glyphRenderer);

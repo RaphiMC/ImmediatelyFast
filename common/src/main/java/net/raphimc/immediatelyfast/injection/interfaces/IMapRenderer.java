@@ -21,8 +21,8 @@ import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 
 public interface IMapRenderer {
 
-    MapAtlasTexture getMapAtlasTexture(int id);
+    MapAtlasTexture immediatelyFast$getMapAtlasTexture(int id);
 
-    int getAtlasMapping(final int mapId);
+    int immediatelyFast$getAtlasMapping(final int mapId);
 
 }

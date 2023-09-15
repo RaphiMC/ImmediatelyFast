@@ -57,13 +57,13 @@ public abstract class MixinFontManager {
     protected abstract FontStorage method_27542(Identifier par1);
 
     @Unique
-    private final Map<Identifier, FontStorage> overriddenFontStorages = new Object2ObjectOpenHashMap<>();
+    private final Map<Identifier, FontStorage> immediatelyFast$overriddenFontStorages = new Object2ObjectOpenHashMap<>();
 
     @Unique
-    private FontStorage defaultFontStorage;
+    private FontStorage immediatelyFast$defaultFontStorage;
 
     @Unique
-    private FontStorage unicodeFontStorage;
+    private FontStorage immediatelyFast$unicodeFontStorage;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void rebuildOverriddenFontStoragesOnReload(TextureManager manager, CallbackInfo ci) {
@@ -78,7 +78,7 @@ public abstract class MixinFontManager {
             @Override
             protected void apply(Map<Identifier, List<Font>> prepared, ResourceManager manager, Profiler profiler) {
                 ((ISinglePreparationResourceReloader) this.delegate).invokeApply(prepared, manager, profiler);
-                rebuildOverriddenFontStorages();
+                immediatelyFast$rebuildOverriddenFontStorages();
             }
 
             @Override
@@ -90,21 +90,21 @@ public abstract class MixinFontManager {
 
     @Inject(method = "setIdOverrides", at = @At("RETURN"))
     private void rebuildOverriddenFontStoragesOnChange(CallbackInfo ci) {
-        this.rebuildOverriddenFontStorages();
+        this.immediatelyFast$rebuildOverriddenFontStorages();
     }
 
     @ModifyArg(method = {"createTextRenderer", "createAdvanceValidatingTextRenderer"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;<init>(Ljava/util/function/Function;Z)V"))
     private Function<Identifier, FontStorage> overrideFontStorage(Function<Identifier, FontStorage> original) {
         return id -> {
             // Fast path for default font
-            if (MinecraftClient.DEFAULT_FONT_ID.equals(id) && this.defaultFontStorage != null) {
-                return this.defaultFontStorage;
-            } else if (MinecraftClient.UNICODE_FONT_ID.equals(id) && this.unicodeFontStorage != null) {
-                return this.unicodeFontStorage;
+            if (MinecraftClient.DEFAULT_FONT_ID.equals(id) && this.immediatelyFast$defaultFontStorage != null) {
+                return this.immediatelyFast$defaultFontStorage;
+            } else if (MinecraftClient.UNICODE_FONT_ID.equals(id) && this.immediatelyFast$unicodeFontStorage != null) {
+                return this.immediatelyFast$unicodeFontStorage;
             }
 
             // Try to get the font storage from the overridden map otherwise
-            final FontStorage storage = this.overriddenFontStorages.get(id);
+            final FontStorage storage = this.immediatelyFast$overriddenFontStorages.get(id);
             if (storage != null) {
                 return storage;
             }
@@ -115,15 +115,15 @@ public abstract class MixinFontManager {
     }
 
     @Unique
-    private void rebuildOverriddenFontStorages() {
-        this.overriddenFontStorages.clear();
-        this.overriddenFontStorages.putAll(this.fontStorages);
+    private void immediatelyFast$rebuildOverriddenFontStorages() {
+        this.immediatelyFast$overriddenFontStorages.clear();
+        this.immediatelyFast$overriddenFontStorages.putAll(this.fontStorages);
         for (Identifier key : this.idOverrides.keySet()) {
-            this.overriddenFontStorages.put(key, this.method_27542(key));
+            this.immediatelyFast$overriddenFontStorages.put(key, this.method_27542(key));
         }
 
-        this.defaultFontStorage = this.overriddenFontStorages.get(MinecraftClient.DEFAULT_FONT_ID);
-        this.unicodeFontStorage = this.overriddenFontStorages.get(MinecraftClient.UNICODE_FONT_ID);
+        this.immediatelyFast$defaultFontStorage = this.immediatelyFast$overriddenFontStorages.get(MinecraftClient.DEFAULT_FONT_ID);
+        this.immediatelyFast$unicodeFontStorage = this.immediatelyFast$overriddenFontStorages.get(MinecraftClient.UNICODE_FONT_ID);
     }
 
 }

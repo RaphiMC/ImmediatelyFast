@@ -51,7 +51,7 @@ public abstract class MixinGameRenderer {
     private Map<String, Shader> shaders;
 
     @Unique
-    private final List<String> cantBeModified = List.of(
+    private final List<String> immediatelyFast$cantBeModified = List.of(
             "rendertype_text",
             "rendertype_text_background",
             "rendertype_text_background_see_through",
@@ -66,7 +66,7 @@ public abstract class MixinGameRenderer {
     private void checkForCoreShaderModifications(ResourceManager manager, CallbackInfo ci) {
         boolean modified = false;
         for (Map.Entry<String, Shader> shaderProgramEntry : this.shaders.entrySet()) {
-            if (!this.cantBeModified.contains(shaderProgramEntry.getKey())) continue;
+            if (!this.immediatelyFast$cantBeModified.contains(shaderProgramEntry.getKey())) continue;
 
             final Identifier vertexIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
             final Resource resource = manager.getResource(vertexIdentifier).orElse(null);
@@ -80,7 +80,7 @@ public abstract class MixinGameRenderer {
             ImmediatelyFast.LOGGER.warn("Core shader modifications detected. Temporarily disabling some parts of ImmediatelyFast.");
             if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
-                this.reloadFontStorages();
+                this.immediatelyFast$reloadFontStorages();
             }
 
             ImmediatelyFast.runtimeConfig.hud_batching = false;
@@ -88,7 +88,7 @@ public abstract class MixinGameRenderer {
         } else {
             if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing && ImmediatelyFast.config.font_atlas_resizing) {
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
-                this.reloadFontStorages();
+                this.immediatelyFast$reloadFontStorages();
             }
 
             ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
@@ -97,7 +97,7 @@ public abstract class MixinGameRenderer {
     }
 
     @Unique
-    private void reloadFontStorages() {
+    private void immediatelyFast$reloadFontStorages() {
         // Force reload the font storages to rebuild the font atlas textures
         for (FontStorage storage : MinecraftClient.getInstance().fontManager.fontStorages.values()) {
             final List<Font> fonts = new ArrayList<>(storage.fonts);

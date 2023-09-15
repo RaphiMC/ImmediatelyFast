@@ -43,7 +43,7 @@ public class BufferBuilderPool {
 
         for (Pair<BufferBuilder, Long> entry : POOL) {
             final BufferBuilder bufferBuilder = entry.getKey();
-            if (!bufferBuilder.isBuilding() && !((IBufferBuilder) bufferBuilder).isReleased()) {
+            if (!bufferBuilder.isBuilding() && !((IBufferBuilder) bufferBuilder).immediatelyFast$isReleased()) {
                 entry.setValue(System.currentTimeMillis());
                 return bufferBuilder;
             }
@@ -60,10 +60,10 @@ public class BufferBuilderPool {
     }
 
     private static void cleanup() {
-        POOL.removeIf(b -> ((IBufferBuilder) b.getKey()).isReleased());
+        POOL.removeIf(b -> ((IBufferBuilder) b.getKey()).immediatelyFast$isReleased());
         POOL.removeIf(b -> {
             if (b.getValue() < System.currentTimeMillis() - 120_000) {
-                ((IBufferBuilder) b.getKey()).release();
+                ((IBufferBuilder) b.getKey()).immediatelyFast$release();
                 return true;
             }
             return false;

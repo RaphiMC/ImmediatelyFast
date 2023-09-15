@@ -32,21 +32,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinArmorChroma_GuiArmor {
 
     @Unique
-    private boolean wasHudBatching;
+    private boolean immediatelyFast$wasHudBatching;
 
     @Inject(method = "draw", at = @At("HEAD"))
     private void endHudBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isHudBatching()) {
             BatchingBuffers.endHudBatching();
-            this.wasHudBatching = true;
+            this.immediatelyFast$wasHudBatching = true;
         }
     }
 
     @Inject(method = "draw", at = @At("RETURN"))
     private void beginHudBatching(CallbackInfo ci) {
-        if (this.wasHudBatching) {
+        if (this.immediatelyFast$wasHudBatching) {
             BatchingBuffers.beginHudBatching();
-            this.wasHudBatching = false;
+            this.immediatelyFast$wasHudBatching = false;
         }
     }
 
