@@ -55,10 +55,9 @@ public abstract class MixinItemRenderer {
     @Redirect(method = "renderGuiItemOverlay(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawableHelper;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V"))
     private void renderQuadsIntoBuffer(MatrixStack matrices, int x1, int y1, int x2, int y2, int color) {
         if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
-            final VertexConsumerProvider prev = BatchingBuffers.FILL_CONSUMER;
-            BatchingBuffers.FILL_CONSUMER = BatchingBuffers.ITEM_OVERLAY_CONSUMER;
+            BatchingBuffers.beginItemOverlayRendering();
             DrawableHelper.fill(matrices, x1, y1, x2, y2, color);
-            BatchingBuffers.FILL_CONSUMER = prev;
+            BatchingBuffers.endItemOverlayRendering();
             return;
         }
 

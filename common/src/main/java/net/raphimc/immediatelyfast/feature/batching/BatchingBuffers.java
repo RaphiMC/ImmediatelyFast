@@ -114,6 +114,29 @@ public class BatchingBuffers {
         ITEM_OVERLAY_BATCH.draw();
     }
 
+    private static VertexConsumerProvider PREV_FILL_CONSUMER = null;
+    private static VertexConsumerProvider PREV_TEXT_CONSUMER = null;
+    private static VertexConsumerProvider PREV_TEXTURE_CONSUMER = null;
+
+    public static void beginItemOverlayRendering() {
+        if (ITEM_OVERLAY_CONSUMER != null) {
+            PREV_FILL_CONSUMER = FILL_CONSUMER;
+            PREV_TEXT_CONSUMER = TEXT_CONSUMER;
+            PREV_TEXTURE_CONSUMER = TEXTURE_CONSUMER;
+            FILL_CONSUMER = ITEM_OVERLAY_CONSUMER;
+            TEXT_CONSUMER = ITEM_OVERLAY_CONSUMER;
+            TEXTURE_CONSUMER = ITEM_OVERLAY_CONSUMER;
+        }
+    }
+
+    public static void endItemOverlayRendering() {
+        if (ITEM_OVERLAY_CONSUMER != null) {
+            FILL_CONSUMER = PREV_FILL_CONSUMER;
+            TEXT_CONSUMER = PREV_TEXT_CONSUMER;
+            TEXTURE_CONSUMER = PREV_TEXTURE_CONSUMER;
+        }
+    }
+
     /**
      * Creates a map of layer buffers for the given RenderLayer's.
      *
