@@ -71,9 +71,15 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformCode.getModVersion("armorchroma").isEmpty()) {
+        if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformCode.getModVersion("armorchroma").isEmpty()) { // https://github.com/A5b84/armor-chroma-fabric
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) {
+        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/squeek502/AppleSkin
+            return false;
+        } else if (packageName.startsWith("hud_batching.compat.iceberg") && PlatformCode.getModVersion("iceberg").isEmpty()) { // https://github.com/AHilyard/Iceberg
+            return false;
+        } else if (packageName.startsWith("hud_batching.compat.highlighter") && PlatformCode.getModVersion("highlighter").isEmpty()) { // https://github.com/AHilyard/Highlighter
+            return false;
+        } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformCode.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
             return false;
         }
 

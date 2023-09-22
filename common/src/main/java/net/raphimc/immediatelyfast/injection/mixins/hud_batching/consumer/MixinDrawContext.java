@@ -37,7 +37,6 @@ import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -127,34 +126,14 @@ public abstract class MixinDrawContext {
         return vertexConsumers;
     }
 
-    @Unique
-    private VertexConsumerProvider immediatelyFast$prevFillConsumer = null;
-
-    @Unique
-    private VertexConsumerProvider immediatelyFast$prevTextConsumer = null;
-
-    @Unique
-    private VertexConsumerProvider immediatelyFast$prevTextureConsumer = null;
-
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemOverlayIntoBufferStart(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
-        if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
-            this.immediatelyFast$prevFillConsumer = BatchingBuffers.FILL_CONSUMER;
-            this.immediatelyFast$prevTextConsumer = BatchingBuffers.TEXT_CONSUMER;
-            this.immediatelyFast$prevTextureConsumer = BatchingBuffers.TEXTURE_CONSUMER;
-            BatchingBuffers.FILL_CONSUMER = BatchingBuffers.ITEM_OVERLAY_CONSUMER;
-            BatchingBuffers.TEXT_CONSUMER = BatchingBuffers.ITEM_OVERLAY_CONSUMER;
-            BatchingBuffers.TEXTURE_CONSUMER = BatchingBuffers.ITEM_OVERLAY_CONSUMER;
-        }
+        BatchingBuffers.beginItemOverlayRendering();
     }
 
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemOverlayIntoBufferEnd(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
-        if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
-            BatchingBuffers.FILL_CONSUMER = this.immediatelyFast$prevFillConsumer;
-            BatchingBuffers.TEXT_CONSUMER = this.immediatelyFast$prevTextConsumer;
-            BatchingBuffers.TEXTURE_CONSUMER = this.immediatelyFast$prevTextureConsumer;
-        }
+        BatchingBuffers.endItemOverlayRendering();
     }
 
 }
