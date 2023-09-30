@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.forge.injection.mixins.hud_batching;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,9 +37,15 @@ public abstract class MixinForgeGui {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             instance.forEach(overlay -> {
                 if (overlay.id().getNamespace().equals("minecraft")) {
-                    BatchingBuffers.beginHudBatching();
-                    consumer.accept(overlay);
-                    BatchingBuffers.endHudBatching();
+                    if (VanillaGuiOverlay.DEBUG_TEXT.type().equals(overlay)) {
+                        BatchingBuffers.beginDebugHudBatching();
+                        consumer.accept(overlay);
+                        BatchingBuffers.endDebugHudBatching();
+                    } else {
+                        BatchingBuffers.beginHudBatching();
+                        consumer.accept(overlay);
+                        BatchingBuffers.endHudBatching();
+                    }
                 } else {
                     consumer.accept(overlay);
                 }

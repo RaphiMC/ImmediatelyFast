@@ -34,6 +34,19 @@ import org.spongepowered.asm.mixin.injection.Coerce;
 public abstract class MixinInGameHud {
 
     @WrapOperation(method = "render", at = {
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;render(Lnet/minecraft/client/gui/DrawContext;)V"),
+    })
+    private void debugHudBatching(@Coerce final Object instance, final DrawContext drawContext, final Operation<Void> operation) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
+            BatchingBuffers.beginDebugHudBatching();
+            operation.call(instance, drawContext);
+            BatchingBuffers.endDebugHudBatching();
+        } else {
+            operation.call(instance, drawContext);
+        }
+    }
+
+    @WrapOperation(method = "render", at = {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusBars(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderMountHealth(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderCrosshair(Lnet/minecraft/client/gui/DrawContext;)V"),
@@ -43,7 +56,6 @@ public abstract class MixinInGameHud {
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/SpectatorHud;renderSpectatorMenu(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderHeldItemTooltip(Lnet/minecraft/client/gui/DrawContext;)V"),
             @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderStatusEffectOverlay(Lnet/minecraft/client/gui/DrawContext;)V"),
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;render(Lnet/minecraft/client/gui/DrawContext;)V"),
     })
     private void batching(@Coerce final Object instance, final DrawContext drawContext, final Operation<Void> operation) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {

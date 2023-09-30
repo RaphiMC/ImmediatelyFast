@@ -52,28 +52,45 @@ public class BatchingBuffers {
      * The batching buffers which hold the vertex data of the batch.
      */
     private static final BatchableImmediate HUD_BATCH = new BatchableImmediate();
+    private static final BatchableImmediate DEBUG_HUD_BATCH = new GuiOverlayFirstBatchableImmediate();
     private static final BatchableImmediate LIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(true);
     private static final BatchableImmediate UNLIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(false);
     private static final BatchableImmediate ITEM_OVERLAY_BATCH = new BatchableImmediate();
 
     public static void beginHudBatching() {
-        if (HUD_BATCH.hasActiveLayers()) {
+        beginHudBatching(HUD_BATCH);
+    }
+
+    public static void beginDebugHudBatching() {
+        beginHudBatching(DEBUG_HUD_BATCH);
+    }
+
+    public static void beginHudBatching(final BatchableImmediate batch) {
+        if (batch.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("HUD batching was already active! endHudBatching() was not called before beginHudBatching(). This will cause rendering issues.");
-            HUD_BATCH.close();
+            batch.close();
         }
-        FILL_CONSUMER = HUD_BATCH;
-        TEXTURE_CONSUMER = HUD_BATCH;
-        TEXT_CONSUMER = HUD_BATCH;
+        FILL_CONSUMER = batch;
+        TEXTURE_CONSUMER = batch;
+        TEXT_CONSUMER = batch;
         beginItemModelBatching();
         beginItemOverlayBatching();
     }
 
     public static void endHudBatching() {
+        endHudBatching(HUD_BATCH);
+    }
+
+    public static void endDebugHudBatching() {
+        endHudBatching(DEBUG_HUD_BATCH);
+    }
+
+    public static void endHudBatching(final BatchableImmediate batch) {
         FILL_CONSUMER = null;
         TEXTURE_CONSUMER = null;
         TEXT_CONSUMER = null;
         final RenderSystemState renderSystemState = RenderSystemState.current();
-        HUD_BATCH.draw();
+        batch.draw();
         endItemModelBatching();
         endItemOverlayBatching();
         renderSystemState.apply();
