@@ -1,3 +1,5 @@
+<h1 style="color: red;">THIS VERSION IS OUTDATED AND NOT BEING MAINTAINED ANYMORE!</h1>
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/RaphiMC/ImmediatelyFast/1.19.3/src/main/resources/assets/immediatelyfast/icon.png" width="150">
   <h1>ImmediatelyFast</h1>
