@@ -44,7 +44,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = new Reference2ObjectLinkedOpenHashMap<>();
     protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
 
-    private boolean drawFallbackLayersFirst = false;
+    protected boolean drawFallbackLayersFirst = false;
 
     public ImmediateAdapter() {
         this(ImmutableMap.of());
