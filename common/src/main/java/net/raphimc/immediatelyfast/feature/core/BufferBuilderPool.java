@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.core;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.client.render.BufferBuilder;
 import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
@@ -36,6 +37,8 @@ public class BufferBuilderPool {
     }
 
     public static BufferBuilder get() {
+        RenderSystem.assertOnRenderThread();
+
         if (lastCleanup < System.currentTimeMillis() - 5_000) {
             lastCleanup = System.currentTimeMillis();
             cleanup();
