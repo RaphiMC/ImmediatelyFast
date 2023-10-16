@@ -32,6 +32,10 @@ public class BatchableImmediate extends ImmediateAdapter {
         super(layerBuffers);
     }
 
+    public BatchableImmediate(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+        super(fallbackBuffer, layerBuffers);
+    }
+
     @Override
     protected void _draw(final RenderLayer layer) {
         for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {

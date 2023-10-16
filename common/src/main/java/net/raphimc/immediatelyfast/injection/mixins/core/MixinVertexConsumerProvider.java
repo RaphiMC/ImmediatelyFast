@@ -46,8 +46,8 @@ public interface MixinVertexConsumerProvider {
         }
 
         // Don't free the fallback buffer. Who knows what else it might get used for outside of this method (https://github.com/RaphiMC/ImmediatelyFast/issues/101)
-
-        return new BatchableImmediate(layerBuffers);
+        // Pass the fallback buffer because some mods access it directly (https://github.com/Team-EnderIO/EnderIO/blob/a67e6dc0dfebf67cd13075ac6aadb9d4598072e8/src/machines/java/com/enderio/machines/client/gui/widget/ioconfig/IOConfigWidget.java#L403)
+        return new BatchableImmediate(fallbackBuffer, layerBuffers);
     }
 
 }

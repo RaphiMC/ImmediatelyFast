@@ -51,7 +51,11 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     }
 
     public ImmediateAdapter(final Map<RenderLayer, BufferBuilder> layerBuffers) {
-        super(FALLBACK_BUFFER, layerBuffers);
+        this(FALLBACK_BUFFER, layerBuffers);
+    }
+
+    public ImmediateAdapter(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+        super(fallbackBuffer, layerBuffers);
     }
 
     @Override
