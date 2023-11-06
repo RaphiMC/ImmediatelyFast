@@ -53,6 +53,9 @@ public abstract class MixinDrawContext {
     @Final
     private MinecraftClient client;
 
+    @Shadow
+    protected abstract void fillGradient(VertexConsumer vertexConsumer, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z);
+
     @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
     private void fillIntoBuffer(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
         if (BatchingBuffers.FILL_CONSUMER != null) {
@@ -77,6 +80,18 @@ public abstract class MixinDrawContext {
             vertexConsumer.vertex(matrix, x2, y2, z).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, z).color(color).next();
             vertexConsumer.vertex(matrix, x1, y1, z).color(color).next();
+        }
+    }
+
+    @Inject(method = "fillGradient(Lnet/minecraft/client/render/RenderLayer;IIIIIII)V", at = @At("HEAD"), cancellable = true)
+    private void fillIntoBuffer(RenderLayer layer, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z, CallbackInfo ci) {
+        if (BatchingBuffers.FILL_CONSUMER != null) {
+            ci.cancel();
+            final float[] shaderColor = RenderSystem.getShaderColor();
+            final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
+            colorStart = ColorHelper.Argb.mixColor(colorStart, argb);
+            colorEnd = ColorHelper.Argb.mixColor(colorEnd, argb);
+            this.fillGradient(BatchingBuffers.FILL_CONSUMER.getBuffer(layer), startX, startY, endX, endY, z, colorStart, colorEnd);
         }
     }
 
