@@ -18,7 +18,9 @@
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching.consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.lenni0451.reflect.Objects;
 import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.ColorHelper;
@@ -27,12 +29,17 @@ import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
 import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFunc;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = DrawableHelper.class, priority = 500)
 public abstract class MixinDrawableHelper {
+
+    @Shadow
+    protected static void fillGradient(Matrix4f matrix, BufferBuilder builder, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z) {
+    }
 
     @Inject(method = "fill(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", at = @At("HEAD"), cancellable = true)
     private static void fillIntoBuffer(MatrixStack matrices, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
@@ -60,6 +67,21 @@ public abstract class MixinDrawableHelper {
             vertexConsumer.vertex(matrix, x2, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x1, y1, 0F).color(color).next();
+            RenderSystem.disableBlend();
+        }
+    }
+
+    @Inject(method = "fillGradient(Lnet/minecraft/client/util/math/MatrixStack;IIIIIII)V", at = @At("HEAD"), cancellable = true)
+    private static void fillIntoBuffer(MatrixStack matrices, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z, CallbackInfo ci) {
+        if (BatchingBuffers.FILL_CONSUMER != null) {
+            ci.cancel();
+            final float[] shaderColor = RenderSystem.getShaderColor();
+            final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
+            colorStart = ColorHelper.Argb.mixColor(colorStart, argb);
+            colorEnd = ColorHelper.Argb.mixColor(colorEnd, argb);
+            RenderSystem.enableBlend();
+            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
+            fillGradient(matrices.peek().getPositionMatrix(), Objects.cast(vertexConsumer, BufferBuilder.class), startX, startY, endX, endY, z, colorStart, colorEnd);
             RenderSystem.disableBlend();
         }
     }
