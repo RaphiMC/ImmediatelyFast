@@ -9,7 +9,8 @@
     "core.MixinForgeRenderTypes",
     "hud_batching.MixinForgeGui",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
-    "hud_batching.consumer.MixinDrawContext"
+    "hud_batching.consumer.MixinDrawContext",
+    "screen_batching.MixinHandledScreen"
   ],
   "injectors": {
     "defaultRequire": 1
