@@ -65,7 +65,7 @@ public class BufferBuilderPool {
     private static void cleanup() {
         POOL.removeIf(b -> ((IBufferBuilder) b.getKey()).immediatelyFast$isReleased());
         POOL.removeIf(b -> {
-            if (b.getValue() < System.currentTimeMillis() - 120_000) {
+            if (b.getValue() < System.currentTimeMillis() - 120_000 && !b.getKey().isBuilding()) {
                 ((IBufferBuilder) b.getKey()).immediatelyFast$release();
                 return true;
             }
