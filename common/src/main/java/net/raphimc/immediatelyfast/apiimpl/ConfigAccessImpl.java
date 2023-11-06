@@ -35,6 +35,7 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "experimental_disable_error_checking" -> ImmediatelyFast.config.experimental_disable_error_checking;
             case "experimental_disable_resource_pack_conflict_handling" -> ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling;
             case "experimental_sign_text_buffering" -> ImmediatelyFast.config.experimental_sign_text_buffering;
+            case "experimental_screen_batching" -> ImmediatelyFast.config.experimental_screen_batching;
             case "debug_only_and_not_recommended_disable_universal_batching" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching;
             case "debug_only_and_not_recommended_disable_mod_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling;
             case "debug_only_and_not_recommended_disable_hardware_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
