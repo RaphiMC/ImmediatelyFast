@@ -15,26 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
+package net.raphimc.immediatelyfast.fabric.injection.mixins.screen_batching;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = HandledScreen.class, priority = 500)
 public abstract class MixinHandledScreen {
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;focusedSlot:Lnet/minecraft/screen/slot/Slot;", ordinal = 0))
-    private void beginBatching(CallbackInfo ci) {
-        BatchingBuffers.beginHudBatching();
+    @Shadow
+    public static void drawSlotHighlight(MatrixStack matrices, int x, int y, int z) {
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/util/math/MatrixStack;II)V", shift = At.Shift.BEFORE))
-    private void endBatching(CallbackInfo ci) {
-        BatchingBuffers.endHudBatching();
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlight(Lnet/minecraft/client/util/math/MatrixStack;III)V"))
+    private void drawSlotHightlightOnTop(MatrixStack matrices, int x, int y, int z) {
+        BatchingBuffers.beginItemOverlayRendering();
+        drawSlotHighlight(matrices, x, y, z);
+        BatchingBuffers.endItemOverlayRendering();
     }
 
 }
