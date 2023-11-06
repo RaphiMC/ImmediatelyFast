@@ -38,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinDrawableHelper {
 
     @Shadow
-    protected static void fillGradient(Matrix4f matrix, BufferBuilder builder, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z) {
+    protected static void fillGradient(Matrix4f matrix, BufferBuilder builder, int startX, int startY, int endX, int endY, int z, int colorStart, int colorEnd) {
     }
 
     @Inject(method = "fill(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V", at = @At("HEAD"), cancellable = true)
