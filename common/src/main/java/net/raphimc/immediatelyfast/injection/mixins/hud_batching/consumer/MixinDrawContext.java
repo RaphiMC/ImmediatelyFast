@@ -54,7 +54,7 @@ public abstract class MixinDrawContext {
     private MinecraftClient client;
 
     @Shadow
-    protected abstract void fillGradient(VertexConsumer vertexConsumer, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z);
+    protected abstract void fillGradient(VertexConsumer vertexConsumer, int startX, int startY, int endX, int endY, int z, int colorStart, int colorEnd);
 
     @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
     private void fillIntoBuffer(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
