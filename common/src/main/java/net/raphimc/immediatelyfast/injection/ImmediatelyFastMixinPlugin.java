@@ -67,6 +67,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
             return false;
         }
+        if (!ImmediatelyFast.config.experimental_screen_batching && packageName.startsWith("screen_batching")) {
+            return false;
+        }
 
         if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformCode.getModVersion("armorchroma").isEmpty()) { // https://github.com/A5b84/armor-chroma-fabric
             return false;

@@ -33,7 +33,8 @@
     "hud_batching.consumer.MixinItemRenderer",
     "hud_batching.consumer.MixinTextRenderer",
     "map_atlas_generation.MixinMapRenderer",
-    "map_atlas_generation.MixinMapRenderer_MapTexture"
+    "map_atlas_generation.MixinMapRenderer_MapTexture",
+    "screen_batching.MixinHandledScreen"
   ],
   "injectors": {
     "defaultRequire": 1
