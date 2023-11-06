@@ -7,7 +7,8 @@
   "client": [
     "core.MixinForgeRenderTypes",
     "hud_batching.MixinForgeGui",
-    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler"
+    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
+    "screen_batching.MixinHandledScreen"
   ],
   "injectors": {
     "defaultRequire": 1
