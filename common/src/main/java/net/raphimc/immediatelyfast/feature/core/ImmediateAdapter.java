@@ -28,10 +28,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
@@ -91,10 +88,25 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         this.currentLayer = Optional.empty();
         this.drawFallbackLayersFirst = false;
 
-        this.activeLayers.stream().filter(l -> !this.layerBuffers.containsKey(l)).sorted((l1, l2) -> {
+        int sortedLayersLength = 0;
+        final RenderLayer[] sortedLayers = new RenderLayer[this.activeLayers.size()];
+        for (RenderLayer layer : this.activeLayers) {
+            if (!this.layerBuffers.containsKey(layer)) {
+                sortedLayers[sortedLayersLength++] = layer;
+            }
+        }
+        if (sortedLayersLength == 0) {
+            return;
+        }
+
+        Arrays.sort(sortedLayers, (l1, l2) -> {
+            if (l1 == null || l2 == null) return 0;
             if (l1.translucent == l2.translucent) return 0;
             return l1.translucent ? 1 : -1;
-        }).forEachOrdered(this::draw);
+        });
+        for (int i = 0; i < sortedLayersLength; i++) {
+            this.draw(sortedLayers[i]);
+        }
     }
 
     @Override
