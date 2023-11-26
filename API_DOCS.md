@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation("maven.modrinth:immediatelyfast:1.2.0+1.20.1") // Get latest version from releases
+    modImplementation("maven.modrinth:immediatelyfast:1.2.0+1.20.1") // Get latest version from releases
 }
 ```
 
