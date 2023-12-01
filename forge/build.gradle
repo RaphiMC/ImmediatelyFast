@@ -7,9 +7,6 @@ loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 
     forge {
-        convertAccessWideners = true
-        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
         mixinConfig("immediatelyfast-forge.mixins.json")
         mixinConfig("immediatelyfast-common.mixins.json")
     }
@@ -27,7 +24,7 @@ configurations {
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.forge_version}")
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
     implementation(include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}"))
     forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}")))
 
@@ -37,7 +34,7 @@ dependencies {
 }
 
 remapJar {
-    injectAccessWidener = true
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 }
 
 jar {
