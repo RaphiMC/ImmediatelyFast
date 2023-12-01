@@ -19,8 +19,6 @@ configurations {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
-    implementation(include("io.github.llamalad7:mixinextras-fabric:${rootProject.mixin_extras_version}"))
     implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}"))
 
     common(project(":api")) { transitive false }
