@@ -45,7 +45,7 @@ subprojects {
                 modLoaders.add("quilt")
             }
 
-            def minecraftVersionList = ["1.20", "1.20.1", "1.20.2"]
+            def minecraftVersionList = ["1.19", "1.19.1", "1.19.2"]
             curseforge {
                 accessToken = providers.gradleProperty("curseforge.publishing_token")
                 projectId = "686911"
