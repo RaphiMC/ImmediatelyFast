@@ -18,8 +18,13 @@ jobs:
           check-latest: true
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Upload Artifacts to GitHub
+      - name: Upload Fabric Artifacts to GitHub
         uses: actions/upload-artifact@v3
         with:
-          name: Artifacts
-          path: build/libs/
+          name: ImmediatelyFast Fabric
+          path: fabric/build/libs/
+      - name: Upload Forge Artifacts to GitHub
+        uses: actions/upload-artifact@v3
+        with:
+          name: ImmediatelyFast Forge
+          path: forge/build/libs/

@@ -20,6 +20,5 @@ pluginManagement {
 rootProject.name = "ImmediatelyFast"
 
 include(":common")
-include(":api")
 include(":fabric")
 include(":forge")

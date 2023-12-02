@@ -7,9 +7,6 @@ loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 
     forge {
-        convertAccessWideners = true
-        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
         mixinConfig("immediatelyfast-forge.mixins.json")
         mixinConfig("immediatelyfast-common.mixins.json")
     }
@@ -27,17 +24,16 @@ configurations {
 dependencies {
     forge("net.minecraftforge:forge:${rootProject.forge_version}")
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
     implementation(include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}"))
     forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}")))
 
-    common(project(":api")) { transitive false }
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
 }
 
 remapJar {
-    injectAccessWidener = true
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 }
 
 jar {
@@ -53,12 +49,6 @@ jar {
     from("../common/src/main/resources/assets/immediatelyfast/icon.png") {
         rename { "immediatelyfast-icon.png" }
     }
-}
-
-sourcesJar {
-    def commonSources = project(":common").sourcesJar
-    dependsOn commonSources
-    from commonSources.archiveFile.map { zipTree(it) }
 }
 
 processResources {
