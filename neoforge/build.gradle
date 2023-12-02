@@ -1,0 +1,62 @@
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+loom {
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+}
+
+configurations {
+    common
+    shadowCommon
+
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentNeoForge.extendsFrom common
+}
+
+repositories {
+    maven {
+        name = "NeoForge"
+        url = "https://maven.neoforged.net/releases"
+    }
+}
+
+dependencies {
+    neoForge("net.neoforged:neoforge:${rootProject.neoforge_version}")
+
+    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
+    implementation(include("io.github.llamalad7:mixinextras-neoforge:${rootProject.mixin_extras_version}"))
+    forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}")))
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive false }
+}
+
+remapJar {
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+}
+
+jar {
+    dependsOn configurations.shadowCommon
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.shadowCommon.collect {
+            zipTree(it)
+        }
+    } {
+        exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
+    }
+    from("../common/src/main/resources/assets/immediatelyfast/icon.png") {
+        rename { "immediatelyfast-icon.png" }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
