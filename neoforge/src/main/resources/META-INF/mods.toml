@@ -21,7 +21,7 @@ config = "immediatelyfast-common.mixins.json"
 [[dependencies.immediatelyfast]]
 modId = "neoforge"
 mandatory = true
-versionRange = "[20.2,)"
+versionRange = "[20.2.84,)"
 ordering = "NONE"
 side = "CLIENT"
 

@@ -26,8 +26,6 @@ repositories {
 dependencies {
     neoForge("net.neoforged:neoforge:${rootProject.neoforge_version}")
 
-    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
-    implementation(include("io.github.llamalad7:mixinextras-neoforge:${rootProject.mixin_extras_version}"))
     forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}")))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
