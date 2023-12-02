@@ -41,12 +41,6 @@ jar {
     }
 }
 
-sourcesJar {
-    def commonSources = project(":common").sourcesJar
-    dependsOn commonSources
-    from commonSources.archiveFile.map { zipTree(it) }
-}
-
 processResources {
     inputs.property "version", project.version
 
