@@ -1,13 +1,7 @@
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "io.github.pacifistmc.forgix" version "1.2.6"
     id "dev.architectury.loom" version "1.4-SNAPSHOT" apply false
-}
-
-forgix {
-    group = "net.raphimc.immediatelyfast."
-    mergedJarName = "${rootProject.name}.jar"
-    outputDir = "build/libs"
+    id "me.modmuss50.mod-publish-plugin" version "0.4.5" apply false
 }
 
 architectury {
@@ -16,12 +10,16 @@ architectury {
 
 subprojects {
     apply plugin: "java-library"
+    apply plugin: "architectury-plugin"
+    apply plugin: "dev.architectury.loom"
+    apply plugin: "me.modmuss50.mod-publish-plugin"
 
     base {
         java.toolchain.languageVersion = JavaLanguageVersion.of(17)
         compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
         group = project.maven_group ?: rootProject.maven_group
+        archivesName = project.maven_name ?: rootProject.maven_name
         version = project.maven_version ?: rootProject.maven_version
     }
 
@@ -29,43 +27,35 @@ subprojects {
         mavenCentral()
     }
 
-    java {
-        withSourcesJar()
-    }
-}
-
-configure(subprojects.findAll { it.name != "api" }) {
-    apply plugin: "architectury-plugin"
-    apply plugin: "dev.architectury.loom"
-
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:${rootProject.yarn_mappings}:v2"
     }
-}
 
-apply plugin: "architectury-plugin"
+    if (project.name != "common") {
+        publishMods {
+            file = remapJar.archiveFile
+            type = STABLE
+            displayName = rootProject.name + ' ' + project.version.substring(0, project.version.lastIndexOf('+'))
+            version = project.version + '-' + project.loom.platform.get().id()
+            modLoaders.add(project.loom.platform.get().id())
+            changelog = file("../CHANGELOG.md").text
+            dryRun = project.maven_version.contains("SNAPSHOT")
+            if (project.name == "fabric") {
+                modLoaders.add("quilt")
+            }
 
-tasks.register("build") {
-    dependsOn(subprojects.collect {
-        it.build
-    })
-}
-
-tasks.register("createFinalJar", Zip) {
-    def inputFile = file("build/libs/${rootProject.name}.jar")
-    from {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        [zipTree(inputFile), zipTree(project(":api").jar.archiveFile.get())]
+            def minecraftVersionList = ["1.20", "1.20.1", "1.20.2"]
+            curseforge {
+                accessToken = providers.gradleProperty("curseforge.publishing_token")
+                projectId = "686911"
+                minecraftVersions.addAll(minecraftVersionList)
+            }
+            modrinth {
+                accessToken = providers.gradleProperty("modrinth.publishing_token")
+                projectId = "5ZwdcRci"
+                minecraftVersions.addAll(minecraftVersionList)
+            }
+        }
     }
-    archiveFileName = "${rootProject.name}-${rootProject.maven_version}.jar"
-    destinationDirectory = inputFile.parentFile
 }
-
-tasks.register("removeForgixJar", Delete) {
-    delete file("build/libs/${rootProject.name}.jar")
-}
-
-build.finalizedBy("mergeJars")
-mergeJars.finalizedBy("createFinalJar")
-createFinalJar.finalizedBy("removeForgixJar")

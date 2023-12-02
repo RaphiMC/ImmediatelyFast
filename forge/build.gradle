@@ -28,7 +28,6 @@ dependencies {
     implementation(include("io.github.llamalad7:mixinextras-forge:${rootProject.mixin_extras_version}"))
     forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}")))
 
-    common(project(":api")) { transitive false }
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
 }
