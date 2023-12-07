@@ -42,9 +42,9 @@ jar {
 }
 
 processResources {
-    inputs.property "version", rootProject.maven_version
+    inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": rootProject.maven_version
+        expand "version": project.version
     }
 }
