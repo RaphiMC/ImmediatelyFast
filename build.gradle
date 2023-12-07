@@ -45,16 +45,15 @@ subprojects {
                 modLoaders.add("quilt")
             }
 
-            def minecraftVersionList = ["1.19.4"]
             curseforge {
                 accessToken = providers.gradleProperty("curseforge.publishing_token")
                 projectId = "686911"
-                minecraftVersions.addAll(minecraftVersionList)
+                minecraftVersions.addAll(rootProject.supported_minecraft_versions)
             }
             modrinth {
                 accessToken = providers.gradleProperty("modrinth.publishing_token")
                 projectId = "5ZwdcRci"
-                minecraftVersions.addAll(minecraftVersionList)
+                minecraftVersions.addAll(rootProject.supported_minecraft_versions)
             }
         }
     }
