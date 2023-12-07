@@ -52,12 +52,12 @@ subprojects {
             curseforge {
                 accessToken = providers.gradleProperty("curseforge.publishing_token")
                 projectId = "686911"
-                minecraftVersions.addAll(rootProject.supported_minecraft_versions)
+                minecraftVersions.addAll(rootProject.supported_minecraft_versions.split(','))
             }
             modrinth {
                 accessToken = providers.gradleProperty("modrinth.publishing_token")
                 projectId = "5ZwdcRci"
-                minecraftVersions.addAll(rootProject.supported_minecraft_versions)
+                minecraftVersions.addAll(rootProject.supported_minecraft_versions.split(','))
             }
         }
     }
