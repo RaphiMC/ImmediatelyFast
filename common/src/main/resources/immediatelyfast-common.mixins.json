@@ -19,7 +19,6 @@
     "fast_text_lookup.MixinFontManager",
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
-    "hud_batching.MixinChatInputSuggestor",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",
     "hud_batching.compat.highlighter.MixinHighlighter_Highlighter",
     "hud_batching.compat.iceberg.MixinIceberg_GuiHelper",
@@ -27,6 +26,8 @@
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderer_MapTexture",
+    "screen_batching.MixinChatInputSuggestor",
+    "screen_batching.MixinChatScreen",
     "screen_batching.MixinHandledScreen",
     "sign_text_buffering.MixinSignBlockEntityRenderer",
     "sign_text_buffering.MixinSignText"
