@@ -39,6 +39,7 @@ public class ImmediatelyFastConfig {
     public boolean experimental_disable_resource_pack_conflict_handling = false;
     public boolean experimental_sign_text_buffering = false;
     public boolean experimental_screen_batching = false;
+    public boolean experimental_universal_hud_batching = false;
 
     // Debug config values
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";

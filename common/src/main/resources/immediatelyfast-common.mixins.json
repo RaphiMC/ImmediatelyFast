@@ -29,7 +29,8 @@
     "map_atlas_generation.MixinMapRenderer_MapTexture",
     "screen_batching.MixinHandledScreen",
     "sign_text_buffering.MixinSignBlockEntityRenderer",
-    "sign_text_buffering.MixinSignText"
+    "sign_text_buffering.MixinSignText",
+    "universal_hud_batching.MixinLayeredDrawer"
   ],
   "injectors": {
     "defaultRequire": 1
