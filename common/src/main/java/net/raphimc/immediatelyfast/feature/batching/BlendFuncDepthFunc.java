@@ -50,16 +50,17 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
     private void apply() {
         if (BLEND) {
             RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
         } else {
             RenderSystem.disableBlend();
         }
+        RenderSystem.blendFuncSeparate(GL_BLEND_SRC_RGB, GL_BLEND_DST_RGB, GL_BLEND_SRC_ALPHA, GL_BLEND_DST_ALPHA);
+
         if (DEPTH_TEST) {
             RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(GL_DEPTH_FUNC);
         } else {
             RenderSystem.disableDepthTest();
         }
+        RenderSystem.depthFunc(GL_DEPTH_FUNC);
     }
 
 }
