@@ -15,33 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
 
-import net.minecraft.client.gui.screen.ChatInputSuggestor;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ChatInputSuggestor.class, priority = 1500)
-public abstract class MixinChatInputSuggestor {
+@Mixin(value = ChatScreen.class, priority = 500)
+public abstract class MixinChatScreen {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
-        if (BatchingBuffers.isHudBatching()) {
-            throw new IllegalStateException("Already batching");
-        }
-
         BatchingBuffers.beginHudBatching();
     }
 
     @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
-        if (!BatchingBuffers.isHudBatching()) {
-            throw new IllegalStateException("Not batching");
-        }
-
         BatchingBuffers.endHudBatching();
     }
 
