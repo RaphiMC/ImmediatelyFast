@@ -60,5 +60,13 @@ subprojects {
                 minecraftVersions.addAll(rootProject.supported_minecraft_versions.split(','))
             }
         }
+
+        idea {
+            module {
+                ["run"].each {
+                    excludeDirs << file("$projectDir/$it")
+                }
+            }
+        }
     }
 }
