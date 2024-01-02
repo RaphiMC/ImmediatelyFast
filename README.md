@@ -25,7 +25,7 @@ The following parts of the immediate mode rendering code are optimized:
 - Particles
 - Text rendering
 - GUI/HUD
-- Immediate mode rendering of other mods (ImmersivePortals benefits a lot from this)
+- Immediate mode rendering of other mods
 
 It also features targeted optimizations where vanilla rendering code is being changed in order to run faster.  
 The following parts of the rendering code are optimized with a more efficient implementation:
