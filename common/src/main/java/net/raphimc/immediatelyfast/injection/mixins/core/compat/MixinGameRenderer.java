@@ -51,6 +51,9 @@ public abstract class MixinGameRenderer {
 
     @Unique
     private final List<String> immediatelyFast$cantBeModified = List.of(
+            "position_color",
+            "position_tex",
+            "position_tex_color",
             "rendertype_text",
             "rendertype_text_background",
             "rendertype_text_background_see_through",
