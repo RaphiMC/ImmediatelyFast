@@ -152,6 +152,7 @@ public abstract class MixinSignBlockEntityRenderer {
         for (OrderedText orderedText : orderedTexts) {
             width = Math.max(width, this.textRenderer.getWidth(orderedText));
         }
+        if (width % 2 != 0) width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
 
         return width;
     }
