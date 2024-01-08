@@ -8,7 +8,7 @@ accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft
 accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/Map;
 accessible field net/minecraft/client/font/FontStorage fonts Ljava/util/List;
 
-accessible field net/minecraft/client/util/GlAllocationUtils ALLOCATOR Lorg/lwjgl/system/MemoryUtil$MemoryAllocator;
+accessible field net/minecraft/client/render/BufferBuilder closed Z
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
 mutable field net/minecraft/client/render/RenderLayer translucent Z  # Only needed on Forge

@@ -20,7 +20,6 @@ package net.raphimc.immediatelyfast.feature.core;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.client.render.BufferBuilder;
-import net.raphimc.immediatelyfast.injection.interfaces.IBufferBuilder;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -46,7 +45,7 @@ public class BufferBuilderPool {
 
         for (Pair<BufferBuilder, Long> entry : POOL) {
             final BufferBuilder bufferBuilder = entry.getKey();
-            if (!bufferBuilder.isBuilding() && !((IBufferBuilder) bufferBuilder).immediatelyFast$isReleased()) {
+            if (!bufferBuilder.isBuilding() && !bufferBuilder.closed) {
                 entry.setValue(System.currentTimeMillis());
                 return bufferBuilder;
             }
@@ -63,10 +62,10 @@ public class BufferBuilderPool {
     }
 
     private static void cleanup() {
-        POOL.removeIf(b -> ((IBufferBuilder) b.getKey()).immediatelyFast$isReleased());
+        POOL.removeIf(b -> b.getKey().closed);
         POOL.removeIf(b -> {
             if (b.getValue() < System.currentTimeMillis() - 120_000 && !b.getKey().isBuilding()) {
-                ((IBufferBuilder) b.getKey()).immediatelyFast$release();
+                b.getKey().close();
                 return true;
             }
             return false;
