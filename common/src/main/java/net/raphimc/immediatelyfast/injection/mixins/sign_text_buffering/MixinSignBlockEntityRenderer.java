@@ -33,6 +33,7 @@ import net.raphimc.immediatelyfast.feature.sign_text_buffering.NoSetTextAnglesMa
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignAtlasFramebuffer;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -81,9 +82,9 @@ public abstract class MixinSignBlockEntityRenderer {
                 final Matrix4f projectionMatrix = new Matrix4f().setOrtho(0F, SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE, 0F, 1000F, 21000F);
                 RenderSystem.backupProjectionMatrix();
                 RenderSystem.setProjectionMatrix(projectionMatrix, VertexSorter.BY_Z);
-                final MatrixStack modelViewMatrix = RenderSystem.getModelViewStack();
-                modelViewMatrix.push();
-                modelViewMatrix.loadIdentity();
+                final Matrix4fStack modelViewMatrix = RenderSystem.getModelViewStack();
+                modelViewMatrix.pushMatrix();
+                modelViewMatrix.identity();
                 modelViewMatrix.translate(0F, 0F, -11000F);
                 RenderSystem.applyModelViewMatrix();
                 final float fogStart = RenderSystem.getShaderFogStart();
@@ -99,7 +100,7 @@ public abstract class MixinSignBlockEntityRenderer {
 
                 MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
                 RenderSystem.setShaderFogStart(fogStart);
-                modelViewMatrix.pop();
+                modelViewMatrix.popMatrix();
                 RenderSystem.applyModelViewMatrix();
                 RenderSystem.restoreProjectionMatrix();
 
