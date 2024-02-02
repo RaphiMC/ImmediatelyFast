@@ -26,6 +26,7 @@ import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,26 +50,11 @@ public abstract class MixinGameRenderer {
     @Final
     private Map<String, ShaderProgram> programs;
 
-    @Unique
-    private final List<String> immediatelyFast$cantBeModified = List.of(
-            "position_color",
-            "position_tex",
-            "position_tex_color",
-            "rendertype_text",
-            "rendertype_text_background",
-            "rendertype_text_background_see_through",
-            "rendertype_text_intensity",
-            "rendertype_text_intensity_see_through",
-            "rendertype_text_see_through",
-            "rendertype_entity_translucent_cull",
-            "rendertype_item_entity_translucent_cull"
-    );
-
     @Inject(method = "loadPrograms", at = @At("RETURN"))
     private void checkForCoreShaderModifications(ResourceFactory factory, CallbackInfo ci) {
         boolean modified = false;
         for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
-            if (!this.immediatelyFast$cantBeModified.contains(shaderProgramEntry.getKey())) continue;
+            if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
 
             final Identifier vertexIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
             final Resource resource = factory.getResource(vertexIdentifier).orElse(null);
