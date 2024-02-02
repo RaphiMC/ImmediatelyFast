@@ -1,6 +1,5 @@
-* Added NeoForge support (1.20.2 and above)
-* Added 1.20.3 and 1.20.4 support
-* Reduced memory allocations by avoiding the java Stream API
-* Moved away from a single jar for all loaders since NeoForge uses the exact same metadata files as Forge
-* Updated dependencies
-* Don't include MixinExtras in the jar for loaders which have it built-in
+* Reverted back to Fabric Loader 0.14 for more mod compatibility (1.19.x)
+* Fixed Blend and Depth state tracking
+* Greatly improved performance in ChatScreen
+* Added more core shaders to the blacklist
+* Fixed sign buffering text squishing when text width is odd
