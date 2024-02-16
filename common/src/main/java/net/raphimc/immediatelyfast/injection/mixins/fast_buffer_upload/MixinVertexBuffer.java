@@ -62,7 +62,9 @@ public abstract class MixinVertexBuffer {
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage, @Local BufferBuilder.DrawParameters parameters) {
         final int dataSize = data.remaining();
-        if (dataSize == 0 && this.immediatelyFast$vertexBufferSize != -1) return;
+        if (dataSize == 0) {
+            return;
+        }
 
         final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
         if (dataSize <= this.immediatelyFast$vertexBufferSize) {
@@ -90,7 +92,9 @@ public abstract class MixinVertexBuffer {
     @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
-        if (dataSize == 0 && this.immediatelyFast$indexBufferSize != -1) return;
+        if (dataSize == 0) {
+            return;
+        }
 
         final PersistentMappedStreamingBuffer streamingBuffer = ImmediatelyFast.persistentMappedStreamingBuffer;
         if (dataSize <= this.immediatelyFast$indexBufferSize) {
