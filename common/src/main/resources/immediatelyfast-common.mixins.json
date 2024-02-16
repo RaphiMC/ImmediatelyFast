@@ -15,7 +15,6 @@
     "core.compat.MixinTextRenderer_Drawer",
     "disable_error_checking.MixinGL11",
     "fast_buffer_upload.MixinVertexBuffer",
-    "fast_text_lookup.MixinFontManager",
     "fast_text_lookup.MixinTextRenderer_Drawer",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",

@@ -18,8 +18,6 @@
 package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.Font;
-import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.Resource;
@@ -35,8 +33,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Mixin(GameRenderer.class)
@@ -85,11 +81,7 @@ public abstract class MixinGameRenderer {
     @Unique
     private void immediatelyFast$reloadFontStorages() {
         // Force reload the font storages to rebuild the font atlas textures
-        for (FontStorage storage : MinecraftClient.getInstance().fontManager.fontStorages.values()) {
-            final List<Font> fonts = new ArrayList<>(storage.fonts);
-            storage.fonts.clear();
-            storage.setFonts(fonts);
-        }
+        MinecraftClient.getInstance().fontManager.setActiveFilters(MinecraftClient.getInstance().options);
     }
 
 }

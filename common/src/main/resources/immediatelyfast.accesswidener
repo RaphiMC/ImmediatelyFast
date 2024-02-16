@@ -6,7 +6,6 @@ accessible method net/minecraft/client/font/FontStorage$GlyphPair getGlyph (Z)Ln
 accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
 accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
 accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/Map;
-accessible field net/minecraft/client/font/FontStorage fonts Ljava/util/List;
 
 accessible field net/minecraft/client/render/BufferBuilder closed Z
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
