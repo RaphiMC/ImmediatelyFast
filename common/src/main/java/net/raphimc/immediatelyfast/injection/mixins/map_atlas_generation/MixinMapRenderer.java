@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.render.MapRenderer;
-import net.minecraft.item.map.MapId;
+import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.map.MapState;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderer;
@@ -53,7 +53,7 @@ public abstract class MixinMapRenderer implements IMapRenderer {
     }
 
     @Inject(method = "getMapTexture", at = @At("HEAD"))
-    private void createMapAtlasTexture(MapId mapId, MapState state, CallbackInfoReturnable<MapRenderer.MapTexture> cir) {
+    private void createMapAtlasTexture(MapIdComponent mapId, MapState state, CallbackInfoReturnable<MapRenderer.MapTexture> cir) {
         this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(mapId.id(), k -> {
             for (MapAtlasTexture atlasTexture : this.immediatelyFast$mapAtlasTextures.values()) {
                 final int location = atlasTexture.getNextMapLocation();
