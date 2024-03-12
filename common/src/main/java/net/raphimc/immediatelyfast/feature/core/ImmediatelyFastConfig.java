@@ -46,5 +46,6 @@ public class ImmediatelyFastConfig {
     public boolean debug_only_and_not_recommended_disable_mod_conflict_handling = false;
     public boolean debug_only_and_not_recommended_disable_hardware_conflict_handling = false;
     public boolean debug_only_print_additional_error_information = false;
+    public boolean debug_only_use_last_usage_for_batch_ordering = false;
 
 }
