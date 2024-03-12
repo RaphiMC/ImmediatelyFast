@@ -26,6 +26,7 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
 import java.util.*;
@@ -78,6 +79,9 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
             } else {
                 bufferBuilder.begin(layer.getDrawMode(), layer.getVertexFormat());
             }
+            this.activeLayers.add(layer);
+        } else if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
+            this.activeLayers.remove(layer);
             this.activeLayers.add(layer);
         }
         return bufferBuilder;
