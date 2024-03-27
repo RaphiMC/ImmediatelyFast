@@ -1,6 +1,3 @@
-* Added NeoForge support (1.20.2 and above)
-* Added 1.20.3 and 1.20.4 support
-* Reduced memory allocations by avoiding the java Stream API
-* Moved away from a single jar for all loaders since NeoForge uses the exact same metadata files as Forge
-* Updated dependencies
-* Don't include MixinExtras in the jar for loaders which have it built-in
+* Fixed OpenGL buffer size error when uploading empty buffers
+* Added option to order batches by last usage (Fixes glint rendering issue with Truly Modular mod)
+* Added support for Iris 1.7.0
