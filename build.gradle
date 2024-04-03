@@ -15,7 +15,7 @@ subprojects {
     apply plugin: "me.modmuss50.mod-publish-plugin"
 
     base {
-        java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+        java.toolchain.languageVersion = JavaLanguageVersion.of(21)
         compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
         group = project.maven_group ?: rootProject.maven_group
