@@ -21,8 +21,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.15.0",
-    "minecraft": "1.20.5-alpha.24.12.a",
-    "java": ">=17"
+    "minecraft": "1.20.5-alpha.24.14.a",
+    "java": ">=21"
   },
   "recommends": {
     "sodium": "*"
