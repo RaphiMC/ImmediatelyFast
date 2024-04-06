@@ -10,6 +10,11 @@ accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/M
 accessible field net/minecraft/client/render/BufferBuilder closed Z
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/render/BufferBuilder;Ljava/util/Map;)V
 accessible field net/minecraft/client/render/RenderLayer translucent Z
+accessible class net/minecraft/client/render/RenderLayer$MultiPhase
+accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
+accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters texture Lnet/minecraft/client/render/RenderPhase$TextureBase;
+accessible method net/minecraft/client/render/RenderLayer$MultiPhase getPhases ()Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
+accessible method net/minecraft/client/render/RenderPhase$TextureBase getId ()Ljava/util/Optional;
 mutable field net/minecraft/client/render/RenderLayer translucent Z  # Only needed on Forge
 accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
 accessible class net/minecraft/client/render/MapRenderer$MapTexture
