@@ -26,6 +26,8 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.item.HorseArmorItem;
+import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
@@ -103,11 +105,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
             return;
         }
 
-        Arrays.sort(sortedLayers, (l1, l2) -> {
-            if (l1 == null || l2 == null) return 0;
-            if (l1.translucent == l2.translucent) return 0;
-            return l1.translucent ? 1 : -1;
-        });
+        Arrays.sort(sortedLayers, (l1, l2) -> Integer.compare(this.getLayerOrder(l1), this.getLayerOrder(l2)));
         for (int i = 0; i < sortedLayersLength; i++) {
             this.draw(sortedLayers[i]);
         }
@@ -192,6 +190,29 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         final BufferBuilder bufferBuilder = BufferBuilderPool.get();
         this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
         return bufferBuilder;
+    }
+
+    protected int getLayerOrder(final RenderLayer layer) {
+        if (layer == null) return 0;
+        if (layer instanceof RenderLayer.MultiPhase multiPhase) {
+            final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
+            if (textureId != null && textureId.toString().startsWith("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
+                final String horseTexturePath = textureId.toString().substring(("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX).length());
+                if (horseTexturePath.startsWith("horse_markings")) {
+                    return 2;
+                } else if (horseTexturePath.startsWith("armor/")) {
+                    return 3;
+                } else {
+                    return 1;
+                }
+            }
+        }
+
+        if (!layer.translucent) {
+            return Integer.MIN_VALUE;
+        } else {
+            return Integer.MAX_VALUE;
+        }
     }
 
 }
