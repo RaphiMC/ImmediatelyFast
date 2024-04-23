@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.neoforge.injection.mixins.screen_batching;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.slot.Slot;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,13 +30,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinHandledScreen {
 
     @Shadow
-    public static void renderSlotHighlight(DrawContext context, int x, int y, int z, int slotColor) {
-    }
+    protected abstract void renderSlotHighlight(DrawContext guiGraphics, Slot slot, int mouseX, int mouseY, float partialTick);
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;renderSlotHighlight(Lnet/minecraft/client/gui/DrawContext;IIII)V"))
-    private void drawSlotHightlightOnTop(DrawContext context, int x, int y, int z, int slotColor) {
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;renderSlotHighlight(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/screen/slot/Slot;IIF)V"))
+    private void drawSlotHightlightOnTop(HandledScreen<?> instance, DrawContext drawContext, Slot slot, int mouseX, int mouseY, float partialTick) {
         BatchingBuffers.beginItemOverlayRendering();
-        renderSlotHighlight(context, x, y, z, slotColor);
+        this.renderSlotHighlight(drawContext, slot, mouseX, mouseY, partialTick);
         BatchingBuffers.endItemOverlayRendering();
     }
 

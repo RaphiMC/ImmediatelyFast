@@ -1,6 +1,6 @@
 /*
  * This file is part of ImmediatelyFast - https://github.com/RaphiMC/ImmediatelyFast
- * Copyright (C) 2023 RK_01/RaphiMC and contributors
+ * Copyright (C) 2023-2024 RK_01/RaphiMC and contributors
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,9 @@
  */
 package net.raphimc.immediatelyfast.neoforge.injection.mixins.core;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
@@ -26,11 +29,10 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.trim.ArmorTrim;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,9 +48,6 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     @Shadow
     protected abstract void setVisible(A bipedModel, EquipmentSlot slot);
 
-    @Shadow
-    protected abstract void renderTrim(ArmorMaterial material, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, Model model, boolean leggings);
-
     @Unique
     private final List<Runnable> immediatelyFast$trimRenderers = new ArrayList<>();
 
@@ -62,16 +61,12 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
         this.immediatelyFast$trimRenderers.clear();
     }
 
-    /**
-     * @author RK_01
-     * @reason Render armor trims in a separate pass
-     */
-    @Overwrite
-    private void lambda$renderArmorPiece$0(ArmorItem armorItem, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Model model, boolean leggings, ArmorTrim trim) {
+    @WrapOperation(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/feature/ArmorFeatureRenderer;renderTrim(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/item/trim/ArmorTrim;Lnet/minecraft/client/model/Model;Z)V"))
+    private void renderTrimsSeparate(ArmorFeatureRenderer<?, ?, ?> instance, RegistryEntry<ArmorMaterial> armorMaterial, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, Model model, boolean leggings, Operation<Void> original, @Local(argsOnly = true) EquipmentSlot armorSlot) {
         this.immediatelyFast$trimRenderers.add(() -> {
             this.getContextModel().copyBipedStateTo((BipedEntityModel<T>) model);
-            this.setVisible((A) model, armorItem.getSlotType());
-            this.renderTrim(armorItem.getMaterial(), matrices, vertexConsumers, light, trim, model, leggings);
+            this.setVisible((A) model, armorSlot);
+            original.call(instance, armorMaterial, matrices, vertexConsumers, light, trim, model, leggings);
         });
     }
 

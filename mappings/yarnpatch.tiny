@@ -1,3 +1,7 @@
 tiny	2	0	intermediary	named
 c	net/minecraft/class_1927	net/minecraft/world/explosion/Explosion
 	m	()Lnet/minecraft/class_243;	method_55109	getPositionYarn
+c	net/minecraft/class_1496	net/minecraft/entity/passive/AbstractHorseEntity
+	m	()Lnet/minecraft/class_1263;	method_56680	getInventoryYarn
+c	net/minecraft/class_329	net/minecraft/client/gui/hud/InGameHud
+	m	(Lnet/minecraft/class_332;F)V	method_1759	renderHotbarYarn

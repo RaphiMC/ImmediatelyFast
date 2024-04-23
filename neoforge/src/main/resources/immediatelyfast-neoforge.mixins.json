@@ -7,7 +7,7 @@
   "client": [
     "core.MixinArmorFeatureRenderer",
     "core.MixinNeoForgeRenderTypes",
-    "hud_batching.MixinExtendedGui",
+    "hud_batching.MixinInGameHud",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.consumer.MixinDrawContext",
     "screen_batching.MixinHandledScreen"

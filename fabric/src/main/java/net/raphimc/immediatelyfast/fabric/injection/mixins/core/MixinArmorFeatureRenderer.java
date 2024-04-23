@@ -48,7 +48,7 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
     protected abstract void setVisible(A bipedModel, EquipmentSlot slot);
 
     @Unique
-    private final List<Runnable> trimRenderers = new ArrayList<>();
+    private final List<Runnable> immediatelyFast$trimRenderers = new ArrayList<>();
 
     public MixinArmorFeatureRenderer(FeatureRendererContext<T, M> context) {
         super(context);
@@ -56,13 +56,13 @@ public abstract class MixinArmorFeatureRenderer<T extends LivingEntity, M extend
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
     private void renderTrimsSeparate(CallbackInfo ci) {
-        this.trimRenderers.forEach(Runnable::run);
-        this.trimRenderers.clear();
+        this.immediatelyFast$trimRenderers.forEach(Runnable::run);
+        this.immediatelyFast$trimRenderers.clear();
     }
 
     @WrapOperation(method = "renderArmor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/feature/ArmorFeatureRenderer;renderTrim(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/item/trim/ArmorTrim;Lnet/minecraft/client/render/entity/model/BipedEntityModel;Z)V"))
     private void renderTrimsSeparate(ArmorFeatureRenderer<?, ?, ?> instance, RegistryEntry<ArmorMaterial> armorMaterial, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, ArmorTrim trim, A model, boolean leggings, Operation<Void> original, @Local(argsOnly = true) EquipmentSlot armorSlot) {
-        this.trimRenderers.add(() -> {
+        this.immediatelyFast$trimRenderers.add(() -> {
             this.getContextModel().copyBipedStateTo(model);
             this.setVisible(model, armorSlot);
             original.call(instance, armorMaterial, matrices, vertexConsumers, light, trim, model, leggings);
