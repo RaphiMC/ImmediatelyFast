@@ -34,35 +34,23 @@ public class IrisCompat {
     public static BooleanConsumer renderWithExtendedVertexFormat;
     public static TriConsumer<BufferBuilder, VertexFormat.DrawMode, VertexFormat> iris$beginWithoutExtending;
 
-    private static String[] PACKAGE_NAMES = new String[] {
-            "net.coderbot.iris.vertices",
-            "net.irisshaders.iris.vertices"
-    };
-
     public static void init() {
         IRIS_LOADED = true;
-        Throwable throwable = null;
-        for (int i = 0; i < PACKAGE_NAMES.length; i++) {
-            String packageName = PACKAGE_NAMES[i];
-            try {
-                final MethodHandles.Lookup lookup = MethodHandles.lookup();
-                final Class<?> immediateStateClass = Class.forName(packageName + ".ImmediateState");
-                final Class<?> extendingBufferBuilderClass = Class.forName(packageName + ".ExtendingBufferBuilder");
+        try {
+            final MethodHandles.Lookup lookup = MethodHandles.lookup();
+            final Class<?> immediateStateClass = Class.forName("net.irisshaders.iris.vertices.ImmediateState");
+            final Class<?> extendingBufferBuilderClass = Class.forName("net.irisshaders.iris.vertices.ExtendingBufferBuilder");
 
-                isRenderingLevel = FieldAccessor.makeGetter(BooleanSupplier.class, null, immediateStateClass.getDeclaredField("isRenderingLevel"));
-                renderWithExtendedVertexFormat = FieldAccessor.makeSetter(BooleanConsumer.class, null, immediateStateClass.getDeclaredField("renderWithExtendedVertexFormat"));
+            isRenderingLevel = FieldAccessor.makeGetter(BooleanSupplier.class, null, immediateStateClass.getDeclaredField("isRenderingLevel"));
+            renderWithExtendedVertexFormat = FieldAccessor.makeSetter(BooleanConsumer.class, null, immediateStateClass.getDeclaredField("renderWithExtendedVertexFormat"));
 
-                final MethodHandle iris$beginWithoutExtendingMH = lookup.findVirtual(extendingBufferBuilderClass, "iris$beginWithoutExtending", MethodType.methodType(void.class, VertexFormat.DrawMode.class, VertexFormat.class));
-                final CallSite iris$beginWithoutExtendingCallSite = LambdaMetafactory.metafactory(lookup, "accept", MethodType.methodType(TriConsumer.class), MethodType.methodType(void.class, Object.class, Object.class, Object.class), iris$beginWithoutExtendingMH, iris$beginWithoutExtendingMH.type());
-                iris$beginWithoutExtending = (TriConsumer<BufferBuilder, VertexFormat.DrawMode, VertexFormat>) iris$beginWithoutExtendingCallSite.getTarget().invoke();
-                return;
-            } catch (Throwable t) {
-                throwable = t;
-            }
+            final MethodHandle iris$beginWithoutExtendingMH = lookup.findVirtual(extendingBufferBuilderClass, "iris$beginWithoutExtending", MethodType.methodType(void.class, VertexFormat.DrawMode.class, VertexFormat.class));
+            final CallSite iris$beginWithoutExtendingCallSite = LambdaMetafactory.metafactory(lookup, "accept", MethodType.methodType(TriConsumer.class), MethodType.methodType(void.class, Object.class, Object.class, Object.class), iris$beginWithoutExtendingMH, iris$beginWithoutExtendingMH.type());
+            iris$beginWithoutExtending = (TriConsumer<BufferBuilder, VertexFormat.DrawMode, VertexFormat>) iris$beginWithoutExtendingCallSite.getTarget().invoke();
+        } catch (Throwable t) {
+            ImmediatelyFast.LOGGER.error("Failed to initialize Iris compatibility. Try updating Iris and ImmediatelyFast before reporting this on GitHub", t);
+            System.exit(-1);
         }
-
-        ImmediatelyFast.LOGGER.error("Failed to initialize Iris compatibility. Try updating Iris and ImmediatelyFast before reporting this on GitHub", throwable);
-        System.exit(-1);
     }
 
 }
