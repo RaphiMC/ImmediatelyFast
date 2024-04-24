@@ -193,7 +193,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
-        if (layer == null) return 0;
+        if (layer == null) return Integer.MAX_VALUE;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
             if (textureId != null && textureId.toString().startsWith("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
@@ -211,7 +211,7 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         if (!layer.translucent) {
             return Integer.MIN_VALUE;
         } else {
-            return Integer.MAX_VALUE;
+            return Integer.MAX_VALUE - 1;
         }
     }
 
