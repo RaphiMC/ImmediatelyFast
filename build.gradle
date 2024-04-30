@@ -49,6 +49,9 @@ subprojects {
                 accessToken = providers.gradleProperty("curseforge.publishing_token")
                 projectId = "686911"
                 minecraftVersions.addAll(rootProject.supported_minecraft_versions.split(','))
+                javaVersions.add(JavaVersion.toVersion(java.toolchain.getLanguageVersion().get().asInt()))
+                clientRequired = true
+                serverRequired = false
             }
             modrinth {
                 accessToken = providers.gradleProperty("modrinth.publishing_token")
