@@ -151,4 +151,12 @@ public abstract class MixinDrawContext {
         BatchingBuffers.endItemOverlayRendering();
     }
 
+    @Inject(method = "setScissor", at = @At("HEAD"))
+    private void forceDrawBatch(CallbackInfo ci) {
+        if (BatchingBuffers.isHudBatching()) {
+            BatchingBuffers.endHudBatching();
+            BatchingBuffers.beginHudBatching();
+        }
+    }
+
 }
