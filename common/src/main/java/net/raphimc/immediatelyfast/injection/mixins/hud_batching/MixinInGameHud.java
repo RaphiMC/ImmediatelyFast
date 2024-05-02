@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.forge.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,15 +25,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ForgeGui.class, priority = 1500)
-public abstract class MixinForgeGui {
+@Mixin(value = InGameHud.class, priority = 1500)
+public abstract class MixinInGameHud {
 
     @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
+            "renderScoreboardSidebar",
+            "renderCrosshair",
+            "renderStatusEffectOverlay",
+            "renderHotbar",
+            "renderMountJumpBar",
+            "renderExperienceBar",
+            "renderHeldItemTooltip",
+            "renderStatusBars",
+            "renderMountHealth",
     }, at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
@@ -42,11 +46,15 @@ public abstract class MixinForgeGui {
     }
 
     @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
+            "renderScoreboardSidebar",
+            "renderCrosshair",
+            "renderStatusEffectOverlay",
+            "renderHotbar",
+            "renderMountJumpBar",
+            "renderExperienceBar",
+            "renderHeldItemTooltip",
+            "renderStatusBars",
+            "renderMountHealth",
     }, at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {

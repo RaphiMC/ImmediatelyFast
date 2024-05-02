@@ -6,7 +6,6 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "core.MixinRenderLayer",
-    "hud_batching.MixinInGameHud",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "screen_batching.MixinHandledScreen"
   ],
