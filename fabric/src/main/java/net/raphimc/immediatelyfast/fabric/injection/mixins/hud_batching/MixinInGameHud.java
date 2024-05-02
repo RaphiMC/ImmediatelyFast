@@ -39,7 +39,7 @@ public abstract class MixinInGameHud {
             "renderExperienceLevel",
             "renderHeldItemTooltip",
             "renderStatusBars",
-            "renderMountHealth",
+            "renderMountHealth"
     }, at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
@@ -58,7 +58,7 @@ public abstract class MixinInGameHud {
             "renderExperienceLevel",
             "renderHeldItemTooltip",
             "renderStatusBars",
-            "renderMountHealth",
+            "renderMountHealth"
     }, at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
