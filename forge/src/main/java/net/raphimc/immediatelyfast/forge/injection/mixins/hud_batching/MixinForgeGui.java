@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ForgeGui.class, priority = 1500)
+@Mixin(value = ForgeGui.class, priority = 500)
 public abstract class MixinForgeGui {
 
     @Inject(method = {
