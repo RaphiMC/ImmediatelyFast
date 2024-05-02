@@ -19,12 +19,13 @@ package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
 
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ChatScreen.class, priority = 500)
+@Mixin(value = ChatScreen.class, priority = 1500)
 public abstract class MixinChatScreen {
 
     @Inject(method = "render", at = @At("HEAD"))
@@ -32,6 +33,7 @@ public abstract class MixinChatScreen {
         BatchingBuffers.beginHudBatching();
     }
 
+    @InjectOnAllReturns
     @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         BatchingBuffers.endHudBatching();

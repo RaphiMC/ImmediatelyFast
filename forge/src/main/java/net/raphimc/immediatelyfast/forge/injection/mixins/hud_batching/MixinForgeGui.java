@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.forge.injection.mixins.hud_batching;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,6 +42,7 @@ public abstract class MixinForgeGui {
         }
     }
 
+    @InjectOnAllReturns
     @Inject(method = {
             "renderArmor",
             "renderAir",
