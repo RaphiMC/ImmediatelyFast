@@ -33,7 +33,9 @@ public abstract class MixinLayeredDrawer {
     private void batchLayeredDraws(LayeredDrawer instance, DrawContext context, float tickDelta, Operation<Void> original) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
+            ImmediatelyFast.runtimeConfig.hud_batching = false;
             original.call(instance, context, tickDelta);
+            ImmediatelyFast.runtimeConfig.hud_batching = true;
             BatchingBuffers.endHudBatching();
         } else {
             original.call(instance, context, tickDelta);
