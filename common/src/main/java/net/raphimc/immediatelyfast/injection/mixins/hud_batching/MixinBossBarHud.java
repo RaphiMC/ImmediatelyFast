@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 import net.minecraft.client.gui.hud.BossBarHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,6 +36,7 @@ public abstract class MixinBossBarHud {
         }
     }
 
+    @InjectOnAllReturns
     @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
