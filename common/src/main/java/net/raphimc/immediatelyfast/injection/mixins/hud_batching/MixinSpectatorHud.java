@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = SpectatorHud.class, priority = 1500)
+@Mixin(value = SpectatorHud.class, priority = 500)
 public abstract class MixinSpectatorHud {
 
     @Inject(method = {"render", "renderSpectatorMenu(Lnet/minecraft/client/gui/DrawContext;FIILnet/minecraft/client/gui/hud/spectator/SpectatorMenuState;)V"}, at = @At("HEAD"))
