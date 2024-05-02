@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.PlatformCode;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturnsProcessor;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -104,6 +105,7 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        InjectOnAllReturnsProcessor.process(targetClass);
     }
 
 }

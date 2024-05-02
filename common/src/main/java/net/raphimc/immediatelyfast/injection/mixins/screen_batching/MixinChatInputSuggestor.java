@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
 
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,6 +40,7 @@ public abstract class MixinChatInputSuggestor {
         }
     }
 
+    @InjectOnAllReturns
     @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (!this.immediatelyFast$wasBatching) {

@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,6 +46,7 @@ public abstract class MixinInGameHud {
         }
     }
 
+    @InjectOnAllReturns
     @Inject(method = {
             "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
             "renderCrosshair",
