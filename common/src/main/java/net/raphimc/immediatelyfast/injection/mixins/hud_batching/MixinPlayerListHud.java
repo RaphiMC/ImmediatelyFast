@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.neoforge.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.PlayerListHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,47 +25,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = InGameHud.class, priority = 500)
-public abstract class MixinInGameHud {
+@Mixin(value = PlayerListHud.class, priority = 1500)
+public abstract class MixinPlayerListHud {
 
-    @Inject(method = {
-            "renderTitleAndSubtitle",
-            "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
-            "renderCrosshair",
-            "renderStatusEffectOverlay",
-            "renderHotbarYarn",
-            "renderMountJumpBar",
-            "renderExperienceBar",
-            "renderExperienceLevel",
-            "renderHeldItemTooltip",
-            "renderHealthLevel",
-            "renderArmorLevel",
-            "renderFoodLevel",
-            "renderAirLevel",
-            "renderMountHealth",
-    }, at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
         }
     }
 
-    @Inject(method = {
-            "renderTitleAndSubtitle",
-            "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
-            "renderCrosshair",
-            "renderStatusEffectOverlay",
-            "renderHotbarYarn",
-            "renderMountJumpBar",
-            "renderExperienceBar",
-            "renderExperienceLevel",
-            "renderHeldItemTooltip",
-            "renderHealthLevel",
-            "renderArmorLevel",
-            "renderFoodLevel",
-            "renderAirLevel",
-            "renderMountHealth",
-    }, at = @At("RETURN"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.endHudBatching();
