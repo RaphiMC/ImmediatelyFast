@@ -17,41 +17,40 @@
  */
 package net.raphimc.immediatelyfast.forge.injection.mixins.hud_batching;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Consumer;
-
-@Mixin(ForgeGui.class)
+@Mixin(value = ForgeGui.class, priority = 1500)
 public abstract class MixinForgeGui {
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList;forEach(Ljava/util/function/Consumer;)V", remap = false))
-    private void batching(final ImmutableList<NamedGuiOverlay> instance, final Consumer<NamedGuiOverlay> consumer) {
+    @Inject(method = {
+            "renderArmor",
+            "renderAir",
+            "renderFood",
+            "renderTitle",
+            "renderHealthMount"
+    }, at = @At("HEAD"))
+    private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            instance.forEach(overlay -> {
-                if (overlay.id().getNamespace().equals("minecraft")) {
-                    if (VanillaGuiOverlay.DEBUG_TEXT.type().equals(overlay)) {
-                        BatchingBuffers.beginDebugHudBatching();
-                        consumer.accept(overlay);
-                        BatchingBuffers.endDebugHudBatching();
-                    } else {
-                        BatchingBuffers.beginHudBatching();
-                        consumer.accept(overlay);
-                        BatchingBuffers.endHudBatching();
-                    }
-                } else {
-                    consumer.accept(overlay);
-                }
-            });
-        } else {
-            instance.forEach(consumer);
+            BatchingBuffers.beginHudBatching();
+        }
+    }
+
+    @Inject(method = {
+            "renderArmor",
+            "renderAir",
+            "renderFood",
+            "renderTitle",
+            "renderHealthMount"
+    }, at = @At("RETURN"))
+    private void endBatching(CallbackInfo ci) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
+            BatchingBuffers.endHudBatching();
         }
     }
 

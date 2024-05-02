@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.neoforge.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.neoforged.neoforge.client.gui.overlay.ExtendedGui;
+import net.minecraft.client.gui.hud.DebugHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,32 +25,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ExtendedGui.class, priority = 1500)
-public abstract class MixinExtendedGui {
+@Mixin(value = DebugHud.class, priority = 1500)
+public abstract class MixinDebugHud {
 
-    @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
-    }, at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginHudBatching();
+            BatchingBuffers.beginDebugHudBatching();
         }
     }
 
-    @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
-    }, at = @At("RETURN"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.endHudBatching();
+            BatchingBuffers.endDebugHudBatching();
         }
     }
 
