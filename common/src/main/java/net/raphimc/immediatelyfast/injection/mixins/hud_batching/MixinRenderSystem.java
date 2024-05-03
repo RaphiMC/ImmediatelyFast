@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,12 +28,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderSystem.class)
 public abstract class MixinRenderSystem {
 
+    @Unique
+    private static boolean immediatelyFast$isForceDrawing;
+
     @Inject(method = "drawElements", at = @At("HEAD"))
     private static void checkForDrawCallWhileBatching(CallbackInfo ci) {
-        if (BatchingBuffers.FILL_CONSUMER != null) {
+        if (!immediatelyFast$isForceDrawing && BatchingBuffers.FILL_CONSUMER != null) {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
-            BatchingBuffers.endHudBatching();
-            BatchingBuffers.beginHudBatching();
+            immediatelyFast$isForceDrawing = true;
+            BatchingBuffers.forceDrawBuffers();
+            immediatelyFast$isForceDrawing = false;
         }
     }
 

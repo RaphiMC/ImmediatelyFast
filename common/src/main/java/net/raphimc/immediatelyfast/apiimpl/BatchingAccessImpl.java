@@ -37,4 +37,9 @@ public class BatchingAccessImpl implements BatchingAccess {
         return BatchingBuffers.isHudBatching();
     }
 
+    @Override
+    public void forceDrawBuffers() {
+        BatchingBuffers.forceDrawBuffers();
+    }
+
 }

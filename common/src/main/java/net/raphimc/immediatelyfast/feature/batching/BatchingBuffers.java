@@ -83,6 +83,15 @@ public class BatchingBuffers {
         return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
     }
 
+    public static void forceDrawBuffers() {
+        final RenderSystemState renderSystemState = RenderSystemState.current();
+        HUD_BATCH.draw();
+        UNLIT_ITEM_MODEL_BATCH.draw();
+        LIT_ITEM_MODEL_BATCH.draw();
+        ITEM_OVERLAY_BATCH.draw();
+        renderSystemState.apply();
+    }
+
     private static void beginItemModelBatching() {
         if (LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("Item model batching was already active! endItemModelBatching() was not called before beginItemModelBatching(). This will cause rendering issues.");
