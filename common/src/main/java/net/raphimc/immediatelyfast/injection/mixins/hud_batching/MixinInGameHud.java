@@ -20,15 +20,17 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
 import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = InGameHud.class, priority = 500)
+@Mixin(value = InGameHud.class, priority = 1500)
 public abstract class MixinInGameHud {
 
+    @InjectAboveEverything
     @Inject(method = {
             "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
             "renderCrosshair",
