@@ -153,7 +153,7 @@ public abstract class MixinDrawContext {
 
     @Inject(method = "setScissor", at = @At("HEAD"))
     private void forceDrawBatch(CallbackInfo ci) {
-        if (BatchingBuffers.isHudBatching()) {
+        if (BatchingBuffers.isHudBatching() && BatchingBuffers.hasDataToDraw()) {
             BatchingBuffers.forceDrawBuffers();
         }
     }
