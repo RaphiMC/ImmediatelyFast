@@ -38,6 +38,11 @@ public class BatchingAccessImpl implements BatchingAccess {
     }
 
     @Override
+    public boolean hasDataToDraw() {
+        return BatchingBuffers.hasDataToDraw();
+    }
+
+    @Override
     public void forceDrawBuffers() {
         BatchingBuffers.forceDrawBuffers();
     }
