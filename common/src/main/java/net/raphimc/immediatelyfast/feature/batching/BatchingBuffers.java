@@ -83,6 +83,10 @@ public class BatchingBuffers {
         return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
     }
 
+    public static boolean hasDataToDraw() {
+        return HUD_BATCH.hasActiveLayers() || LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers() || ITEM_OVERLAY_BATCH.hasActiveLayers();
+    }
+
     public static void forceDrawBuffers() {
         final RenderSystemState renderSystemState = RenderSystemState.current();
         HUD_BATCH.draw();

@@ -20,19 +20,21 @@ package net.raphimc.immediatelyfast.feature.batching;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.Shader;
 
-public record RenderSystemState(int texture0, Shader shaderProgram, BlendFuncDepthFunc blendFuncDepthFunc) {
+public record RenderSystemState(int texture0, Shader program, float[] shaderColor, BlendFuncDepthFunc blendFuncDepthFunc) {
 
     public static RenderSystemState current() {
         return new RenderSystemState(
                 RenderSystem.getShaderTexture(0),
                 RenderSystem.getShader(),
-                BlendFuncDepthFunc.current()
+                RenderSystem.getShaderColor().clone(),
+                net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFunc.current()
         );
     }
 
     public void apply() {
         RenderSystem.setShaderTexture(0, this.texture0);
-        RenderSystem.setShader(() -> this.shaderProgram);
+        RenderSystem.setShader(() -> this.program);
+        RenderSystem.setShaderColor(this.shaderColor[0], this.shaderColor[1], this.shaderColor[2], this.shaderColor[3]);
         this.blendFuncDepthFunc.apply();
     }
 

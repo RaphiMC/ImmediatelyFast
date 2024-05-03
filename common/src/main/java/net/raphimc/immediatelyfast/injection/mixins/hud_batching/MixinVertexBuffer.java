@@ -17,26 +17,31 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gl.VertexBuffer;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(RenderSystem.class)
-public abstract class MixinRenderSystem {
+@Mixin(VertexBuffer.class)
+public abstract class MixinVertexBuffer {
+
+    @Shadow
+    public abstract void bind();
 
     @Unique
     private static boolean immediatelyFast$isForceDrawing;
 
-    @Inject(method = "drawElements", at = @At("HEAD"))
-    private static void checkForDrawCallWhileBatching(CallbackInfo ci) {
-        if (!immediatelyFast$isForceDrawing && BatchingBuffers.FILL_CONSUMER != null) {
+    @Inject(method = "drawInternal", at = @At("HEAD"))
+    private void checkForDrawCallWhileBatching(CallbackInfo ci) {
+        if (!immediatelyFast$isForceDrawing && BatchingBuffers.FILL_CONSUMER != null && BatchingBuffers.hasDataToDraw()) {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
             immediatelyFast$isForceDrawing = true;
             BatchingBuffers.forceDrawBuffers();
+            this.bind();
             immediatelyFast$isForceDrawing = false;
         }
     }
