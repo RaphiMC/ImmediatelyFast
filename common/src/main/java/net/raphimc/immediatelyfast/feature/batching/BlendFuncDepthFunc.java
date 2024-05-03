@@ -47,7 +47,7 @@ public record BlendFuncDepthFunc(boolean BLEND, boolean DEPTH_TEST, int GL_BLEND
         STACK.pop().apply();
     }
 
-    private void apply() {
+    public void apply() {
         if (BLEND) {
             RenderSystem.enableBlend();
         } else {
