@@ -35,4 +35,9 @@ public interface BatchingAccess {
      */
     boolean isHudBatching();
 
+    /**
+     * Draws all currently stored batches immediately.
+     */
+    void forceDrawBuffers();
+
 }
