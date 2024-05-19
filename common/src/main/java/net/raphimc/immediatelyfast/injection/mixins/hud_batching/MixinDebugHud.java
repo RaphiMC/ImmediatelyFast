@@ -35,6 +35,9 @@ public abstract class MixinDebugHud {
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginDebugHudBatching();
+        } else if (ImmediatelyFast.config.experimental_universal_hud_batching && BatchingBuffers.isHudBatching()) {
+            BatchingBuffers.endHudBatching();
+            BatchingBuffers.beginDebugHudBatching();
         }
     }
 
@@ -43,6 +46,9 @@ public abstract class MixinDebugHud {
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.endDebugHudBatching();
+        } else if (ImmediatelyFast.config.experimental_universal_hud_batching && BatchingBuffers.isHudBatching()) {
+            BatchingBuffers.endDebugHudBatching();
+            BatchingBuffers.beginHudBatching();
         }
     }
 
