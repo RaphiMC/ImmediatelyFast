@@ -1,4 +1,3 @@
-* Fixed HUD batching injection ordering issues
-* Fixed draw order issues when force drawing batches
-* Fixed GL state issues when force drawing batches
-* Fixed blend/depth state issues
+* Track texture 1 and 2 in RenderSystemState (Fixes issue with dark items / item count text)
+* Fixed graphical issues with experimental universal HUD batching (1.20.5)
+* Updated libraries
