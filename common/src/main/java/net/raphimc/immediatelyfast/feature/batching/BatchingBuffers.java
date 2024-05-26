@@ -50,7 +50,7 @@ public class BatchingBuffers {
      * The batching buffers which hold the vertex data of the batch.
      */
     private static final BatchingBuffer HUD_BATCH = new BatchingBuffer();
-    private static final BatchingBuffer ITEM_MODEL_BATCH = new ItemModelBatchableImmediate();
+    private static final BatchingBuffer ITEM_MODEL_BATCH = new ItemModelBatchingBuffer();
     private static final BatchingBuffer ITEM_OVERLAY_BATCH = new BatchingBuffer();
 
     public static void beginHudBatching() {
@@ -102,7 +102,6 @@ public class BatchingBuffers {
 
     private static void endItemModelBatching() {
         ITEM_MODEL_CONSUMER = null;
-
         ITEM_MODEL_BATCH.draw();
     }
 

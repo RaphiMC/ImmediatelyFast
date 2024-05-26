@@ -22,7 +22,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
+import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -47,7 +47,7 @@ public interface MixinVertexConsumerProvider {
 
         // Don't free the fallback buffer. Who knows what else it might get used for outside of this method (https://github.com/RaphiMC/ImmediatelyFast/issues/101)
         // Pass the fallback buffer because some mods access it directly (https://github.com/Team-EnderIO/EnderIO/blob/a67e6dc0dfebf67cd13075ac6aadb9d4598072e8/src/machines/java/com/enderio/machines/client/gui/widget/ioconfig/IOConfigWidget.java#L403)
-        return new BatchableImmediate(fallbackBuffer, layerBuffers);
+        return new BatchableBufferSource(fallbackBuffer, layerBuffers);
     }
 
 }

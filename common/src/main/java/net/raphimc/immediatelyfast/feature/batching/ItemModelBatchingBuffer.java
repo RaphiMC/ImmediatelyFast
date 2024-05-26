@@ -26,11 +26,11 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.screen.PlayerScreenHandler;
 
-public class ItemModelBatchableImmediate extends BatchingBuffer {
+public class ItemModelBatchingBuffer extends BatchingBuffer {
 
     private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
 
-    public ItemModelBatchableImmediate() {
+    public ItemModelBatchingBuffer() {
         super(BatchingBuffers.createLayerBuffers(
                 RenderLayer.getArmorGlint(),
                 RenderLayer.getArmorEntityGlint(),

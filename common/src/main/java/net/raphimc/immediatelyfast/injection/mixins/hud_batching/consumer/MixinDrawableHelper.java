@@ -27,7 +27,7 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Matrix4f;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
-import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFunc;
+import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFuncState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,7 +60,7 @@ public abstract class MixinDrawableHelper {
             color = ColorHelper.Argb.mixColor(color, argb);
 
             RenderSystem.enableBlend();
-            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFuncState.current()));
             vertexConsumer.vertex(matrix, x1, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y2, 0F).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, 0F).color(color).next();
@@ -78,7 +78,7 @@ public abstract class MixinDrawableHelper {
             colorStart = ColorHelper.Argb.mixColor(colorStart, argb);
             colorEnd = ColorHelper.Argb.mixColor(colorEnd, argb);
             RenderSystem.enableBlend();
-            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(BatchingRenderLayers.FILLED_QUAD.apply(BlendFuncDepthFuncState.current()));
             fillGradient(matrices.peek().getPositionMatrix(), Objects.cast(vertexConsumer, BufferBuilder.class), startX, startY, endX, endY, z, colorStart, colorEnd);
             RenderSystem.disableBlend();
         }
@@ -93,7 +93,7 @@ public abstract class MixinDrawableHelper {
             final int g = (int) (shaderColor[1] * 255);
             final int b = (int) (shaderColor[2] * 255);
             final int a = (int) (shaderColor[3] * 255);
-            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(RenderSystem.getShaderTexture(0), BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(RenderSystem.getShaderTexture(0), BlendFuncDepthFuncState.current()));
             vertexConsumer.vertex(matrix, x0, y1, z).texture(u0, v1).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x1, y0, z).texture(u1, v0).color(r, g, b, a).next();
