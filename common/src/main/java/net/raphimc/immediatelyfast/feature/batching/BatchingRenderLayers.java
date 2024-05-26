@@ -80,4 +80,18 @@ public class BatchingRenderLayers {
 
     }
 
+    public static class WrappedRenderLayer extends RenderLayer {
+
+        public WrappedRenderLayer(final RenderLayer renderLayer, final Runnable additionalStartAction, final Runnable additionalEndAction) {
+            super(renderLayer.name, renderLayer.getVertexFormat(), renderLayer.getDrawMode(), renderLayer.getExpectedBufferSize(), renderLayer.hasCrumbling(), renderLayer.translucent, () -> {
+                renderLayer.startDrawing();
+                additionalStartAction.run();
+            }, () -> {
+                renderLayer.endDrawing();
+                additionalEndAction.run();
+            });
+        }
+
+    }
+
 }

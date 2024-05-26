@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
 import net.minecraft.client.gl.VertexBuffer;
+import net.raphimc.immediatelyfast.feature.batching.BatchingBuffer;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,7 +38,12 @@ public abstract class MixinVertexBuffer {
 
     @Inject(method = "drawInternal", at = @At("HEAD"))
     private void checkForDrawCallWhileBatching(CallbackInfo ci) {
-        if (!immediatelyFast$isForceDrawing && BatchingBuffers.FILL_CONSUMER != null && BatchingBuffers.hasDataToDraw()) {
+        // Force draw the current batch if
+        // we are not already force drawing (prevent recursion)
+        // and the buffer being drawn is not one of the IF batching buffers
+        // and we are currently batching (just checks if one of the vertex consumers is set)
+        // and there is data to draw
+        if (!immediatelyFast$isForceDrawing && !BatchingBuffer.IS_DRAWING && BatchingBuffers.FILL_CONSUMER != null && BatchingBuffers.hasDataToDraw()) {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
             immediatelyFast$isForceDrawing = true;
             BatchingBuffers.forceDrawBuffers();

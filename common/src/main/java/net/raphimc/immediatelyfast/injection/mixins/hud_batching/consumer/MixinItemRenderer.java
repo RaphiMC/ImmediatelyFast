@@ -41,12 +41,12 @@ public abstract class MixinItemRenderer {
 
     @ModifyArg(method = "renderGuiItemModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"))
     private VertexConsumerProvider renderItemIntoBuffer(ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
-        if (BatchingBuffers.LIT_ITEM_MODEL_CONSUMER != null || BatchingBuffers.UNLIT_ITEM_MODEL_CONSUMER != null) {
+        if (BatchingBuffers.ITEM_MODEL_CONSUMER != null) {
             // Get the model view transformations and apply them to the empty matrix stack.
             // When rendering that batch the model view matrix will be set to the identity matrix to not apply the model view transformations twice.
             matrices.peek().getPositionMatrix().load(RenderSystem.getModelViewMatrix());
 
-            return model.isSideLit() ? BatchingBuffers.LIT_ITEM_MODEL_CONSUMER : BatchingBuffers.UNLIT_ITEM_MODEL_CONSUMER;
+            return BatchingBuffers.ITEM_MODEL_CONSUMER;
         }
 
         return vertexConsumers;
