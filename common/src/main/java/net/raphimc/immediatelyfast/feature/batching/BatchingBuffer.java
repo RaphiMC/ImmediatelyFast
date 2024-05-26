@@ -19,11 +19,11 @@ package net.raphimc.immediatelyfast.feature.batching;
 
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
-import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
+import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 
 import java.util.Map;
 
-public class BatchingBuffer extends BatchableImmediate {
+public class BatchingBuffer extends BatchableBufferSource {
 
     public static boolean IS_DRAWING;
 
