@@ -17,15 +17,35 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
+import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 
-public class GuiOverlayFirstBatchableImmediate extends BatchingBuffer {
+import java.util.Map;
+
+public class BatchingBuffer extends BatchableImmediate {
+
+    public static boolean IS_DRAWING;
+
+    public BatchingBuffer() {
+    }
+
+    public BatchingBuffer(final Map<RenderLayer, BufferBuilder> layerBuffers) {
+        super(layerBuffers);
+    }
+
+    public BatchingBuffer(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+        super(fallbackBuffer, layerBuffers);
+    }
 
     @Override
-    public void draw() {
-        this.drawFallbackLayersFirst = false;
-        this.draw(RenderLayer.getGuiOverlay());
-        super.draw();
+    public void draw(final RenderLayer layer) {
+        try {
+            IS_DRAWING = true;
+            super.draw(layer);
+        } finally {
+            IS_DRAWING = false;
+        }
     }
 
 }

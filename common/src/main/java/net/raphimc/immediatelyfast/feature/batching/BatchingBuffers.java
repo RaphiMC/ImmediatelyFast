@@ -23,7 +23,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
 
 import java.util.Map;
 
@@ -44,18 +43,16 @@ public class BatchingBuffers {
     public static VertexConsumerProvider FILL_CONSUMER = null;
     public static VertexConsumerProvider TEXTURE_CONSUMER = null;
     public static VertexConsumerProvider TEXT_CONSUMER = null;
-    public static VertexConsumerProvider LIT_ITEM_MODEL_CONSUMER = null;
-    public static VertexConsumerProvider UNLIT_ITEM_MODEL_CONSUMER = null;
+    public static VertexConsumerProvider ITEM_MODEL_CONSUMER = null;
     public static VertexConsumerProvider ITEM_OVERLAY_CONSUMER = null;
 
     /*
      * The batching buffers which hold the vertex data of the batch.
      */
-    private static final BatchableImmediate HUD_BATCH = new BatchableImmediate();
-    private static final BatchableImmediate DEBUG_HUD_BATCH = new GuiOverlayFirstBatchableImmediate();
-    private static final BatchableImmediate LIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(true);
-    private static final BatchableImmediate UNLIT_ITEM_MODEL_BATCH = new ItemModelBatchableImmediate(false);
-    private static final BatchableImmediate ITEM_OVERLAY_BATCH = new BatchableImmediate();
+    private static final BatchingBuffer HUD_BATCH = new BatchingBuffer();
+    private static final BatchingBuffer DEBUG_HUD_BATCH = new GuiOverlayFirstBatchableImmediate();
+    private static final BatchingBuffer ITEM_MODEL_BATCH = new ItemModelBatchableImmediate();
+    private static final BatchingBuffer ITEM_OVERLAY_BATCH = new BatchingBuffer();
 
     public static void beginHudBatching() {
         beginHudBatching(HUD_BATCH);
@@ -65,7 +62,7 @@ public class BatchingBuffers {
         beginHudBatching(DEBUG_HUD_BATCH);
     }
 
-    public static void beginHudBatching(final BatchableImmediate batch) {
+    public static void beginHudBatching(final BatchingBuffer batch) {
         if (batch.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("HUD batching was already active! endHudBatching() was not called before beginHudBatching(). This will cause rendering issues.");
             batch.close();
@@ -85,7 +82,7 @@ public class BatchingBuffers {
         endHudBatching(DEBUG_HUD_BATCH);
     }
 
-    public static void endHudBatching(final BatchableImmediate batch) {
+    public static void endHudBatching(final BatchingBuffer batch) {
         FILL_CONSUMER = null;
         TEXTURE_CONSUMER = null;
         TEXT_CONSUMER = null;
@@ -97,39 +94,34 @@ public class BatchingBuffers {
     }
 
     public static boolean isHudBatching() {
-        return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || LIT_ITEM_MODEL_CONSUMER != null || UNLIT_ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
+        return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
     }
 
     public static boolean hasDataToDraw() {
-        return HUD_BATCH.hasActiveLayers() || DEBUG_HUD_BATCH.hasActiveLayers() || LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers() || ITEM_OVERLAY_BATCH.hasActiveLayers();
+        return HUD_BATCH.hasActiveLayers() || DEBUG_HUD_BATCH.hasActiveLayers() || ITEM_MODEL_BATCH.hasActiveLayers() || ITEM_OVERLAY_BATCH.hasActiveLayers();
     }
 
     public static void forceDrawBuffers() {
         final RenderSystemState renderSystemState = RenderSystemState.current();
         HUD_BATCH.draw();
         DEBUG_HUD_BATCH.draw();
-        UNLIT_ITEM_MODEL_BATCH.draw();
-        LIT_ITEM_MODEL_BATCH.draw();
+        ITEM_MODEL_BATCH.draw();
         ITEM_OVERLAY_BATCH.draw();
         renderSystemState.apply();
     }
 
     private static void beginItemModelBatching() {
-        if (LIT_ITEM_MODEL_BATCH.hasActiveLayers() || UNLIT_ITEM_MODEL_BATCH.hasActiveLayers()) {
+        if (ITEM_MODEL_BATCH.hasActiveLayers()) {
             ImmediatelyFast.LOGGER.warn("Item model batching was already active! endItemModelBatching() was not called before beginItemModelBatching(). This will cause rendering issues.");
-            LIT_ITEM_MODEL_BATCH.close();
-            UNLIT_ITEM_MODEL_BATCH.close();
+            ITEM_MODEL_BATCH.close();
         }
-        LIT_ITEM_MODEL_CONSUMER = LIT_ITEM_MODEL_BATCH;
-        UNLIT_ITEM_MODEL_CONSUMER = UNLIT_ITEM_MODEL_BATCH;
+        ITEM_MODEL_CONSUMER = ITEM_MODEL_BATCH;
     }
 
     private static void endItemModelBatching() {
-        LIT_ITEM_MODEL_CONSUMER = null;
-        UNLIT_ITEM_MODEL_CONSUMER = null;
+        ITEM_MODEL_CONSUMER = null;
 
-        UNLIT_ITEM_MODEL_BATCH.draw();
-        LIT_ITEM_MODEL_BATCH.draw();
+        ITEM_MODEL_BATCH.draw();
     }
 
     private static void beginItemOverlayBatching() {

@@ -25,3 +25,4 @@ accessible field com/mojang/blaze3d/platform/GlStateManager DEPTH Lcom/mojang/bl
 accessible class com/mojang/blaze3d/platform/GlStateManager$DepthTestState
 accessible class com/mojang/blaze3d/platform/GlStateManager$CapabilityTracker # Only needed on Forge
 accessible field com/mojang/blaze3d/platform/GlStateManager$CapabilityTracker state Z
+accessible field com/mojang/blaze3d/systems/RenderSystem shaderLightDirections [Lorg/joml/Vector3f;
