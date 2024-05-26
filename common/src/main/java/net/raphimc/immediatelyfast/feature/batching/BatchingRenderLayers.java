@@ -37,7 +37,7 @@ import static net.minecraft.util.Util.memoize;
  */
 public class BatchingRenderLayers {
 
-    public static final BiFunction<Integer, BlendFuncDepthFunc, RenderLayer> COLORED_TEXTURE = memoize((id, blendFuncDepthFunc) -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
+    public static final BiFunction<Integer, BlendFuncDepthFuncState, RenderLayer> COLORED_TEXTURE = memoize((id, blendFuncDepthFunc) -> new ImmediatelyFastRenderLayer("texture", VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR, false, () -> {
         blendFuncDepthFunc.saveAndApply();
         RenderSystem.setShaderTexture(0, id);
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);

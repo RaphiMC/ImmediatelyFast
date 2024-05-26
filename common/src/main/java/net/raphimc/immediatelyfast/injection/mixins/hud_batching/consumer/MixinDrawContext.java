@@ -32,7 +32,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
-import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFunc;
+import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFuncState;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -105,7 +105,7 @@ public abstract class MixinDrawContext {
             final int g = (int) (shaderColor[1] * 255);
             final int b = (int) (shaderColor[2] * 255);
             final int a = (int) (shaderColor[3] * 255);
-            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
             vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a).next();
@@ -123,7 +123,7 @@ public abstract class MixinDrawContext {
             final int color = ColorHelper.Argb.mixColor((int) (alpha * 255) << 24 | (int) (red * 255) << 16 | (int) (green * 255) << 8 | (int) (blue * 255), argb);
 
             RenderSystem.enableBlend();
-            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFunc.current()));
+            final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
             vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(color).next();
             vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(color).next();
             vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(color).next();

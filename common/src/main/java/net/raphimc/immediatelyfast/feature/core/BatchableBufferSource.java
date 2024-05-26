@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
@@ -33,7 +34,7 @@ import net.raphimc.immediatelyfast.compat.IrisCompat;
 
 import java.util.*;
 
-public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate implements AutoCloseable {
+public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
     /**
      * A fallback buffer has to be defined because Iris tries to release that buffer, so it can't be null. It should be fine
@@ -46,15 +47,15 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
 
     protected boolean drawFallbackLayersFirst = false;
 
-    public ImmediateAdapter() {
+    public BatchableBufferSource() {
         this(ImmutableMap.of());
     }
 
-    public ImmediateAdapter(final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchableBufferSource(final Map<RenderLayer, BufferBuilder> layerBuffers) {
         this(FALLBACK_BUFFER, layerBuffers);
     }
 
-    public ImmediateAdapter(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchableBufferSource(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
         super(fallbackBuffer, layerBuffers);
     }
 
@@ -135,7 +136,11 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
         }
 
         this.activeLayers.remove(layer);
-        this._draw(layer);
+        for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+            if (bufferBuilder != null) {
+                layer.draw(bufferBuilder, RenderSystem.getVertexSorting());
+            }
+        }
         this.fallbackBuffers.remove(layer);
 
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
@@ -161,8 +166,6 @@ public abstract class ImmediateAdapter extends VertexConsumerProvider.Immediate 
     public boolean hasActiveLayers() {
         return !this.activeLayers.isEmpty();
     }
-
-    protected abstract void _draw(RenderLayer layer);
 
     protected BufferBuilder getOrCreateBufferBuilder(final RenderLayer layer) {
         if (!layer.areVerticesNotShared()) {

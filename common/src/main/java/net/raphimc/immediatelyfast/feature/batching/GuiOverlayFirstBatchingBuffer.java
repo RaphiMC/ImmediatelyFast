@@ -15,32 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.feature.core;
+package net.raphimc.immediatelyfast.feature.batching;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 
-import java.util.Map;
-
-public class BatchableImmediate extends ImmediateAdapter {
-
-    public BatchableImmediate() {
-    }
-
-    public BatchableImmediate(final Map<RenderLayer, BufferBuilder> layerBuffers) {
-        super(layerBuffers);
-    }
-
-    public BatchableImmediate(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
-        super(fallbackBuffer, layerBuffers);
-    }
+public class GuiOverlayFirstBatchingBuffer extends BatchingBuffer {
 
     @Override
-    protected void _draw(final RenderLayer layer) {
-        for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-            if (bufferBuilder != null) layer.draw(bufferBuilder, RenderSystem.getVertexSorting());
-        }
+    public void draw() {
+        this.drawFallbackLayersFirst = false;
+        this.draw(RenderLayer.getGuiOverlay());
+        super.draw();
     }
 
 }
