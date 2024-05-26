@@ -18,15 +18,18 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.DiffuseLighting;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceObjectImmutablePair;
+import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
 import net.minecraft.client.render.RenderLayer;
-import net.raphimc.immediatelyfast.feature.core.BatchableImmediate;
+import net.minecraft.client.render.VertexConsumer;
 
-public class ItemModelBatchableImmediate extends BatchableImmediate {
+public class ItemModelBatchableImmediate extends BatchingBuffer {
 
-    private final boolean guiDepthLighting;
+    private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
 
-    public ItemModelBatchableImmediate(final boolean guiDepthLighting) {
+    public ItemModelBatchableImmediate() {
         super(BatchingBuffers.createLayerBuffers(
                 RenderLayer.getArmorGlint(),
                 RenderLayer.getArmorEntityGlint(),
@@ -36,24 +39,20 @@ public class ItemModelBatchableImmediate extends BatchableImmediate {
                 RenderLayer.getEntityGlint(),
                 RenderLayer.getDirectEntityGlint()
         ));
+    }
 
-        this.guiDepthLighting = guiDepthLighting;
+    @Override
+    public VertexConsumer getBuffer(final RenderLayer layer) {
+        final LightingState lightingState = LightingState.current();
+        return super.getBuffer(this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingRenderLayers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert)));
     }
 
     @Override
     public void draw() {
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.enableBlend();
-        if (this.guiDepthLighting) {
-            DiffuseLighting.enableGuiDepthLighting();
-        } else {
-            DiffuseLighting.disableGuiDepthLighting();
-        }
         super.draw();
-        if (!this.guiDepthLighting) {
-            DiffuseLighting.enableGuiDepthLighting();
-        }
         RenderSystem.disableBlend();
+        this.lightingRenderLayers.clear();
     }
 
 }

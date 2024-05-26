@@ -17,15 +17,33 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
-import net.minecraft.client.render.RenderLayer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Vector3f;
 
-public class GuiOverlayFirstBatchableImmediate extends BatchingBuffer {
+import java.util.Stack;
 
-    @Override
-    public void draw() {
-        this.drawFallbackLayersFirst = false;
-        this.draw(RenderLayer.getGuiOverlay());
-        super.draw();
+public record LightingState(Vector3f shaderLightDirection0, Vector3f shaderLightDirection1) {
+
+    private static final Stack<LightingState> STACK = new Stack<>();
+
+    public static LightingState current() {
+        return new LightingState(
+                RenderSystem.shaderLightDirections[0],
+                RenderSystem.shaderLightDirections[1]
+        );
+    }
+
+    public void saveAndApply() {
+        STACK.push(current());
+        this.apply();
+    }
+
+    public void revert() {
+        STACK.pop().apply();
+    }
+
+    public void apply() {
+        RenderSystem.setShaderLights(this.shaderLightDirection0, this.shaderLightDirection1);
     }
 
 }
