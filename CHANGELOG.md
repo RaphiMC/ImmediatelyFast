@@ -1,3 +1,4 @@
-* Track texture 1 and 2 in RenderSystemState (Fixes issue with dark items / item count text)
-* Fixed graphical issues with experimental universal HUD batching (1.20.5)
-* Updated libraries
+* Rewrote item batching
+   * Fixes lighting issues with items (Requires a geckolib update if you're using it)
+   * The Ars-Nouveau spell book is still broken, but should start working once https://github.com/baileyholl/Ars-Nouveau/pull/1307 is merged
+* Fixed issues with negative width characters in chat messages
