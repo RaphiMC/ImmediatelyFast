@@ -18,17 +18,17 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ReferenceObjectImmutablePair;
-import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.screen.PlayerScreenHandler;
 
+import java.util.Set;
+
 public class ItemModelBatchingBuffer extends BatchingBuffer {
 
     private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
+    private final Reference2ObjectMap<RenderLayer, ReferenceSet<RenderLayer>> renderLayerMap = new Reference2ObjectOpenHashMap<>();
 
     public ItemModelBatchingBuffer() {
         super(BatchingBuffers.createLayerBuffers(
@@ -44,8 +44,26 @@ public class ItemModelBatchingBuffer extends BatchingBuffer {
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
+        if (this.layerBuffers.containsKey(layer)) {
+            return super.getBuffer(layer);
+        }
+
         final LightingState lightingState = LightingState.current();
-        return super.getBuffer(this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingRenderLayers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert)));
+        final RenderLayer newLayer = this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingRenderLayers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert));
+        this.renderLayerMap.computeIfAbsent(layer, key -> new ReferenceOpenHashSet<>()).add(newLayer);
+        return super.getBuffer(newLayer);
+    }
+
+    @Override
+    public void draw(final RenderLayer layer) {
+        final Set<RenderLayer> renderLayers = this.renderLayerMap.remove(layer);
+        if (renderLayers != null) {
+            for (RenderLayer renderLayer : renderLayers) {
+                super.draw(renderLayer);
+            }
+        } else {
+            super.draw(layer);
+        }
     }
 
     @Override
@@ -58,9 +76,16 @@ public class ItemModelBatchingBuffer extends BatchingBuffer {
         super.draw();
         RenderSystem.disableBlend();
         this.lightingRenderLayers.clear();
+        this.renderLayerMap.clear();
         RenderSystem.getModelViewStack().pop();
         RenderSystem.applyModelViewMatrix();
+    }
 
+    @Override
+    public void close() {
+        super.close();
+        this.lightingRenderLayers.clear();
+        this.renderLayerMap.clear();
     }
 
 }
