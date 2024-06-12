@@ -17,16 +17,15 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.BufferAllocator;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import java.util.Map;
+import java.util.SequencedMap;
 
 @Mixin(VertexConsumerProvider.class)
 public interface MixinVertexConsumerProvider {
@@ -36,12 +35,8 @@ public interface MixinVertexConsumerProvider {
      * @reason Universal Batching
      */
     @Overwrite
-    static VertexConsumerProvider.Immediate immediate(Map<RenderLayer, BufferBuilder> layerBuffers, BufferBuilder fallbackBuffer) {
-        if (ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching || fallbackBuffer == null) {
-            if (fallbackBuffer == null) { // Indicate that this shouldn't get batched regardless of the config
-                fallbackBuffer = Tessellator.getInstance().getBuffer();
-            }
-
+    static VertexConsumerProvider.Immediate immediate(SequencedMap<RenderLayer, BufferAllocator> layerBuffers, BufferAllocator fallbackBuffer) {
+        if (ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching) {
             return new VertexConsumerProvider.Immediate(fallbackBuffer, layerBuffers);
         }
 

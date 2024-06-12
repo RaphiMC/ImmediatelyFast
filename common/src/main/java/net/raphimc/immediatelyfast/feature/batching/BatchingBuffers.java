@@ -18,13 +18,12 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.BufferAllocator;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
-import java.util.Map;
+import java.util.SequencedMap;
 
 /**
  * Class which holds various allocated buffers used for batching various rendered elements.
@@ -165,10 +164,10 @@ public class BatchingBuffers {
      * @param layers The RenderLayer's for which to create the layer buffers.
      * @return A map of layer buffers for the given RenderLayer's.
      */
-    public static Map<RenderLayer, BufferBuilder> createLayerBuffers(final RenderLayer... layers) {
-        final Object2ObjectMap<RenderLayer, BufferBuilder> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.length);
+    public static SequencedMap<RenderLayer, BufferAllocator> createLayerBuffers(final RenderLayer... layers) {
+        final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.length);
         for (final RenderLayer layer : layers) {
-            layerBuffers.put(layer, new BufferBuilder(layer.getExpectedBufferSize()));
+            layerBuffers.put(layer, new BufferAllocator(layer.getExpectedBufferSize()));
         }
         return layerBuffers;
     }

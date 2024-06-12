@@ -76,10 +76,10 @@ public abstract class MixinDrawContext {
             color = ColorHelper.Argb.mixColor(color, argb);
 
             final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(layer);
-            vertexConsumer.vertex(matrix, x1, y2, z).color(color).next();
-            vertexConsumer.vertex(matrix, x2, y2, z).color(color).next();
-            vertexConsumer.vertex(matrix, x2, y1, z).color(color).next();
-            vertexConsumer.vertex(matrix, x1, y1, z).color(color).next();
+            vertexConsumer.vertex(matrix, x1, y2, z).color(color);
+            vertexConsumer.vertex(matrix, x2, y2, z).color(color);
+            vertexConsumer.vertex(matrix, x2, y1, z).color(color);
+            vertexConsumer.vertex(matrix, x1, y1, z).color(color);
         }
     }
 
@@ -106,10 +106,10 @@ public abstract class MixinDrawContext {
             final int b = (int) (shaderColor[2] * 255);
             final int a = (int) (shaderColor[3] * 255);
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
-            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a).next();
-            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a).next();
-            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a).next();
-            vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a).next();
+            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a);
+            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a);
+            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a);
+            vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a);
         }
     }
 
@@ -124,10 +124,10 @@ public abstract class MixinDrawContext {
 
             RenderSystem.enableBlend();
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
-            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(color).next();
-            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(color).next();
-            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(color).next();
-            vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(color).next();
+            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(color);
+            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(color);
+            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(color);
+            vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(color);
             RenderSystem.disableBlend();
         }
     }

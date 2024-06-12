@@ -52,7 +52,7 @@ public abstract class MixinGameRenderer {
         for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
             if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
 
-            final Identifier vertexIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
+            final Identifier vertexIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
             final Resource resource = factory.getResource(vertexIdentifier).orElse(null);
             if (resource != null && !resource.getPack().equals(this.client.getDefaultResourcePack())) {
                 modified = true;

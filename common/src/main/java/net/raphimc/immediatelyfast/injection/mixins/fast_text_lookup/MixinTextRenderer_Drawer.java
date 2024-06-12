@@ -47,7 +47,7 @@ public abstract class MixinTextRenderer_Drawer {
     @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
         // The buffer got drawn while rendering the text, so we need to reset the cached data
-        final boolean isBufferInvalid = this.immediatelyFast$lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.isBuilding();
+        final boolean isBufferInvalid = this.immediatelyFast$lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.building;
 
         if (!isBufferInvalid && this.immediatelyFast$lastRenderLayer == renderLayer) {
             return this.immediatelyFast$lastVertexConsumer;

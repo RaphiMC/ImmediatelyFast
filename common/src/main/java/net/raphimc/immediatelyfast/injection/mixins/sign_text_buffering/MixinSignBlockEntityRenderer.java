@@ -22,13 +22,18 @@ import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BackgroundRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.NoSetTextAnglesMatrixStack;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignAtlasFramebuffer;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
@@ -91,12 +96,14 @@ public abstract class MixinSignBlockEntityRenderer {
                 BackgroundRenderer.clearFog();
                 ImmediatelyFast.signTextCache.signAtlasFramebuffer.beginWrite(true);
 
-                final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+                final BufferAllocator bufferAllocator = BufferAllocatorPool.borrowBufferAllocator();
+                final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
                 final MatrixStack matrixStack = new NoSetTextAnglesMatrixStack();
                 matrixStack.translate(slot.x, slot.y, 0F);
                 matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
                 this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
                 immediate.draw();
+                BufferAllocatorPool.returnBufferAllocatorSafe(bufferAllocator);
 
                 MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
                 RenderSystem.setShaderFogStart(fogStart);
@@ -126,10 +133,10 @@ public abstract class MixinSignBlockEntityRenderer {
         matrices.translate(-slot.width / 2F, -slot.height / 2F, 0F);
         final Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(ImmediatelyFast.signTextCache.renderLayer);
-        vertexConsumer.vertex(matrix4f, 0F, slot.height, 0F).color(255, 255, 255, 255).texture(u1, v2).light(light).next();
-        vertexConsumer.vertex(matrix4f, slot.width, slot.height, 0F).color(255, 255, 255, 255).texture(u2, v2).light(light).next();
-        vertexConsumer.vertex(matrix4f, slot.width, 0F, 0F).color(255, 255, 255, 255).texture(u2, v1).light(light).next();
-        vertexConsumer.vertex(matrix4f, 0F, 0F, 0F).color(255, 255, 255, 255).texture(u1, v1).light(light).next();
+        vertexConsumer.vertex(matrix4f, 0F, slot.height, 0F).color(255, 255, 255, 255).texture(u1, v2).light(light);
+        vertexConsumer.vertex(matrix4f, slot.width, slot.height, 0F).color(255, 255, 255, 255).texture(u2, v2).light(light);
+        vertexConsumer.vertex(matrix4f, slot.width, 0F, 0F).color(255, 255, 255, 255).texture(u2, v1).light(light);
+        vertexConsumer.vertex(matrix4f, 0F, 0F, 0F).color(255, 255, 255, 255).texture(u1, v1).light(light);
         matrices.pop();
 
         ci.cancel();

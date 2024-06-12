@@ -19,7 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import net.minecraft.client.gui.hud.DebugHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.BufferBuilderPool;
+import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,7 +37,7 @@ public abstract class MixinDebugHud {
 
         cir.getReturnValue().add("");
         cir.getReturnValue().add("ImmediatelyFast " + ImmediatelyFast.VERSION);
-        cir.getReturnValue().add("Buffer Pool: " + BufferBuilderPool.getAllocatedSize());
+        cir.getReturnValue().add("Buffer Pool: " + BufferAllocatorPool.getSize());
         if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
             cir.getReturnValue().add("Streaming Buffer: " + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getOffset()) + "/" + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) + " MiB");
         }

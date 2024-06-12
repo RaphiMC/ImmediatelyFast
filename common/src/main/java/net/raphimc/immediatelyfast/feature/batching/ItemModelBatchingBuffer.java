@@ -31,10 +31,8 @@ public class ItemModelBatchingBuffer extends BatchingBuffer {
 
     public ItemModelBatchingBuffer() {
         super(BatchingBuffers.createLayerBuffers(
-                RenderLayer.getArmorGlint(),
                 RenderLayer.getArmorEntityGlint(),
                 RenderLayer.getGlint(),
-                RenderLayer.getDirectGlint(),
                 RenderLayer.getGlintTranslucent(),
                 RenderLayer.getEntityGlint(),
                 RenderLayer.getDirectEntityGlint()

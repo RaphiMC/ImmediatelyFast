@@ -35,7 +35,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
         super(false);
         this.resize(ATLAS_SIZE, ATLAS_SIZE, MinecraftClient.IS_SYSTEM_MAC);
         MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
-        this.textureId = new Identifier("immediatelyfast", "sign_atlas/" + this.colorAttachment);
+        this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + this.colorAttachment);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, new FboTexture());
 
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);

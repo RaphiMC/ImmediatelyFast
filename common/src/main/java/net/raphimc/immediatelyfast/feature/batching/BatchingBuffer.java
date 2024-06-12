@@ -17,11 +17,11 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.util.BufferAllocator;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 
-import java.util.Map;
+import java.util.SequencedMap;
 
 public class BatchingBuffer extends BatchableBufferSource {
 
@@ -30,11 +30,11 @@ public class BatchingBuffer extends BatchableBufferSource {
     public BatchingBuffer() {
     }
 
-    public BatchingBuffer(final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchingBuffer(final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
         super(layerBuffers);
     }
 
-    public BatchingBuffer(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchingBuffer(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
         super(fallbackBuffer, layerBuffers);
     }
 

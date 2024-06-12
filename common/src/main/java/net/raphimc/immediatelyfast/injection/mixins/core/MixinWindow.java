@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import net.minecraft.client.util.Window;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,6 +31,11 @@ public abstract class MixinWindow {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initImmediatelyFast(CallbackInfo ci) {
         ImmediatelyFast.windowInit();
+    }
+
+    @Inject(method = "swapBuffers", at = @At("HEAD"))
+    private void endFrame(CallbackInfo ci) {
+        BufferAllocatorPool.onEndFrame();
     }
 
 }

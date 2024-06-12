@@ -17,21 +17,20 @@
  */
 package net.raphimc.immediatelyfast.feature.core;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.SequencedMap;
+import java.util.Set;
 
 public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
@@ -39,59 +38,74 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
      * A fallback buffer has to be defined because Iris tries to release that buffer, so it can't be null. It should be fine
      * to reuse/release the buffer multiple times, as it won't ever be written into by minecraft or Iris.
      */
-    private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
+    private final static BufferAllocator FALLBACK_BUFFER = new BufferAllocator(0);
 
-    protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = new Reference2ObjectLinkedOpenHashMap<>();
+    protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> pendingBuffers = new Reference2ObjectLinkedOpenHashMap<>();
     protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
 
     protected boolean drawFallbackLayersFirst = false;
 
     public BatchableBufferSource() {
-        this(ImmutableMap.of());
+        this(Object2ObjectSortedMaps.emptyMap());
     }
 
-    public BatchableBufferSource(final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchableBufferSource(final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
         this(FALLBACK_BUFFER, layerBuffers);
     }
 
-    public BatchableBufferSource(final BufferBuilder fallbackBuffer, final Map<RenderLayer, BufferBuilder> layerBuffers) {
+    public BatchableBufferSource(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
         super(fallbackBuffer, layerBuffers);
     }
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
-        final Optional<RenderLayer> newLayer = layer.asOptional();
         if (!this.drawFallbackLayersFirst) {
-            if (!this.currentLayer.equals(newLayer)) {
-                if (this.currentLayer.isPresent() && !this.layerBuffers.containsKey(this.currentLayer.get())) {
-                    this.drawFallbackLayersFirst = true;
-                }
+            if (this.currentLayer != null && this.currentLayer != layer && !this.layerBuffers.containsKey(this.currentLayer)) {
+                this.drawFallbackLayersFirst = true;
             }
         }
-        this.currentLayer = newLayer;
 
-        final BufferBuilder bufferBuilder = this.getOrCreateBufferBuilder(layer);
-        if (bufferBuilder.isBuilding() && !layer.areVerticesNotShared()) {
-            throw new IllegalStateException("Tried to write shared vertices into the same buffer");
+        if (IrisCompat.IRIS_LOADED) {
+            IrisCompat.skipExtension.set(!IrisCompat.isRenderingLevel.getAsBoolean());
         }
 
-        if (!bufferBuilder.isBuilding()) {
-            if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
-                IrisCompat.iris$beginWithoutExtending.accept(bufferBuilder, layer.getDrawMode(), layer.getVertexFormat());
-            } else {
-                bufferBuilder.begin(layer.getDrawMode(), layer.getVertexFormat());
+        final BufferBuilder bufferBuilder;
+        boolean hasBufferForRenderLayer = this.pendingBuffers.containsKey(layer);
+        if (!layer.areVerticesNotShared()) {
+            bufferBuilder = new BufferBuilder(BufferAllocatorPool.borrowBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
+            this.currentLayer = layer;
+        } else if (hasBufferForRenderLayer) {
+            bufferBuilder = this.pendingBuffers.get(layer).iterator().next();
+        } else if (this.layerBuffers.containsKey(layer)) {
+            bufferBuilder = new BufferBuilder(this.layerBuffers.get(layer), layer.getDrawMode(), layer.getVertexFormat());
+        } else {
+            bufferBuilder = new BufferBuilder(BufferAllocatorPool.borrowBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
+            this.currentLayer = layer;
+        }
+
+        if (IrisCompat.IRIS_LOADED) {
+            IrisCompat.skipExtension.set(false);
+        }
+
+        if (!hasBufferForRenderLayer) {
+            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
+        }
+
+        if (hasBufferForRenderLayer) {
+            if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
+                this.activeLayers.remove(layer);
+                this.activeLayers.add(layer);
             }
-            this.activeLayers.add(layer);
-        } else if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
-            this.activeLayers.remove(layer);
+        } else {
             this.activeLayers.add(layer);
         }
+
         return bufferBuilder;
     }
 
     @Override
     public void drawCurrentLayer() {
-        this.currentLayer = Optional.empty();
+        this.currentLayer = null;
         this.drawFallbackLayersFirst = false;
 
         int sortedLayersLength = 0;
@@ -136,11 +150,13 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
         this.activeLayers.remove(layer);
         for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-            if (bufferBuilder != null) {
-                layer.draw(bufferBuilder, RenderSystem.getVertexSorting());
-            }
+            final BufferAllocator prevBufferAllocator = bufferBuilder.allocator;
+            this.allocator = bufferBuilder.allocator;
+            this.draw(layer, bufferBuilder);
+            this.allocator = prevBufferAllocator;
+            BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
         }
-        this.fallbackBuffers.remove(layer);
+        this.pendingBuffers.remove(layer);
 
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(true);
@@ -149,49 +165,30 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
     @Override
     public void close() {
-        this.currentLayer = Optional.empty();
+        this.currentLayer = null;
         this.drawFallbackLayersFirst = false;
 
         for (RenderLayer layer : this.activeLayers) {
             for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.end().release();
+                bufferBuilder.endNullable();
+                BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
             }
         }
 
         this.activeLayers.clear();
-        this.fallbackBuffers.clear();
+        this.pendingBuffers.clear();
     }
 
     public boolean hasActiveLayers() {
         return !this.activeLayers.isEmpty();
     }
 
-    protected BufferBuilder getOrCreateBufferBuilder(final RenderLayer layer) {
-        if (!layer.areVerticesNotShared()) {
-            return this.addNewFallbackBuffer(layer);
-        } else if (this.layerBuffers.containsKey(layer)) {
-            return this.layerBuffers.get(layer);
-        } else if (this.fallbackBuffers.containsKey(layer)) {
-            return this.fallbackBuffers.get(layer).iterator().next();
-        } else {
-            return this.addNewFallbackBuffer(layer);
-        }
-    }
-
     protected Set<BufferBuilder> getBufferBuilder(final RenderLayer layer) {
-        if (this.fallbackBuffers.containsKey(layer)) {
-            return this.fallbackBuffers.get(layer);
-        } else if (this.layerBuffers.containsKey(layer)) {
-            return Collections.singleton(this.layerBuffers.get(layer));
+        if (this.pendingBuffers.containsKey(layer)) {
+            return this.pendingBuffers.get(layer);
         } else {
             return Collections.emptySet();
         }
-    }
-
-    protected BufferBuilder addNewFallbackBuffer(final RenderLayer layer) {
-        final BufferBuilder bufferBuilder = BufferBuilderPool.get();
-        this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
-        return bufferBuilder;
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
@@ -210,7 +207,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             }
         }
 
-        if (!layer.translucent) {
+        if (!layer.isTranslucent()) {
             return Integer.MIN_VALUE;
         } else {
             return Integer.MAX_VALUE - 1;

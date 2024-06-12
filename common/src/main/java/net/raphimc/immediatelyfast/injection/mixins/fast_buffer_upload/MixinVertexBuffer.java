@@ -20,7 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
 import org.lwjgl.opengl.GL15C;
@@ -60,7 +60,7 @@ public abstract class MixinVertexBuffer {
     }
 
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
-    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage, @Local BufferBuilder.DrawParameters parameters) {
+    private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage, @Local BuiltBuffer.DrawParameters parameters) {
         final int dataSize = data.remaining();
         if (dataSize == 0) {
             return;
@@ -89,7 +89,7 @@ public abstract class MixinVertexBuffer {
         }
     }
 
-    @Redirect(method = "uploadIndexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
+    @Redirect(method = "uploadIndexBuffer*", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
         if (dataSize == 0) {

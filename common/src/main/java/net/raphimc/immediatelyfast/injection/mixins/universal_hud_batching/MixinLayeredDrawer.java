@@ -21,6 +21,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.LayeredDrawer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,16 +30,16 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = LayeredDrawer.class, priority = 500)
 public abstract class MixinLayeredDrawer {
 
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer;renderInternal(Lnet/minecraft/client/gui/DrawContext;F)V"))
-    private void batchLayeredDraws(LayeredDrawer instance, DrawContext context, float tickDelta, Operation<Void> original) {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer;renderInternal(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V"))
+    private void batchLayeredDraws(LayeredDrawer instance, DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             BatchingBuffers.beginHudBatching();
             ImmediatelyFast.runtimeConfig.hud_batching = false;
-            original.call(instance, context, tickDelta);
+            original.call(instance, context, tickCounter);
             ImmediatelyFast.runtimeConfig.hud_batching = true;
             BatchingBuffers.endHudBatching();
         } else {
-            original.call(instance, context, tickDelta);
+            original.call(instance, context, tickCounter);
         }
     }
 
