@@ -70,7 +70,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         final BufferBuilder bufferBuilder;
-        boolean hasBufferForRenderLayer = this.pendingBuffers.containsKey(layer);
+        boolean hasBufferForRenderLayer = layer.areVerticesNotShared() && this.pendingBuffers.containsKey(layer);
         if (!layer.areVerticesNotShared()) {
             bufferBuilder = new BufferBuilder(BufferAllocatorPool.borrowBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
             this.currentLayer = layer;
