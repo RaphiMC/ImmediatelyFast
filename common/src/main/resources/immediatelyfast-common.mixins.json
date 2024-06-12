@@ -29,7 +29,6 @@
     "hud_batching.MixinVertexBuffer",
     "hud_batching.compat.armorchroma.MixinArmorChroma_GuiArmor",
     "hud_batching.compat.highlighter.MixinHighlighter_Highlighter",
-    "hud_batching.compat.iceberg.MixinIceberg_GuiHelper",
     "hud_batching.compat.itemborders.MixinItemBorders_ItemBorders",
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
