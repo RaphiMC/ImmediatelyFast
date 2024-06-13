@@ -21,14 +21,6 @@ repositories {
         name = "NeoForge"
         url = "https://maven.neoforged.net/releases"
     }
-    maven {
-        name 'Maven for PR #1076' // https://github.com/neoforged/NeoForge/pull/1076
-        url 'https://prmaven.neoforged.net/NeoForge/pr1076'
-        content {
-            includeModule('net.neoforged', 'neoforge')
-            includeModule('net.neoforged', 'testframework')
-        }
-    }
 }
 
 dependencies {

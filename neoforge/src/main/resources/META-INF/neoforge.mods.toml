@@ -25,9 +25,9 @@ config = "immediatelyfast-common.mixins.json"
 #ordering = "NONE"
 #side = "CLIENT"
 
-#[[dependencies.immediatelyfast]]
-#modId = "minecraft"
-#required = true
-#versionRange = "[1.21]"
-#ordering = "NONE"
-#side = "CLIENT"
+[[dependencies.immediatelyfast]]
+modId = "minecraft"
+required = true
+versionRange = "[1.21]"
+ordering = "NONE"
+side = "CLIENT"
