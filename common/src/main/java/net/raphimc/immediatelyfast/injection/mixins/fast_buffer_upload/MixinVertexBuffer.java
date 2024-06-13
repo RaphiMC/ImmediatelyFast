@@ -89,7 +89,7 @@ public abstract class MixinVertexBuffer {
         }
     }
 
-    @Redirect(method = "uploadIndexBuffer*", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
+    @Redirect(method = {"uploadIndexBuffer(Lnet/minecraft/client/util/BufferAllocator$CloseableBuffer;)V", "uploadIndexBuffer(Lnet/minecraft/client/render/BuiltBuffer$DrawParameters;Ljava/nio/ByteBuffer;)Lcom/mojang/blaze3d/systems/RenderSystem$ShapeIndexBuffer;"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
         final int dataSize = data.remaining();
         if (dataSize == 0) {
