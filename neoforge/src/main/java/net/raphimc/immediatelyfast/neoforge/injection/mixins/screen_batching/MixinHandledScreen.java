@@ -17,25 +17,27 @@
  */
 package net.raphimc.immediatelyfast.neoforge.injection.mixins.screen_batching;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.screen.slot.Slot;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = HandledScreen.class, priority = 500)
+@Mixin(value = HandledScreen.class, priority = 1500)
 public abstract class MixinHandledScreen {
 
-    @Shadow
-    protected abstract void renderSlotHighlight(DrawContext guiGraphics, Slot slot, int mouseX, int mouseY, float partialTick);
-
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;renderSlotHighlight(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/screen/slot/Slot;IIF)V"))
-    private void drawSlotHightlightOnTop(HandledScreen<?> instance, DrawContext drawContext, Slot slot, int mouseX, int mouseY, float partialTick) {
+    @InjectAboveEverything
+    @Inject(method = "renderSlotHighlight(Lnet/minecraft/client/gui/DrawContext;IIII)V", at = @At("HEAD"))
+    private static void beginDrawSlotHighlightOnTop(CallbackInfo ci) {
         BatchingBuffers.beginItemOverlayRendering();
-        this.renderSlotHighlight(drawContext, slot, mouseX, mouseY, partialTick);
+    }
+
+    @InjectOnAllReturns
+    @Inject(method = "renderSlotHighlight(Lnet/minecraft/client/gui/DrawContext;IIII)V", at = @At("RETURN"))
+    private static void endDrawSlotHighlightOnTop(CallbackInfo ci) {
         BatchingBuffers.endItemOverlayRendering();
     }
 
