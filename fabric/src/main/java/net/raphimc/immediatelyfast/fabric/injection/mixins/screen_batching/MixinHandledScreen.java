@@ -18,24 +18,26 @@
 package net.raphimc.immediatelyfast.fabric.injection.mixins.screen_batching;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = HandledScreen.class, priority = 500)
+@Mixin(value = HandledScreen.class, priority = 1500)
 public abstract class MixinHandledScreen {
 
-    @Shadow
-    public static void drawSlotHighlight(MatrixStack matrices, int x, int y, int z) {
+    @InjectAboveEverything
+    @Inject(method = "drawSlotHighlight", at = @At("HEAD"))
+    private static void beginDrawSlotHighlightOnTop(CallbackInfo ci) {
+        BatchingBuffers.beginItemOverlayRendering();
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlight(Lnet/minecraft/client/util/math/MatrixStack;III)V"))
-    private void drawSlotHightlightOnTop(MatrixStack matrices, int x, int y, int z) {
-        BatchingBuffers.beginItemOverlayRendering();
-        drawSlotHighlight(matrices, x, y, z);
+    @InjectOnAllReturns
+    @Inject(method = "drawSlotHighlight", at = @At("RETURN"))
+    private static void endDrawSlotHighlightOnTop(CallbackInfo ci) {
         BatchingBuffers.endItemOverlayRendering();
     }
 
