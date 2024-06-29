@@ -22,6 +22,7 @@ accessible field net/minecraft/client/render/RenderLayer translucent Z  # Only n
 mutable field net/minecraft/client/render/RenderLayer translucent Z  # Only needed on Forge
 accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
 accessible class net/minecraft/client/render/MapRenderer$MapTexture
+accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate layerBuffers Ljava/util/SequencedMap;
 
 accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendFuncState;
 accessible class com/mojang/blaze3d/platform/GlStateManager$BlendFuncState

@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.feature.batching;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 
@@ -30,13 +31,9 @@ public class ItemModelBatchingBuffer extends BatchingBuffer {
     private final Reference2ObjectMap<RenderLayer, ReferenceSet<RenderLayer>> renderLayerMap = new Reference2ObjectOpenHashMap<>();
 
     public ItemModelBatchingBuffer() {
-        super(BatchingBuffers.createLayerBuffers(
-                RenderLayer.getArmorEntityGlint(),
-                RenderLayer.getGlint(),
-                RenderLayer.getGlintTranslucent(),
-                RenderLayer.getEntityGlint(),
-                RenderLayer.getDirectEntityGlint()
-        ));
+        super(BatchingBuffers.createLayerBuffers(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().layerBuffers.keySet().stream()
+                .filter(layer -> layer.name.contains("glint"))
+                .toArray(RenderLayer[]::new)));
     }
 
     @Override
