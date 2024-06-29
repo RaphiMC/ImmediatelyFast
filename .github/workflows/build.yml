@@ -9,9 +9,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@v3
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
@@ -19,17 +19,17 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Upload Fabric Artifacts to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ImmediatelyFast Fabric
           path: fabric/build/libs/
       - name: Upload Forge Artifacts to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ImmediatelyFast Forge
           path: forge/build/libs/
       - name: Upload NeoForge Artifacts to GitHub
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ImmediatelyFast NeoForge
           path: neoforge/build/libs/
