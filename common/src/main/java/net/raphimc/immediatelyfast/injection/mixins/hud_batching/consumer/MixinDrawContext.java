@@ -19,30 +19,25 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching.consumer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
 import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFuncState;
+import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
+import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = DrawContext.class, priority = 500)
+@Mixin(value = DrawContext.class, priority = 1500)
 public abstract class MixinDrawContext {
 
     @Shadow
@@ -55,6 +50,14 @@ public abstract class MixinDrawContext {
 
     @Shadow
     protected abstract void fillGradient(VertexConsumer vertexConsumer, int startX, int startY, int endX, int endY, int z, int colorStart, int colorEnd);
+
+    @Shadow
+    @Final
+    @Mutable
+    private VertexConsumerProvider.Immediate vertexConsumers;
+
+    @Unique
+    private VertexConsumerProvider.Immediate immediatelyFast$previousVertexConsumers;
 
     @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
     private void fillIntoBuffer(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
@@ -132,23 +135,55 @@ public abstract class MixinDrawContext {
         }
     }
 
-    @ModifyArg(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V"))
-    private VertexConsumerProvider renderItemIntoBuffer(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
+    @InjectAboveEverything
+    @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"))
+    private void renderItemIntoBufferStart(CallbackInfo ci) {
         if (BatchingBuffers.ITEM_MODEL_CONSUMER != null) {
-            return BatchingBuffers.ITEM_MODEL_CONSUMER;
+            if (this.immediatelyFast$previousVertexConsumers != null) {
+                throw new IllegalStateException("Previous VertexConsumerProvider was not null");
+            }
+            this.immediatelyFast$previousVertexConsumers = this.vertexConsumers;
+            this.vertexConsumers = (VertexConsumerProvider.Immediate) BatchingBuffers.ITEM_MODEL_CONSUMER;
         }
-
-        return vertexConsumers;
     }
 
+    @InjectOnAllReturns
+    @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("RETURN"))
+    private void renderItemIntoBufferEnd(CallbackInfo ci) {
+        if (this.immediatelyFast$previousVertexConsumers != null) {
+            this.vertexConsumers = this.immediatelyFast$previousVertexConsumers;
+            this.immediatelyFast$previousVertexConsumers = null;
+        }
+    }
+
+    @InjectAboveEverything
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
-    private void renderItemOverlayIntoBufferStart(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
+    private void renderItemOverlayIntoBufferStart(CallbackInfo ci) {
         BatchingBuffers.beginItemOverlayRendering();
+        if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
+            if (this.immediatelyFast$previousVertexConsumers != null) {
+                throw new IllegalStateException("Previous VertexConsumerProvider was not null");
+            }
+            this.immediatelyFast$previousVertexConsumers = this.vertexConsumers;
+            this.vertexConsumers = (VertexConsumerProvider.Immediate) BatchingBuffers.ITEM_OVERLAY_CONSUMER;
+        }
     }
 
+    @InjectOnAllReturns
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
-    private void renderItemOverlayIntoBufferEnd(TextRenderer textRenderer, ItemStack stack, int x, int y, String countOverride, CallbackInfo ci) {
+    private void renderItemOverlayIntoBufferEnd(CallbackInfo ci) {
         BatchingBuffers.endItemOverlayRendering();
+        if (this.immediatelyFast$previousVertexConsumers != null) {
+            this.vertexConsumers = this.immediatelyFast$previousVertexConsumers;
+            this.immediatelyFast$previousVertexConsumers = null;
+        }
+    }
+
+    @Inject(method = "draw()V", at = @At("HEAD"), cancellable = true)
+    private void dontDrawIfBatching(CallbackInfo ci) {
+        if (this.immediatelyFast$previousVertexConsumers != null) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "setScissor", at = @At("HEAD"))
