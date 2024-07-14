@@ -17,35 +17,38 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.font.Glyph;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.minecraft.text.Style;
+import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Vec3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(TextRenderer.Drawer.class)
 public abstract class MixinTextRenderer_Drawer {
 
     @Shadow
     @Final
-    VertexConsumerProvider vertexConsumers;
+    @Mutable
+    private Matrix4f matrix;
 
     /**
      * Fixes <a href="https://github.com/RaphiMC/ImmediatelyFast/issues/81">https://github.com/RaphiMC/ImmediatelyFast/issues/81</a>
      */
-    @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/Glyph;getAdvance(Z)F"))
-    private float fixNegativeAdvanceGlyphs(Glyph instance, boolean bold) {
-        final float advance = instance.getAdvance(bold);
-        if (advance < 0 && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
-            if (this.vertexConsumers instanceof VertexConsumerProvider.Immediate) {
-                ((VertexConsumerProvider.Immediate) this.vertexConsumers).drawCurrentLayer();
-            }
+    @Inject(method = "accept", at = @At(value = "RETURN"))
+    private void fixNegativeAdvanceGlyphs(int i, Style style, int j, CallbackInfoReturnable<Boolean> cir, @Local Glyph glyph) {
+        final float advance = glyph.getAdvance(style.isBold());
+        if (advance < 0) {
+            this.matrix = this.matrix.copy();
+            this.matrix.addToLastColumn(new Vec3f(0F, 0F, 0.03F));
         }
-        return advance;
     }
 
 }
