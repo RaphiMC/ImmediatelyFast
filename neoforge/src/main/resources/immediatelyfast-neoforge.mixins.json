@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "core.MixinArmorFeatureRenderer",
     "core.MixinNeoForgeRenderTypes",
     "hud_batching.MixinInGameHud",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
