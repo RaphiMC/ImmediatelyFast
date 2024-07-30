@@ -18,10 +18,7 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -195,13 +192,17 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (layer == null) return Integer.MAX_VALUE;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
-            if (textureId != null && textureId.toString().startsWith("minecraft:textures/entity/horse/")) {
-                final String horseTexturePath = textureId.toString().substring(("minecraft:textures/entity/horse/").length());
-                if (horseTexturePath.startsWith("horse_markings")) {
-                    return 2;
-                } else if (horseTexturePath.startsWith("armor/")) {
-                    return 3;
-                } else {
+            if (textureId != null) {
+                if (textureId.toString().startsWith("minecraft:textures/entity/horse/")) {
+                    final String horseTexturePath = textureId.toString().substring(("minecraft:textures/entity/horse/").length());
+                    if (horseTexturePath.startsWith("horse_markings")) {
+                        return 2;
+                    } else if (horseTexturePath.startsWith("armor/")) {
+                        return 3;
+                    } else {
+                        return 1;
+                    }
+                } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
                     return 1;
                 }
             }
