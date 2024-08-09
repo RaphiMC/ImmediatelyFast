@@ -57,7 +57,12 @@ public abstract class MixinDrawContext {
     private VertexConsumerProvider.Immediate vertexConsumers;
 
     @Unique
-    private VertexConsumerProvider.Immediate immediatelyFast$previousVertexConsumers;
+    private VertexConsumerProvider.Immediate immediatelyFast$originalVertexConsumers;
+
+    @Inject(method = "<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;)V", at = @At("RETURN"))
+    private void storeOriginalVertexConsumers(CallbackInfo ci) {
+        this.immediatelyFast$originalVertexConsumers = this.vertexConsumers;
+    }
 
     @Inject(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), cancellable = true)
     private void fillIntoBuffer(RenderLayer layer, int x1, int y1, int x2, int y2, int z, int color, CallbackInfo ci) {
@@ -139,10 +144,6 @@ public abstract class MixinDrawContext {
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("HEAD"))
     private void renderItemIntoBufferStart(CallbackInfo ci) {
         if (BatchingBuffers.ITEM_MODEL_CONSUMER != null) {
-            if (this.immediatelyFast$previousVertexConsumers != null) {
-                throw new IllegalStateException("Previous VertexConsumerProvider was not null");
-            }
-            this.immediatelyFast$previousVertexConsumers = this.vertexConsumers;
             this.vertexConsumers = (VertexConsumerProvider.Immediate) BatchingBuffers.ITEM_MODEL_CONSUMER;
         }
     }
@@ -150,9 +151,8 @@ public abstract class MixinDrawContext {
     @InjectOnAllReturns
     @Inject(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At("RETURN"))
     private void renderItemIntoBufferEnd(CallbackInfo ci) {
-        if (this.immediatelyFast$previousVertexConsumers != null) {
-            this.vertexConsumers = this.immediatelyFast$previousVertexConsumers;
-            this.immediatelyFast$previousVertexConsumers = null;
+        if (BatchingBuffers.ITEM_MODEL_CONSUMER != null) {
+            this.vertexConsumers = this.immediatelyFast$originalVertexConsumers;
         }
     }
 
@@ -161,10 +161,6 @@ public abstract class MixinDrawContext {
     private void renderItemOverlayIntoBufferStart(CallbackInfo ci) {
         BatchingBuffers.beginItemOverlayRendering();
         if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
-            if (this.immediatelyFast$previousVertexConsumers != null) {
-                throw new IllegalStateException("Previous VertexConsumerProvider was not null");
-            }
-            this.immediatelyFast$previousVertexConsumers = this.vertexConsumers;
             this.vertexConsumers = (VertexConsumerProvider.Immediate) BatchingBuffers.ITEM_OVERLAY_CONSUMER;
         }
     }
@@ -173,15 +169,14 @@ public abstract class MixinDrawContext {
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemOverlayIntoBufferEnd(CallbackInfo ci) {
         BatchingBuffers.endItemOverlayRendering();
-        if (this.immediatelyFast$previousVertexConsumers != null) {
-            this.vertexConsumers = this.immediatelyFast$previousVertexConsumers;
-            this.immediatelyFast$previousVertexConsumers = null;
+        if (BatchingBuffers.ITEM_OVERLAY_CONSUMER != null) {
+            this.vertexConsumers = this.immediatelyFast$originalVertexConsumers;
         }
     }
 
     @Inject(method = "draw()V", at = @At("HEAD"), cancellable = true)
     private void dontDrawIfBatching(CallbackInfo ci) {
-        if (this.immediatelyFast$previousVertexConsumers != null) {
+        if (this.vertexConsumers != this.immediatelyFast$originalVertexConsumers) {
             ci.cancel();
         }
     }
