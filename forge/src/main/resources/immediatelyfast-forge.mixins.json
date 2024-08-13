@@ -2,12 +2,11 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.raphimc.immediatelyfast.forge.injection.mixins",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "core.MixinArmorFeatureRenderer",
     "core.MixinForgeRenderTypes",
-    "hud_batching.MixinForgeGui",
+    "hud_batching.MixinInGameHud",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.consumer.MixinDrawContext",
     "screen_batching.MixinHandledScreen"

@@ -1,6 +1,6 @@
 architectury {
     common("fabric")
-    //common("forge")
+    common("forge")
     common("neoforge")
 }
 
