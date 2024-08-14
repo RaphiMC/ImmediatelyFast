@@ -45,7 +45,7 @@ public abstract class MixinTextRenderer_Drawer {
     private void fixNegativeAdvanceGlyphs(int i, Style style, int j, CallbackInfoReturnable<Boolean> cir, @Local Glyph glyph) {
         final float advance = glyph.getAdvance(style.isBold());
         if (advance < 0) {
-            this.matrix = this.matrix.translate(0F, 0F, 0.03F, new Matrix4f());
+            this.matrix = this.matrix.translate(0F, 0F, 0.001F, new Matrix4f());
         }
     }
 
