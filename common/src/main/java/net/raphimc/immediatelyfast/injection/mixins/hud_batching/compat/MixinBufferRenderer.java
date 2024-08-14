@@ -15,29 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
-import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.BufferRenderer;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffer;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(VertexBuffer.class)
-public abstract class MixinVertexBuffer {
-
-    @Shadow
-    public abstract void bind();
+@Mixin(BufferRenderer.class)
+public abstract class MixinBufferRenderer {
 
     @Unique
     private static boolean immediatelyFast$isForceDrawing;
 
-    @Inject(method = "drawInternal", at = @At("HEAD"))
-    private void checkForDrawCallWhileBatching(CallbackInfo ci) {
+    @Inject(method = {"draw", "drawWithGlobalProgramInternal"}, at = @At("HEAD"))
+    private static void checkForDrawCallWhileBatching(CallbackInfo ci) {
         // Force draw the current batch if
         // we are not already force drawing (prevent recursion)
         // and the buffer being drawn is not one of the IF batching buffers
@@ -47,7 +43,6 @@ public abstract class MixinVertexBuffer {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
             immediatelyFast$isForceDrawing = true;
             BatchingBuffers.forceDrawBuffers();
-            this.bind();
             immediatelyFast$isForceDrawing = false;
         }
     }
