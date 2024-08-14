@@ -47,7 +47,7 @@ public abstract class MixinTextRenderer_Drawer {
         final float advance = glyph.getAdvance(style.isBold());
         if (advance < 0) {
             this.matrix = this.matrix.copy();
-            this.matrix.addToLastColumn(new Vec3f(0F, 0F, 0.03F));
+            this.matrix.addToLastColumn(new Vec3f(0F, 0F, 0.001F));
         }
     }
 
