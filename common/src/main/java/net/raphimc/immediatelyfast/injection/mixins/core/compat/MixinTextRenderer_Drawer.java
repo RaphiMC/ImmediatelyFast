@@ -40,6 +40,7 @@ public abstract class MixinTextRenderer_Drawer {
 
     /**
      * Fixes <a href="https://github.com/RaphiMC/ImmediatelyFast/issues/81">https://github.com/RaphiMC/ImmediatelyFast/issues/81</a>
+     * Needed because the universal batching optimization combines glyphs on the same texture into a single draw call which causes overlapping to not be handled by draw order.
      */
     @Inject(method = "accept", at = @At(value = "RETURN"))
     private void fixNegativeAdvanceGlyphs(int i, Style style, int j, CallbackInfoReturnable<Boolean> cir, @Local Glyph glyph) {
