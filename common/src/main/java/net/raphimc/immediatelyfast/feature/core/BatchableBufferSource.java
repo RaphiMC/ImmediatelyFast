@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.feature.core;
 
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -199,6 +200,12 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                         return 2;
                     } else if (horseTexturePath.startsWith("armor/")) {
                         return 3;
+                    } else {
+                        return 1;
+                    }
+                } else if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
+                    if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
+                        return 2;
                     } else {
                         return 1;
                     }

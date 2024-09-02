@@ -6,6 +6,7 @@ accessible method net/minecraft/client/font/FontStorage$GlyphPair getGlyph (Z)Ln
 accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
 accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
 accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/Map;
+accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
 
 accessible field net/minecraft/client/util/BufferAllocator pointer J
 accessible field net/minecraft/client/render/BufferBuilder allocator Lnet/minecraft/client/util/BufferAllocator;
