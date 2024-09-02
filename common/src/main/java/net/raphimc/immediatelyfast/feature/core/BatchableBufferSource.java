@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
@@ -202,6 +203,12 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                         return 2;
                     } else if (horseTexturePath.startsWith("armor/")) {
                         return 3;
+                    } else {
+                        return 1;
+                    }
+                } else if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
+                    if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
+                        return 2;
                     } else {
                         return 1;
                     }
