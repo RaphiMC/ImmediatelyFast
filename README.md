@@ -110,7 +110,7 @@ Known incompatibilities:
 If you encounter any issues, please report them on the [Issue Tracker](https://github.com/RaphiMC/ImmediatelyFast/issues).
 
 ## Developer API
-You can read the latest version of the API docs [here](https://github.com/RaphiMC/ImmediatelyFast/blob/1.20/API_DOCS.md).
+You can read the API docs [here](docs/API_DOCS.md).
 
 ## Partners
 YourKit supports open source projects with innovative and intelligent tools
