@@ -123,8 +123,10 @@ and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
 
 ---
 
-Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals click the image below and use code **RaphiMC** at checkout for 25% off your first month!
+Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals click **[here](https://billing.kinetichosting.net/aff.php?aff=47)** or use code **RaphiMC** at checkout for 25% off your first month!
 
-[![Kinetic Hosting](https://i.imgur.com/GgSxkKv.png)](https://billing.kinetichosting.net/aff.php?aff=47)
+![Kinetic Hosting](https://i.imgur.com/GgSxkKv.png)
+
+---
 
 Credits to [sydist](https://github.com/sydist) for making the logo!
