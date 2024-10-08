@@ -20,8 +20,8 @@
     "immediatelyfast-common.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.10",
-    "minecraft": ">=1.21 <=1.21.1",
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.21.2-beta.2",
     "java": ">=21"
   },
   "recommends": {

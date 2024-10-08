@@ -21,7 +21,6 @@ import net.minecraft.client.gui.hud.DebugHud;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -38,14 +37,6 @@ public abstract class MixinDebugHud {
         cir.getReturnValue().add("");
         cir.getReturnValue().add("ImmediatelyFast " + ImmediatelyFast.VERSION);
         cir.getReturnValue().add("Buffer Pool: " + BufferAllocatorPool.getSize());
-        if (ImmediatelyFast.persistentMappedStreamingBuffer != null) {
-            cir.getReturnValue().add("Streaming Buffer: " + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getOffset()) + "/" + this.immediatelyFast$bytesToMiB(ImmediatelyFast.persistentMappedStreamingBuffer.getSize()) + " MiB");
-        }
-    }
-
-    @Unique
-    private String immediatelyFast$bytesToMiB(long bytes) {
-        return String.format("%.0f", bytes / 1024F / 1024F);
     }
 
 }

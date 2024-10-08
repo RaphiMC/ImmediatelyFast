@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.interfaces;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import net.minecraft.client.gui.DrawContext;
+import net.raphimc.immediatelyfast.feature.batching.HudBatchingBufferSource;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 
-public interface IMapRenderer {
+@Mixin(DrawContext.class)
+public abstract class MixinDrawContext {
 
-    MapAtlasTexture immediatelyFast$getMapAtlasTexture(int id);
-
-    int immediatelyFast$getAtlasMapping(final int mapId);
+    @WrapWithCondition(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V"))
+    private boolean dontDrawIfBatching(DrawContext instance) {
+        return !(instance.vertexConsumers instanceof HudBatchingBufferSource);
+    }
 
 }

@@ -17,29 +17,31 @@
  */
 package net.raphimc.immediatelyfast.compat;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.util.Identifier;
+
 import java.util.List;
 
 public class CoreShaderBlacklist {
 
-    private static final List<String> BLACKLIST = List.of(
-            "position_color",
-            "position_tex",
-            "position_tex_color",
-            "rendertype_text",
-            "rendertype_text_background",
-            "rendertype_text_background_see_through",
-            "rendertype_text_intensity",
-            "rendertype_text_intensity_see_through",
-            "rendertype_text_see_through",
-            "rendertype_entity_translucent_cull",
-            "rendertype_item_entity_translucent_cull"
+    private static final List<Identifier> BLACKLIST = List.of(
+            ShaderProgramKeys.POSITION_COLOR.configId(),
+            ShaderProgramKeys.POSITION_TEX.configId(),
+            ShaderProgramKeys.POSITION_TEX_COLOR.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH.configId(),
+            ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH.configId(),
+            ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL.configId()
     );
 
-    public static boolean isBlacklisted(final String name) {
-        return BLACKLIST.contains(name);
+    public static boolean isBlacklisted(final Identifier identifier) {
+        return BLACKLIST.contains(identifier);
     }
 
-    public static List<String> getBlacklist() {
+    public static List<Identifier> getBlacklist() {
         return BLACKLIST;
     }
 

@@ -15,17 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.feature.batching;
+package net.raphimc.immediatelyfast.injection.interfaces;
 
-import net.minecraft.client.render.RenderLayer;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 
-public class GuiOverlayFirstBatchingBuffer extends BatchingBuffer {
+public interface IMapRenderState {
 
-    @Override
-    public void draw() {
-        this.drawFallbackLayersFirst = false;
-        this.draw(RenderLayer.getGuiOverlay());
-        super.draw();
-    }
+    int immediatelyFast$getAtlasX();
+
+    void immediatelyFast$setAtlasX(final int x);
+
+    int immediatelyFast$getAtlasY();
+
+    void immediatelyFast$setAtlasY(final int y);
+
+    MapAtlasTexture immediatelyFast$getAtlasTexture();
+
+    void immediatelyFast$setAtlasTexture(final MapAtlasTexture atlasTexture);
 
 }

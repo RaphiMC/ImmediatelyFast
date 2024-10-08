@@ -37,6 +37,7 @@ public abstract class MixinGlyphAtlasTexture {
         return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048 : 256;
     }
 
+    @SuppressWarnings("MixinAnnotationTarget")
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
     private float modifyGlyphAtlasTextureSize(float original) {
         return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048F : 256F;

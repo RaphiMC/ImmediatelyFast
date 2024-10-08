@@ -15,26 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.LayeredDrawer;
+import net.minecraft.client.render.RenderTickCounter;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = HandledScreen.class, priority = 500)
-public abstract class MixinHandledScreen {
+@Mixin(LayeredDrawer.class)
+public abstract class MixinLayeredDrawer {
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;focusedSlot:Lnet/minecraft/screen/slot/Slot;", ordinal = 0))
-    private void beginBatching(CallbackInfo ci) {
-        BatchingBuffers.beginHudBatching();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.BEFORE))
-    private void endBatching(CallbackInfo ci) {
-        BatchingBuffers.endHudBatching();
+    @Inject(method = "renderInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer$Layer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
+    private void renderBatch(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching && !ImmediatelyFast.config.experimental_universal_hud_batching) {
+            context.draw();
+        }
     }
 
 }

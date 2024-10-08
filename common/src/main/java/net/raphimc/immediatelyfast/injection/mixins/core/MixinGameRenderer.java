@@ -1,6 +1,6 @@
 /*
  * This file is part of ImmediatelyFast - https://github.com/RaphiMC/ImmediatelyFast
- * Copyright (C) 2023 RK_01/RaphiMC and contributors
+ * Copyright (C) 2023-2024 RK_01/RaphiMC and contributors
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,27 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.neoforge.injection.mixins.hud_batching.compat.appleskin;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "squeek.appleskin.client.HUDOverlayHandler", remap = false)
-@Pseudo
-public abstract class MixinAppleSkin_HUDOverlayHandler {
+@Mixin(GameRenderer.class)
+public abstract class MixinGameRenderer {
 
-    @Inject(method = "drawExhaustionOverlay", at = @At("RETURN"))
-    private static void forceDrawBatch(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isHudBatching()) {
-            BatchingBuffers.endHudBatching();
-            BatchingBuffers.beginHudBatching();
-        }
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getEntityVertexConsumers()Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;"))
+    private VertexConsumerProvider.Immediate returnNonBatchingVertexConsumer(BufferBuilderStorage instance) {
+        return BatchingBuffers.getNonBatchingEntityVertexConsumers();
     }
 
 }

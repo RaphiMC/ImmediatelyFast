@@ -18,7 +18,6 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
 import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverythingProcessor;
 import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturnsProcessor;
 import org.objectweb.asm.tree.ClassNode;
@@ -73,21 +72,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (!ImmediatelyFast.config.experimental_screen_batching && packageName.startsWith("screen_batching")) {
-            return false;
-        }
-        if (!ImmediatelyFast.config.experimental_universal_hud_batching && packageName.startsWith("universal_hud_batching")) {
-            return false;
-        }
-
-        if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformCode.getModVersion("armorchroma").isEmpty()) { // https://github.com/A5b84/armor-chroma-fabric
-            return false;
-        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/squeek502/AppleSkin
-            return false;
-        } else if (packageName.startsWith("hud_batching.compat.iceberg") && PlatformCode.getModVersion("iceberg").isEmpty()) { // https://github.com/AHilyard/Iceberg
-            return false;
-        } else if (packageName.startsWith("hud_batching.compat.highlighter") && PlatformCode.getModVersion("highlighter").isEmpty()) { // https://github.com/AHilyard/Highlighter
-            return false;
-        } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformCode.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
             return false;
         }
 

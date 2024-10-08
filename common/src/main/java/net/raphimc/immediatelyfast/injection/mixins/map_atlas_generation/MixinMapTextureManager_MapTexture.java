@@ -19,8 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.MapColor;
-import net.minecraft.client.render.MapRenderer;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.texture.MapTextureManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -28,19 +27,17 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
-import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderer;
+import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(value = MapRenderer.MapTexture.class, priority = 1100) // Workaround for Porting-Lib which relies on the LVT to be intact
-public abstract class MixinMapRenderer_MapTexture {
+@Mixin(value = MapTextureManager.MapTexture.class, priority = 1100) // Workaround for Porting-Lib which relies on the LVT to be intact
+public abstract class MixinMapTextureManager_MapTexture {
 
     @Shadow
     private MapState state;
@@ -51,8 +48,7 @@ public abstract class MixinMapRenderer_MapTexture {
     private NativeImageBackedTexture texture;
 
     @Shadow
-    @Final
-    MapRenderer field_2047;
+    private boolean needsUpdate;
 
     @Unique
     private static final NativeImageBackedTexture DUMMY_TEXTURE;
@@ -75,8 +71,8 @@ public abstract class MixinMapRenderer_MapTexture {
     }
 
     @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
-    private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(int width, int height, boolean useMipmaps, @Local int id) {
-        final int packedLocation = ((IMapRenderer) this.field_2047).immediatelyFast$getAtlasMapping(id);
+    private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(int width, int height, boolean useMipmaps, @Local(argsOnly = true) MapTextureManager mapTextureManager, @Local(argsOnly = true) int id) {
+        final int packedLocation = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlasMapping(id);
         if (packedLocation == -1) {
             ImmediatelyFast.LOGGER.warn("Map " + id + " is not in an atlas");
             // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
@@ -85,7 +81,7 @@ public abstract class MixinMapRenderer_MapTexture {
 
         this.immediatelyFast$atlasX = ((packedLocation >> 8) & 0xFF) * MAP_SIZE;
         this.immediatelyFast$atlasY = (packedLocation & 0xFF) * MAP_SIZE;
-        this.immediatelyFast$atlasTexture = ((IMapRenderer) this.field_2047).immediatelyFast$getMapAtlasTexture(packedLocation >> 16);
+        this.immediatelyFast$atlasTexture = ((IMapTextureManager) mapTextureManager).immediatelyFast$getMapAtlasTexture(packedLocation >> 16);
         if (this.immediatelyFast$atlasTexture == null) {
             throw new IllegalStateException("getMapAtlasTexture returned null for packedLocation " + packedLocation + " (map " + id + ")");
         }
@@ -105,7 +101,7 @@ public abstract class MixinMapRenderer_MapTexture {
 
     @Inject(method = "updateTexture", at = @At("HEAD"), cancellable = true)
     private void updateAtlasTexture(CallbackInfo ci) {
-        if (this.immediatelyFast$atlasTexture != null) {
+        if (this.needsUpdate && this.immediatelyFast$atlasTexture != null) {
             ci.cancel();
             final NativeImageBackedTexture atlasTexture = this.immediatelyFast$atlasTexture.getTexture();
             final NativeImage atlasImage = atlasTexture.getImage();
@@ -116,33 +112,13 @@ public abstract class MixinMapRenderer_MapTexture {
             for (int x = 0; x < MAP_SIZE; x++) {
                 for (int y = 0; y < MAP_SIZE; y++) {
                     final int i = x + y * MAP_SIZE;
-                    atlasImage.setColor(this.immediatelyFast$atlasX + x, this.immediatelyFast$atlasY + y, MapColor.getRenderColor(this.state.colors[i]));
+                    atlasImage.setColorArgb(this.immediatelyFast$atlasX + x, this.immediatelyFast$atlasY + y, MapColor.getRenderColor(this.state.colors[i]));
                 }
             }
             atlasTexture.bindTexture();
             atlasImage.upload(0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, false, false);
+            this.needsUpdate = false;
         }
-    }
-
-    @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;texture(FF)Lnet/minecraft/client/render/VertexConsumer;"), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;vertex(Lorg/joml/Matrix4f;FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 0), to = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;light(I)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 3)))
-    private VertexConsumer drawAtlasTexture(VertexConsumer instance, float u, float v) {
-        if (this.immediatelyFast$atlasTexture != null) {
-            if (u == 0 && v == 1) {
-                u = (float) this.immediatelyFast$atlasX / ATLAS_SIZE;
-                v = (float) (this.immediatelyFast$atlasY + MAP_SIZE) / ATLAS_SIZE;
-            } else if (u == 1 && v == 1) {
-                u = (float) (this.immediatelyFast$atlasX + MAP_SIZE) / ATLAS_SIZE;
-                v = (float) (this.immediatelyFast$atlasY + MAP_SIZE) / ATLAS_SIZE;
-            } else if (u == 1 && v == 0) {
-                u = (float) (this.immediatelyFast$atlasX + MAP_SIZE) / ATLAS_SIZE;
-                v = (float) this.immediatelyFast$atlasY / ATLAS_SIZE;
-            } else if (u == 0 && v == 0) {
-                u = (float) this.immediatelyFast$atlasX / ATLAS_SIZE;
-                v = (float) this.immediatelyFast$atlasY / ATLAS_SIZE;
-            }
-        }
-
-        return instance.texture(u, v);
     }
 
     @Inject(method = "close", at = @At("HEAD"), cancellable = true)

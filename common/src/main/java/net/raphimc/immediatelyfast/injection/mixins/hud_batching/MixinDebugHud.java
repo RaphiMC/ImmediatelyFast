@@ -17,11 +17,10 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.DebugHud;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
-import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
-import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
+import net.minecraft.client.render.RenderLayer;
+import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,25 +29,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = DebugHud.class, priority = 1500)
 public abstract class MixinDebugHud {
 
-    @InjectAboveEverything
-    @Inject(method = "render", at = @At("HEAD"))
-    private void beginBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginDebugHudBatching();
-        } else if (ImmediatelyFast.config.experimental_universal_hud_batching && BatchingBuffers.isHudBatching()) {
-            BatchingBuffers.endHudBatching();
-            BatchingBuffers.beginDebugHudBatching();
-        }
-    }
-
-    @InjectOnAllReturns
     @Inject(method = "render", at = @At("RETURN"))
-    private void endBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.endDebugHudBatching();
-        } else if (ImmediatelyFast.config.experimental_universal_hud_batching && BatchingBuffers.isHudBatching()) {
-            BatchingBuffers.endDebugHudBatching();
-            BatchingBuffers.beginHudBatching();
+    private void fixDrawOrder(DrawContext context, CallbackInfo ci) {
+        if (context.vertexConsumers instanceof BatchableBufferSource batchableBufferSource) {
+            batchableBufferSource.drawDirect(RenderLayer.getGui());
+            batchableBufferSource.drawDirect(RenderLayer.getGuiOverlay());
         }
     }
 

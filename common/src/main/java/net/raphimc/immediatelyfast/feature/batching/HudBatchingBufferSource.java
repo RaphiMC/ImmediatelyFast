@@ -17,54 +17,56 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.BufferAllocator;
+import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 
+import java.util.SequencedMap;
 import java.util.Set;
 
-public class ItemModelBatchingBuffer extends BatchingBuffer {
+public class HudBatchingBufferSource extends BatchableBufferSource {
 
     private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
     private final Reference2ObjectMap<RenderLayer, ReferenceSet<RenderLayer>> renderLayerMap = new Reference2ObjectOpenHashMap<>();
+    private boolean renderingItem = false;
 
-    public ItemModelBatchingBuffer() {
-        super(BatchingBuffers.createLayerBuffers(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().layerBuffers.keySet().stream()
-                .filter(layer -> layer.name.contains("glint"))
-                .toArray(RenderLayer[]::new)));
+    public HudBatchingBufferSource(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
+        super(fallbackBuffer, layerBuffers);
+    }
+
+    public void setRenderingItem(final boolean renderingItem) {
+        this.renderingItem = renderingItem;
     }
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
-        if (this.layerBuffers.containsKey(layer)) {
+        if (!this.renderingItem || layer.name.contains("glint")) {
             return super.getBuffer(layer);
         }
 
         final LightingState lightingState = LightingState.current();
-        final RenderLayer newLayer = this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingRenderLayers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert));
+        final RenderLayer newLayer = this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingBuffers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert));
         this.renderLayerMap.computeIfAbsent(layer, key -> new ReferenceOpenHashSet<>()).add(newLayer);
         return super.getBuffer(newLayer);
     }
 
     @Override
-    public void draw(final RenderLayer layer) {
+    public void drawDirect(final RenderLayer layer) {
         final Set<RenderLayer> renderLayers = this.renderLayerMap.remove(layer);
         if (renderLayers != null) {
             for (RenderLayer renderLayer : renderLayers) {
-                super.draw(renderLayer);
+                super.drawDirect(renderLayer);
             }
         } else {
-            super.draw(layer);
+            super.drawDirect(layer);
         }
     }
 
     @Override
     public void draw() {
-        RenderSystem.enableBlend();
         super.draw();
-        RenderSystem.disableBlend();
         this.lightingRenderLayers.clear();
         this.renderLayerMap.clear();
     }

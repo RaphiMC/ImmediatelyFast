@@ -17,32 +17,43 @@
  */
 package net.raphimc.immediatelyfastapi;
 
+@Deprecated
 public interface BatchingAccess {
 
     /**
      * Starts batching all rendered HUD elements between {@link #beginHudBatching()} and {@link #endHudBatching()}.<br>
      * Make sure to <b>always</b> call {@link #endHudBatching()} after you began batching when rendering your HUD elements even if you didn't render anything.
+     * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
+    @Deprecated
     void beginHudBatching();
 
     /**
      * Draws all batched HUD elements at once.
+     * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
+    @Deprecated
     void endHudBatching();
 
     /**
      * @return Whether HUD batching is currently active.
+     * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
+    @Deprecated
     boolean isHudBatching();
 
     /**
      * @return Whether any batches are currently stored.
+     * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
+    @Deprecated
     boolean hasDataToDraw();
 
     /**
      * Draws all currently stored batches immediately.
+     * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
+    @Deprecated
     void forceDrawBuffers();
 
 }

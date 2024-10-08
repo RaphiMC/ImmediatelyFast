@@ -17,13 +17,11 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
-import net.minecraft.client.font.FontStorage;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,13 +36,7 @@ public abstract class MixinTextRenderer_Drawer {
     @Unique
     private VertexConsumer immediatelyFast$lastVertexConsumer;
 
-    @Unique
-    private Identifier immediatelyFast$lastFont;
-
-    @Unique
-    private FontStorage immediatelyFast$lastFontStorage;
-
-    @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
+    @Redirect(method = "drawLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
         // The buffer got drawn while rendering the text, so we need to reset the cached data
         final boolean isBufferInvalid = this.immediatelyFast$lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.building;
@@ -55,16 +47,6 @@ public abstract class MixinTextRenderer_Drawer {
 
         this.immediatelyFast$lastRenderLayer = renderLayer;
         return this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderLayer);
-    }
-
-    @Redirect(method = "accept", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;getFontStorage(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;"))
-    private FontStorage reduceGetFontStorageCalls(TextRenderer instance, Identifier id) {
-        if (this.immediatelyFast$lastFont == id) {
-            return this.immediatelyFast$lastFontStorage;
-        }
-
-        this.immediatelyFast$lastFont = id;
-        return this.immediatelyFast$lastFontStorage = instance.getFontStorage(id);
     }
 
 }

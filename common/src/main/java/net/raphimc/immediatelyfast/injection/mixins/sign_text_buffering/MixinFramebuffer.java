@@ -15,30 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
+package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
-import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
-import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
+import net.minecraft.client.gl.Framebuffer;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ChatScreen.class, priority = 1500)
-public abstract class MixinChatScreen {
+@Mixin(Framebuffer.class)
+public abstract class MixinFramebuffer {
 
-    @InjectAboveEverything
-    @Inject(method = "render", at = @At("HEAD"))
-    private void beginBatching(CallbackInfo ci) {
-        BatchingBuffers.beginHudBatching();
-    }
-
-    @InjectOnAllReturns
-    @Inject(method = "render", at = @At("RETURN"))
-    private void endBatching(CallbackInfo ci) {
-        BatchingBuffers.endHudBatching();
+    @Inject(method = {"beginWrite", "endWrite"}, at = @At("HEAD"), cancellable = true)
+    private void lockFramebuffer(CallbackInfo ci) {
+        if (ImmediatelyFast.signTextCache != null && ImmediatelyFast.signTextCache.lockFramebuffer) {
+            ci.cancel();
+        }
     }
 
 }

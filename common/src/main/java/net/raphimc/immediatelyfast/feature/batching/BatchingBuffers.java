@@ -18,158 +18,55 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 import java.util.SequencedMap;
+import java.util.Set;
 
-/**
- * Class which holds various allocated buffers used for batching various rendered elements.
- * <p>
- * Also contains references to vertex consumers which are called within mixins to redirect the vertex data into the batching buffer.
- * <p>
- * Once a begin method is called, all vertex data between the begin and end method will be redirected into the batching buffer and drawn in one batch at the end.
- */
 public class BatchingBuffers {
 
-    /*
-     * The references into which specific vertex data is redirected.
-     *
-     * Set to null if batching is disabled and the data should be drawn immediately as usual.
-     */
-    public static VertexConsumerProvider FILL_CONSUMER = null;
-    public static VertexConsumerProvider TEXTURE_CONSUMER = null;
-    public static VertexConsumerProvider TEXT_CONSUMER = null;
-    public static VertexConsumerProvider ITEM_MODEL_CONSUMER = null;
-    public static VertexConsumerProvider ITEM_OVERLAY_CONSUMER = null;
+    private static VertexConsumerProvider.Immediate nonBatchingEntityVertexConsumers;
+    private static VertexConsumerProvider.Immediate hudBatchingVertexConsumers;
 
-    /*
-     * The batching buffers which hold the vertex data of the batch.
-     */
-    private static final BatchingBuffer HUD_BATCH = new BatchingBuffer();
-    private static final BatchingBuffer DEBUG_HUD_BATCH = new GuiOverlayFirstBatchingBuffer();
-    private static final BatchingBuffer ITEM_MODEL_BATCH = new ItemModelBatchingBuffer();
-    private static final BatchingBuffer ITEM_OVERLAY_BATCH = new BatchingBuffer();
-
-    public static void beginHudBatching() {
-        beginHudBatching(HUD_BATCH);
-    }
-
-    public static void beginDebugHudBatching() {
-        beginHudBatching(DEBUG_HUD_BATCH);
-    }
-
-    public static void beginHudBatching(final BatchingBuffer batch) {
-        if (batch.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("HUD batching was already active! endHudBatching() was not called before beginHudBatching(). This will cause rendering issues.");
-            batch.close();
+    public static VertexConsumerProvider.Immediate getNonBatchingEntityVertexConsumers() {
+        if (nonBatchingEntityVertexConsumers == null) {
+            final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = createLayerBuffers(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().layerBuffers.keySet());
+            nonBatchingEntityVertexConsumers = new VertexConsumerProvider.Immediate(new BufferAllocator(786432), layerBuffers);
         }
-        FILL_CONSUMER = batch;
-        TEXTURE_CONSUMER = batch;
-        TEXT_CONSUMER = batch;
-        beginItemModelBatching();
-        beginItemOverlayBatching();
+        return nonBatchingEntityVertexConsumers;
     }
 
-    public static void endHudBatching() {
-        endHudBatching(HUD_BATCH);
-    }
-
-    public static void endDebugHudBatching() {
-        endHudBatching(DEBUG_HUD_BATCH);
-    }
-
-    public static void endHudBatching(final BatchingBuffer batch) {
-        FILL_CONSUMER = null;
-        TEXTURE_CONSUMER = null;
-        TEXT_CONSUMER = null;
-        final RenderSystemState renderSystemState = RenderSystemState.current();
-        batch.draw();
-        endItemModelBatching();
-        endItemOverlayBatching();
-        renderSystemState.apply();
-    }
-
-    public static boolean isHudBatching() {
-        return TEXT_CONSUMER != null || TEXTURE_CONSUMER != null || FILL_CONSUMER != null || ITEM_MODEL_CONSUMER != null || ITEM_OVERLAY_CONSUMER != null;
-    }
-
-    public static boolean hasDataToDraw() {
-        return HUD_BATCH.hasActiveLayers() || DEBUG_HUD_BATCH.hasActiveLayers() || ITEM_MODEL_BATCH.hasActiveLayers() || ITEM_OVERLAY_BATCH.hasActiveLayers();
-    }
-
-    public static void forceDrawBuffers() {
-        final RenderSystemState renderSystemState = RenderSystemState.current();
-        HUD_BATCH.draw();
-        DEBUG_HUD_BATCH.draw();
-        ITEM_MODEL_BATCH.draw();
-        ITEM_OVERLAY_BATCH.draw();
-        renderSystemState.apply();
-    }
-
-    private static void beginItemModelBatching() {
-        if (ITEM_MODEL_BATCH.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("Item model batching was already active! endItemModelBatching() was not called before beginItemModelBatching(). This will cause rendering issues.");
-            ITEM_MODEL_BATCH.close();
+    public static VertexConsumerProvider.Immediate getHudBatchingVertexConsumers() {
+        if (hudBatchingVertexConsumers == null) {
+            final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = createLayerBuffers(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().layerBuffers.keySet());
+            hudBatchingVertexConsumers = new HudBatchingBufferSource(new BufferAllocator(786432), layerBuffers);
         }
-        ITEM_MODEL_CONSUMER = ITEM_MODEL_BATCH;
+        return hudBatchingVertexConsumers;
     }
 
-    private static void endItemModelBatching() {
-        ITEM_MODEL_CONSUMER = null;
-        ITEM_MODEL_BATCH.draw();
-    }
-
-    private static void beginItemOverlayBatching() {
-        if (ITEM_OVERLAY_BATCH.hasActiveLayers()) {
-            ImmediatelyFast.LOGGER.warn("Item overlay batching was already active! endItemOverlayBatching() was not called before beginItemOverlayBatching(). This will cause rendering issues.");
-            ITEM_OVERLAY_BATCH.close();
-        }
-        ITEM_OVERLAY_CONSUMER = ITEM_OVERLAY_BATCH;
-    }
-
-    private static void endItemOverlayBatching() {
-        ITEM_OVERLAY_CONSUMER = null;
-        ITEM_OVERLAY_BATCH.draw();
-    }
-
-    private static VertexConsumerProvider PREV_FILL_CONSUMER = null;
-    private static VertexConsumerProvider PREV_TEXT_CONSUMER = null;
-    private static VertexConsumerProvider PREV_TEXTURE_CONSUMER = null;
-
-    public static void beginItemOverlayRendering() {
-        if (ITEM_OVERLAY_CONSUMER != null) {
-            PREV_FILL_CONSUMER = FILL_CONSUMER;
-            PREV_TEXT_CONSUMER = TEXT_CONSUMER;
-            PREV_TEXTURE_CONSUMER = TEXTURE_CONSUMER;
-            FILL_CONSUMER = ITEM_OVERLAY_CONSUMER;
-            TEXT_CONSUMER = ITEM_OVERLAY_CONSUMER;
-            TEXTURE_CONSUMER = ITEM_OVERLAY_CONSUMER;
-        }
-    }
-
-    public static void endItemOverlayRendering() {
-        if (ITEM_OVERLAY_CONSUMER != null) {
-            FILL_CONSUMER = PREV_FILL_CONSUMER;
-            TEXT_CONSUMER = PREV_TEXT_CONSUMER;
-            TEXTURE_CONSUMER = PREV_TEXTURE_CONSUMER;
-        }
-    }
-
-    /**
-     * Creates a map of layer buffers for the given RenderLayer's.
-     *
-     * @param layers The RenderLayer's for which to create the layer buffers.
-     * @return A map of layer buffers for the given RenderLayer's.
-     */
-    public static SequencedMap<RenderLayer, BufferAllocator> createLayerBuffers(final RenderLayer... layers) {
-        final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.length);
+    private static SequencedMap<RenderLayer, BufferAllocator> createLayerBuffers(final Set<RenderLayer> layers) {
+        final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.size());
         for (final RenderLayer layer : layers) {
             layerBuffers.put(layer, new BufferAllocator(layer.getExpectedBufferSize()));
         }
         return layerBuffers;
+    }
+
+    public static class WrappedRenderLayer extends RenderLayer {
+
+        public WrappedRenderLayer(final RenderLayer renderLayer, final Runnable additionalStartAction, final Runnable additionalEndAction) {
+            super(renderLayer.name, renderLayer.getVertexFormat(), renderLayer.getDrawMode(), renderLayer.getExpectedBufferSize(), renderLayer.hasCrumbling(), renderLayer.isTranslucent(), () -> {
+                renderLayer.startDrawing();
+                additionalStartAction.run();
+            }, () -> {
+                renderLayer.endDrawing();
+                additionalEndAction.run();
+            });
+        }
+
     }
 
 }

@@ -15,20 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
+package net.raphimc.immediatelyfast.injection.interfaces;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import net.minecraft.client.gl.GpuBuffer;
-import net.minecraft.client.gl.VertexBuffer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 
-@Mixin(VertexBuffer.class)
-public abstract class MixinVertexBuffer {
+public interface IMapTextureManager {
 
-    @WrapWithCondition(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GpuBuffer;resize(I)V"))
-    private boolean onlyResizeIfNeeded(GpuBuffer instance, int newSize) {
-        return newSize > instance.size;
-    }
+    MapAtlasTexture immediatelyFast$getMapAtlasTexture(final int id);
+
+    int immediatelyFast$getAtlasMapping(final int mapId);
 
 }

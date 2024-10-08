@@ -142,6 +142,26 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             this.drawCurrentLayer();
         }
 
+        this.drawDirect(layer);
+    }
+
+    @Override
+    public void close() {
+        this.currentLayer = null;
+        this.drawFallbackLayersFirst = false;
+
+        for (RenderLayer layer : this.activeLayers) {
+            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+                bufferBuilder.endNullable();
+                BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
+            }
+        }
+
+        this.activeLayers.clear();
+        this.pendingBuffers.clear();
+    }
+
+    public void drawDirect(final RenderLayer layer) {
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(false);
         }
@@ -159,22 +179,6 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(true);
         }
-    }
-
-    @Override
-    public void close() {
-        this.currentLayer = null;
-        this.drawFallbackLayersFirst = false;
-
-        for (RenderLayer layer : this.activeLayers) {
-            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.endNullable();
-                BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
-            }
-        }
-
-        this.activeLayers.clear();
-        this.pendingBuffers.clear();
     }
 
     public boolean hasActiveLayers() {

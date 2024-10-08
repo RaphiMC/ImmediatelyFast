@@ -17,12 +17,12 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.BackgroundRenderer;
+import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -86,30 +86,32 @@ public abstract class MixinSignBlockEntityRenderer {
             if (slot != null) {
                 final Matrix4f projectionMatrix = new Matrix4f().setOrtho(0F, SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE, 0F, 1000F, 21000F);
                 RenderSystem.backupProjectionMatrix();
-                RenderSystem.setProjectionMatrix(projectionMatrix, VertexSorter.BY_Z);
+                RenderSystem.setProjectionMatrix(projectionMatrix, ProjectionType.ORTHOGRAPHIC);
                 final Matrix4fStack modelViewMatrix = RenderSystem.getModelViewStack();
                 modelViewMatrix.pushMatrix();
                 modelViewMatrix.identity();
                 modelViewMatrix.translate(0F, 0F, -11000F);
-                RenderSystem.applyModelViewMatrix();
-                final float fogStart = RenderSystem.getShaderFogStart();
-                BackgroundRenderer.clearFog();
-                ImmediatelyFast.signTextCache.signAtlasFramebuffer.beginWrite(true);
-
+                final Fog fog = RenderSystem.getShaderFog();
+                RenderSystem.setShaderFog(Fog.DUMMY);
                 final BufferAllocator bufferAllocator = BufferAllocatorPool.borrowBufferAllocator();
-                final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
-                final MatrixStack matrixStack = new NoSetTextAnglesMatrixStack();
-                matrixStack.translate(slot.x, slot.y, 0F);
-                matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
-                this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
-                immediate.draw();
-                BufferAllocatorPool.returnBufferAllocatorSafe(bufferAllocator);
+                ImmediatelyFast.signTextCache.signAtlasFramebuffer.beginWrite(true);
+                ImmediatelyFast.signTextCache.lockFramebuffer = true;
 
-                MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
-                RenderSystem.setShaderFogStart(fogStart);
-                modelViewMatrix.popMatrix();
-                RenderSystem.applyModelViewMatrix();
-                RenderSystem.restoreProjectionMatrix();
+                try {
+                    final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
+                    final MatrixStack matrixStack = new NoSetTextAnglesMatrixStack();
+                    matrixStack.translate(slot.x, slot.y, 0F);
+                    matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
+                    this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
+                    immediate.draw();
+                } finally {
+                    ImmediatelyFast.signTextCache.lockFramebuffer = false;
+                    MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
+                    BufferAllocatorPool.returnBufferAllocatorSafe(bufferAllocator);
+                    RenderSystem.setShaderFog(fog);
+                    modelViewMatrix.popMatrix();
+                    RenderSystem.restoreProjectionMatrix();
+                }
 
                 ImmediatelyFast.signTextCache.slotCache.put(signText, slot);
             } else {

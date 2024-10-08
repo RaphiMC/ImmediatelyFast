@@ -33,7 +33,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
     public SignAtlasFramebuffer() {
         super(false);
-        this.resize(ATLAS_SIZE, ATLAS_SIZE, MinecraftClient.IS_SYSTEM_MAC);
+        this.resize(ATLAS_SIZE, ATLAS_SIZE);
         MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
         this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + this.colorAttachment);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, new FboTexture());
@@ -51,8 +51,8 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
         return this.rootSlot.findSlot(width, height);
     }
 
-    public void clear() {
-        this.clear(MinecraftClient.IS_SYSTEM_MAC);
+    public void clearAtlas() {
+        this.clear();
         MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
 
         this.rootSlot.subSlot1 = null;
@@ -94,7 +94,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
             GL11C.glScissor(this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
             GL11C.glEnable(GL11C.GL_SCISSOR_TEST);
-            SignAtlasFramebuffer.this.clear(MinecraftClient.IS_SYSTEM_MAC);
+            SignAtlasFramebuffer.this.clear();
             GL11C.glDisable(GL11C.GL_SCISSOR_TEST);
             MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
         }

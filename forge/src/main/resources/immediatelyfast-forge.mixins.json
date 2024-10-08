@@ -5,11 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "core.MixinForgeRenderTypes",
-    "hud_batching.MixinInGameHud",
-    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
-    "hud_batching.consumer.MixinDrawContext",
-    "screen_batching.MixinHandledScreen"
+    "core.MixinForgeRenderTypes"
   ],
   "injectors": {
     "defaultRequire": 1

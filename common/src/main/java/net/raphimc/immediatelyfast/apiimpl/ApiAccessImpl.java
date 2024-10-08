@@ -23,11 +23,13 @@ import net.raphimc.immediatelyfastapi.ConfigAccess;
 
 public class ApiAccessImpl implements ApiAccess {
 
+    @Deprecated
     private final BatchingAccess batchingAccess = new BatchingAccessImpl();
     private final ConfigAccess configAccess = new ConfigAccessImpl();
     private final ConfigAccess runtimeConfigAccess = new RuntimeConfigAccessImpl();
 
     @Override
+    @Deprecated
     public BatchingAccess getBatching() {
         return this.batchingAccess;
     }
