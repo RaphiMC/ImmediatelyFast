@@ -2,10 +2,7 @@ accessWidener v1 named
 #https://fabricmc.net/wiki/tutorial:accesswideners
 
 accessible class net/minecraft/client/font/TextRenderer$Drawer
-accessible method net/minecraft/client/font/FontStorage$GlyphPair getGlyph (Z)Lnet/minecraft/client/font/Glyph;
-accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
 accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
-accessible field net/minecraft/client/font/FontManager fontStorages Ljava/util/Map;
 accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
 
 accessible field net/minecraft/client/util/BufferAllocator pointer J
@@ -27,10 +24,4 @@ accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate la
 accessible field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
 mutable field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
 
-accessible field com/mojang/blaze3d/platform/GlStateManager BLEND Lcom/mojang/blaze3d/platform/GlStateManager$BlendFuncState;
-accessible class com/mojang/blaze3d/platform/GlStateManager$BlendFuncState
-accessible field com/mojang/blaze3d/platform/GlStateManager DEPTH Lcom/mojang/blaze3d/platform/GlStateManager$DepthTestState;
-accessible class com/mojang/blaze3d/platform/GlStateManager$DepthTestState
-accessible class com/mojang/blaze3d/platform/GlStateManager$CapabilityTracker # Only needed on Forge
-accessible field com/mojang/blaze3d/platform/GlStateManager$CapabilityTracker state Z
 accessible field com/mojang/blaze3d/systems/RenderSystem shaderLightDirections [Lorg/joml/Vector3f;
