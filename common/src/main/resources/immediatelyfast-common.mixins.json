@@ -22,7 +22,6 @@
     "hud_batching.MixinDebugHud",
     "hud_batching.MixinDrawContext",
     "hud_batching.MixinGameRenderer",
-    "hud_batching.MixinItemRenderer",
     "hud_batching.MixinLayeredDrawer",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderState",

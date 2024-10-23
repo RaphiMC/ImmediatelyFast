@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "core.MixinRenderLayer"
+    "core.MixinRenderLayer",
+    "hud_batching.MixinItemRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
