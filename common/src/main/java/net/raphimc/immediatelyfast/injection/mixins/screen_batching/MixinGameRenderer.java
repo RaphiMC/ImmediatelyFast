@@ -21,6 +21,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -33,14 +34,15 @@ public abstract class MixinGameRenderer {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V"))
     private void screenBatching(Screen instance, DrawContext context, int mouseX, int mouseY, float delta, Operation<Void> original) {
+        final boolean batchScreen = instance instanceof HandledScreen;
         final VertexConsumerProvider.Immediate prev = context.vertexConsumers;
-        if (ImmediatelyFast.runtimeConfig.experimental_screen_batching) {
+        if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && batchScreen) {
             context.draw();
             context.vertexConsumers = BatchingBuffers.getHudBatchingVertexConsumers();
         }
         try {
             original.call(instance, context, mouseX, mouseY, delta);
-            if (ImmediatelyFast.runtimeConfig.experimental_screen_batching) {
+            if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && batchScreen) {
                 context.draw();
             }
         } finally {
