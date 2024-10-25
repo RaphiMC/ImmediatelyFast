@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gl.GpuBuffer;
 import net.minecraft.client.gl.VertexBuffer;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -28,7 +29,7 @@ public abstract class MixinVertexBuffer {
 
     @WrapWithCondition(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GpuBuffer;resize(I)V"))
     private boolean onlyResizeIfNeeded(GpuBuffer instance, int newSize) {
-        return newSize > instance.size;
+        return !ImmediatelyFast.runtimeConfig.fast_buffer_upload || newSize > instance.size;
     }
 
 }

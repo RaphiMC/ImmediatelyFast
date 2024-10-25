@@ -81,8 +81,26 @@ public class ImmediatelyFast {
         final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
+        boolean isNvidia = false;
+        boolean isAmd = false;
+        boolean isIntel = false;
+        boolean isApple = false;
+        if (gpuVendor != null) {
+            final String gpuVendorLower = gpuVendor.toLowerCase();
+
+            isNvidia = gpuVendorLower.startsWith("nvidia");
+            isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
+            isIntel = gpuVendorLower.startsWith("intel");
+            isApple = gpuVendorLower.startsWith("apple");
+        }
+
         Objects.requireNonNull(config, "Config not loaded yet");
         Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
+
+        if (config.fast_buffer_upload && isApple && !config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+            LOGGER.warn("Apple GPU detected. Disabling fast buffer upload.");
+            runtimeConfig.fast_buffer_upload = false;
+        }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
             PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {
