@@ -23,7 +23,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,18 +33,10 @@ public abstract class MixinGameRenderer {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V"))
     private void hudBatching(InGameHud instance, DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
-        final VertexConsumerProvider.Immediate prev = context.vertexConsumers;
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            context.draw();
-            context.vertexConsumers = BatchingBuffers.getHudBatchingVertexConsumers();
-        }
-        try {
+            BatchingBuffers.runBatched(context, () -> original.call(instance, context, tickCounter));
+        } else {
             original.call(instance, context, tickCounter);
-            if (ImmediatelyFast.runtimeConfig.hud_batching) {
-                context.draw();
-            }
-        } finally {
-            context.vertexConsumers = prev;
         }
     }
 

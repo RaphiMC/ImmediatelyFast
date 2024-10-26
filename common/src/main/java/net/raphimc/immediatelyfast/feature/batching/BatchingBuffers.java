@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.feature.batching;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
@@ -45,6 +46,18 @@ public class BatchingBuffers {
             hudBatchingVertexConsumers = new HudBatchingBufferSource(new BufferAllocator(786432), layerBuffers);
         }
         return hudBatchingVertexConsumers;
+    }
+
+    public static void runBatched(final DrawContext drawContext, final Runnable runnable) {
+        drawContext.draw();
+        final VertexConsumerProvider.Immediate prev = drawContext.vertexConsumers;
+        drawContext.vertexConsumers = getHudBatchingVertexConsumers();
+        try {
+            runnable.run();
+            drawContext.draw();
+        } finally {
+            drawContext.vertexConsumers = prev;
+        }
     }
 
     private static SequencedMap<RenderLayer, BufferAllocator> createLayerBuffers(final Set<RenderLayer> layers) {

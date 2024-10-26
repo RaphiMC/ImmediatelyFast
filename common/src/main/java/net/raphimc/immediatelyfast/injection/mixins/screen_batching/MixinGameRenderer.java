@@ -23,7 +23,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,18 +34,11 @@ public abstract class MixinGameRenderer {
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V"))
     private void screenBatching(Screen instance, DrawContext context, int mouseX, int mouseY, float delta, Operation<Void> original) {
         final boolean batchScreen = instance instanceof ChatScreen;
-        final VertexConsumerProvider.Immediate prev = context.vertexConsumers;
+
         if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && batchScreen) {
-            context.draw();
-            context.vertexConsumers = BatchingBuffers.getHudBatchingVertexConsumers();
-        }
-        try {
+            BatchingBuffers.runBatched(context, () -> original.call(instance, context, mouseX, mouseY, delta));
+        } else {
             original.call(instance, context, mouseX, mouseY, delta);
-            if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && batchScreen) {
-                context.draw();
-            }
-        } finally {
-            context.vertexConsumers = prev;
         }
     }
 

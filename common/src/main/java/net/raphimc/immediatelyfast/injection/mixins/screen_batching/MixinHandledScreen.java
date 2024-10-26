@@ -21,7 +21,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,18 +31,10 @@ public abstract class MixinHandledScreen {
 
     @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlots(Lnet/minecraft/client/gui/DrawContext;)V"))
     private void batchContainerItems(HandledScreen<?> instance, DrawContext drawContext, Operation<Void> original) {
-        final VertexConsumerProvider.Immediate prev = drawContext.vertexConsumers;
         if (ImmediatelyFast.runtimeConfig.experimental_screen_batching) {
-            drawContext.draw();
-            drawContext.vertexConsumers = BatchingBuffers.getHudBatchingVertexConsumers();
-        }
-        try {
+            BatchingBuffers.runBatched(drawContext, () -> original.call(instance, drawContext));
+        } else {
             original.call(instance, drawContext);
-            if (ImmediatelyFast.runtimeConfig.experimental_screen_batching) {
-                drawContext.draw();
-            }
-        } finally {
-            drawContext.vertexConsumers = prev;
         }
     }
 
