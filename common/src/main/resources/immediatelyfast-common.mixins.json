@@ -28,6 +28,7 @@
     "map_atlas_generation.MixinMapTextureManager",
     "map_atlas_generation.MixinMapTextureManager_MapTexture",
     "screen_batching.MixinGameRenderer",
+    "screen_batching.MixinHandledScreen",
     "sign_text_buffering.MixinFramebuffer",
     "sign_text_buffering.MixinSignBlockEntityRenderer",
     "sign_text_buffering.MixinSignText"
