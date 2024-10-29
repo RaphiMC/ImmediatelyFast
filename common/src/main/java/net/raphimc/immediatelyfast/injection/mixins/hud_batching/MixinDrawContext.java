@@ -21,14 +21,25 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gui.DrawContext;
 import net.raphimc.immediatelyfast.feature.batching.HudBatchingBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DrawContext.class)
 public abstract class MixinDrawContext {
 
+    @Shadow
+    public abstract void draw();
+
     @WrapWithCondition(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V"))
     private boolean dontDrawIfBatching(DrawContext instance) {
         return !(instance.vertexConsumers instanceof HudBatchingBufferSource);
+    }
+
+    @Inject(method = "drawCooldownProgress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", shift = At.Shift.BEFORE))
+    private void forceDraw(CallbackInfo ci) {
+        this.draw();
     }
 
 }
