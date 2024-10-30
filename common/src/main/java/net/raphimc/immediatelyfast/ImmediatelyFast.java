@@ -23,11 +23,8 @@ import net.raphimc.immediatelyfast.apiimpl.ApiAccessImpl;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
-import net.raphimc.immediatelyfast.feature.fast_buffer_upload.PersistentMappedStreamingBuffer;
 import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GLCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -45,8 +42,6 @@ public class ImmediatelyFast {
     public static String VERSION;
     public static ImmediatelyFastConfig config;
     public static ImmediatelyFastRuntimeConfig runtimeConfig;
-
-    public static PersistentMappedStreamingBuffer persistentMappedStreamingBuffer;
 
     public static void earlyInit() {
         if (config != null) return;
@@ -67,11 +62,9 @@ public class ImmediatelyFast {
         PlatformCode.checkModCompatibility();
 
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
-        //ImmediatelyFast.config.fast_buffer_upload = false; // Fast buffer upload causes renderdoc captures to explode in size
     }
 
     public static void windowInit() {
-        final GLCapabilities cap = GL.getCapabilities();
         final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
         final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
         final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
@@ -80,41 +73,22 @@ public class ImmediatelyFast {
         boolean isNvidia = false;
         boolean isAmd = false;
         boolean isIntel = false;
+        boolean isApple = false;
         if (gpuVendor != null) {
             final String gpuVendorLower = gpuVendor.toLowerCase();
 
             isNvidia = gpuVendorLower.startsWith("nvidia");
             isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
             isIntel = gpuVendorLower.startsWith("intel");
+            isApple = gpuVendorLower.startsWith("apple");
         }
 
         Objects.requireNonNull(config, "Config not loaded yet");
         Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
 
-        if (config.fast_buffer_upload) {
-            final boolean supportsCaps = cap.GL_ARB_direct_state_access && cap.GL_ARB_buffer_storage && cap.glMemoryBarrier != 0;
-            final boolean supportedGpu = !isIntel || config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
-            final boolean requiresCoherentBufferMapping = isAmd && !config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
-            final boolean supportsLegacyFastBufferUpload = isNvidia || config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
-
-            if (supportsCaps && supportedGpu) {
-                if (requiresCoherentBufferMapping) {
-                    // Explicit flush causes AMD GPUs to stall the pipeline a lot.
-                    LOGGER.info("AMD GPU detected. Enabling coherent buffer mapping");
-                    config.fast_buffer_upload_explicit_flush = false;
-                }
-
-                persistentMappedStreamingBuffer = new PersistentMappedStreamingBuffer(config.fast_buffer_upload_size_mb * 1024 * 1024);
-            } else {
-                runtimeConfig.fast_buffer_upload = false;
-                if (supportsLegacyFastBufferUpload) {
-                    runtimeConfig.legacy_fast_buffer_upload = true;
-                    LOGGER.info("Using legacy fast buffer upload optimization");
-                } else {
-                    // Legacy fast buffer upload causes a lot of graphical issues on non NVIDIA GPUs.
-                    LOGGER.warn("Force disabling fast buffer upload optimization due to unsupported GPU");
-                }
-            }
+        if (config.fast_buffer_upload && isApple && !config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
+            LOGGER.warn("Apple GPU detected. Disabling fast buffer upload.");
+            runtimeConfig.fast_buffer_upload = false;
         }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {

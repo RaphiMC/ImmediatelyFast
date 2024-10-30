@@ -23,14 +23,12 @@ public class ImmediatelyFastRuntimeConfig {
     public boolean font_atlas_resizing;
     public boolean universal_batching_text;
     public boolean fast_buffer_upload;
-    public boolean legacy_fast_buffer_upload;
 
     public ImmediatelyFastRuntimeConfig(final ImmediatelyFastConfig config) {
         this.hud_batching = config.hud_batching;
         this.font_atlas_resizing = config.font_atlas_resizing;
         this.universal_batching_text = true;
         this.fast_buffer_upload = config.fast_buffer_upload;
-        this.legacy_fast_buffer_upload = false;
     }
 
 }
