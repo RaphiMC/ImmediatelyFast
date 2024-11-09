@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[51,)"
+loaderVersion = "[53,)"
 issueTrackerURL = "https://github.com/RaphiMC/ImmediatelyFast/issues"
 license = "LGPL-3.0"
 
@@ -16,13 +16,13 @@ logoFile = "immediatelyfast-icon.png"
 [[dependencies.immediatelyfast]]
 modId = "forge"
 mandatory = true
-versionRange = "[51,)"
+versionRange = "[53,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.immediatelyfast]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21,1.21.1]"
+versionRange = "[1.21.2,1.21.3]"
 ordering = "NONE"
 side = "CLIENT"
