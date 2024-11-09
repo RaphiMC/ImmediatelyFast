@@ -198,14 +198,24 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (layer == null) return Integer.MAX_VALUE;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
-            if (textureId != null && textureId.toString().startsWith("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
-                final String horseTexturePath = textureId.toString().substring(("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX).length());
-                if (horseTexturePath.startsWith("horse_markings")) {
-                    return 2;
-                } else if (horseTexturePath.startsWith("armor/")) {
-                    return 3;
-                } else {
-                    return 1;
+            if (textureId != null) {
+                if (textureId.toString().startsWith("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
+                    final String horseTexturePath = textureId.toString().substring(("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX).length());
+                    if (horseTexturePath.startsWith("horse_markings")) {
+                        return 2;
+                    } else if (horseTexturePath.startsWith("armor/")) {
+                        return 3;
+                    } else {
+                        return 1;
+                    }
+                } else if (layer.name.startsWith("text")) {
+                    // Draws vanilla text over custom font layers
+                    // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
+                    if (textureId.getNamespace().equals("minecraft")) {
+                        return 2;
+                    } else {
+                        return 1;
+                    }
                 }
             }
         }
