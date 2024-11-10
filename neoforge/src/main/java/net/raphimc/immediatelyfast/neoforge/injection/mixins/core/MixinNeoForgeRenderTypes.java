@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "net.neoforged.neoforge.client.NeoForgeRenderTypes$Internal", priority = 500)
 public abstract class MixinNeoForgeRenderTypes {
 
+    // Pre NeoForge 21.3.23-beta
     @Inject(method = {
             "getText",
             "getTextIntensity",
@@ -33,8 +34,21 @@ public abstract class MixinNeoForgeRenderTypes {
             "getTextIntensityPolygonOffset",
             "getTextSeeThrough",
             "getTextIntensitySeeThrough"
-    }, at = @At(value = "RETURN"), remap = false) // Forge doesn't allow me to target the of() call for some reason
-    private static void changeTranslucency(CallbackInfoReturnable<RenderLayer> cir) {
+    }, at = @At(value = "RETURN"), remap = false, require = 0) // Forge doesn't allow me to target the of() call for some reason
+    private static void changeTranslucencyOld(CallbackInfoReturnable<RenderLayer> cir) {
+        cir.getReturnValue().translucent = false;
+    }
+
+    // Post NeoForge 21.3.23-beta
+    @Inject(method = {
+            "getTextFiltered",
+            "getTextIntensityFiltered",
+            "getTextPolygonOffsetFiltered",
+            "getTextIntensityPolygonOffsetFiltered",
+            "getTextSeeThroughFiltered",
+            "getTextIntensitySeeThroughFiltered"
+    }, at = @At(value = "RETURN"), remap = false, require = 0) // Forge doesn't allow me to target the of() call for some reason
+    private static void changeTranslucencyNew(CallbackInfoReturnable<RenderLayer> cir) {
         cir.getReturnValue().translucent = false;
     }
 

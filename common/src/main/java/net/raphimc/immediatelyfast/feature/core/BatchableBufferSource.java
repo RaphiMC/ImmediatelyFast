@@ -206,7 +206,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                     }
                 } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
                     return 1;
-                } else if (layer.name.startsWith("text")) {
+                } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text") || layer.name.startsWith("forge_text")) {
                     // Draws vanilla text over custom font layers
                     // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
                     if (textureId.getNamespace().equals("minecraft")) {
