@@ -12,6 +12,7 @@ description = '''
 Speed up and optimize immediate mode rendering in Minecraft
 '''
 logoFile = "immediatelyfast-icon.png"
+displayTest = "IGNORE_ALL_VERSION"
 
 [[dependencies.immediatelyfast]]
 modId = "forge"
