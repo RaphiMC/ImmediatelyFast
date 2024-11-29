@@ -6,7 +6,7 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "core.MixinRenderLayer",
-    "hud_batching.MixinItemRenderer"
+    "hud_batching.MixinItemRenderState"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -19,10 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.MapColor;
-import net.minecraft.client.texture.MapTextureManager;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
+import net.minecraft.client.texture.*;
 import net.minecraft.item.map.MapState;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -49,6 +46,11 @@ public abstract class MixinMapTextureManager_MapTexture {
 
     @Shadow
     private boolean needsUpdate;
+
+    @Shadow
+    @Final
+    @Mutable
+    Identifier textureId;
 
     @Unique
     private static final NativeImageBackedTexture DUMMY_TEXTURE;
@@ -89,13 +91,13 @@ public abstract class MixinMapTextureManager_MapTexture {
         return DUMMY_TEXTURE;
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureManager;registerDynamicTexture(Ljava/lang/String;Lnet/minecraft/client/texture/NativeImageBackedTexture;)Lnet/minecraft/util/Identifier;"))
-    private Identifier getAtlasTextureIdentifier(TextureManager textureManager, String id, NativeImageBackedTexture texture) {
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureManager;registerTexture(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/texture/AbstractTexture;)V"))
+    private void getAtlasTextureIdentifier(TextureManager instance, Identifier id, AbstractTexture texture) {
         if (this.immediatelyFast$atlasTexture != null) {
             this.texture = null; // Don't leave the texture field pointing to the uninitialized dummy texture
-            return this.immediatelyFast$atlasTexture.getIdentifier();
+            this.textureId = this.immediatelyFast$atlasTexture.getIdentifier();
         } else {
-            return textureManager.registerDynamicTexture(id, texture);
+            instance.registerTexture(id, texture);
         }
     }
 
@@ -116,7 +118,7 @@ public abstract class MixinMapTextureManager_MapTexture {
                 }
             }
             atlasTexture.bindTexture();
-            atlasImage.upload(0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, false, false);
+            atlasImage.upload(0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, false);
             this.needsUpdate = false;
         }
     }

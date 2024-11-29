@@ -26,7 +26,7 @@ import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
+import net.minecraft.client.render.block.entity.AbstractSignBlockEntityRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
@@ -34,7 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
-import net.raphimc.immediatelyfast.feature.sign_text_buffering.NoSetTextAnglesMatrixStack;
+import net.raphimc.immediatelyfast.feature.sign_text_buffering.NoTextTransformMatrixStack;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignAtlasFramebuffer;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
 import org.joml.Matrix4f;
@@ -50,25 +50,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(SignBlockEntityRenderer.class)
-public abstract class MixinSignBlockEntityRenderer {
+@Mixin(AbstractSignBlockEntityRenderer.class)
+public abstract class MixinAbstractSignBlockEntityRenderer {
 
     @Shadow
     @Final
     private TextRenderer textRenderer;
 
     @Shadow
-    abstract void renderText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front);
+    protected abstract void renderText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front);
 
     @Shadow
-    protected abstract void setTextAngles(MatrixStack matrices, boolean front, Vec3d translation);
+    protected abstract void applyTextTransforms(MatrixStack matrices, boolean front, Vec3d textOffset);
 
     @Shadow
-    abstract Vec3d getTextOffset();
+    protected abstract Vec3d getTextOffset();
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
     private void renderBufferedSignText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front, CallbackInfo ci) {
-        if (matrices instanceof NoSetTextAnglesMatrixStack) return;
+        if (matrices instanceof NoTextTransformMatrixStack) return;
         final ISignText iSignText = (ISignText) signText;
         if (!iSignText.immediatelyFast$shouldCache()) return;
 
@@ -99,7 +99,7 @@ public abstract class MixinSignBlockEntityRenderer {
 
                 try {
                     final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
-                    final MatrixStack matrixStack = new NoSetTextAnglesMatrixStack();
+                    final MatrixStack matrixStack = new NoTextTransformMatrixStack();
                     matrixStack.translate(slot.x, slot.y, 0F);
                     matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
                     this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
@@ -131,7 +131,7 @@ public abstract class MixinSignBlockEntityRenderer {
         }
 
         matrices.push();
-        this.setTextAngles(matrices, front, this.getTextOffset());
+        this.applyTextTransforms(matrices, front, this.getTextOffset());
         matrices.translate(-slot.width / 2F, -slot.height / 2F, 0F);
         final Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(ImmediatelyFast.signTextCache.renderLayer);
@@ -144,11 +144,11 @@ public abstract class MixinSignBlockEntityRenderer {
         ci.cancel();
     }
 
-    @Redirect(method = "renderText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/entity/SignBlockEntityRenderer;setTextAngles(Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/util/math/Vec3d;)V"))
-    private void dontSetTextAngles(SignBlockEntityRenderer instance, MatrixStack matrices, boolean front, Vec3d translation) {
-        if (matrices instanceof NoSetTextAnglesMatrixStack) return;
+    @Redirect(method = "renderText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/entity/AbstractSignBlockEntityRenderer;applyTextTransforms(Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/util/math/Vec3d;)V"))
+    private void dontApplyTextTransform(AbstractSignBlockEntityRenderer instance, MatrixStack matrices, boolean front, Vec3d textOffset) {
+        if (matrices instanceof NoTextTransformMatrixStack) return;
 
-        this.setTextAngles(matrices, front, translation);
+        this.applyTextTransforms(matrices, front, textOffset);
     }
 
     @Unique

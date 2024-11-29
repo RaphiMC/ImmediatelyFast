@@ -19,5 +19,5 @@ package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
 import net.minecraft.client.util.math.MatrixStack;
 
-public class NoSetTextAnglesMatrixStack extends MatrixStack {
+public class NoTextTransformMatrixStack extends MatrixStack {
 }

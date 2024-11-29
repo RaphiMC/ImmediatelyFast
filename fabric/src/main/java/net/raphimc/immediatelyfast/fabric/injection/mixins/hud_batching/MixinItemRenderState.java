@@ -20,24 +20,21 @@ package net.raphimc.immediatelyfast.fabric.injection.mixins.hud_batching;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.raphimc.immediatelyfast.feature.batching.HudBatchingBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(ItemRenderer.class)
-public abstract class MixinItemRenderer {
+@Mixin(ItemRenderState.class)
+public abstract class MixinItemRenderState {
 
-    @WrapMethod(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;Z)V")
-    private void renderItem(ItemStack stack, ModelTransformationMode transformationMode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, boolean useInventoryModel, Operation<Void> original) {
+    @WrapMethod(method = "render")
+    private void renderItem(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, Operation<Void> original) {
         if (vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
             hudBatchingBufferSource.setRenderingItem(true);
         }
         try {
-            original.call(stack, transformationMode, matrices, vertexConsumers, light, overlay, model, useInventoryModel);
+            original.call(matrices, vertexConsumers, light, overlay);
         } finally {
             if (vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
                 hudBatchingBufferSource.setRenderingItem(false);

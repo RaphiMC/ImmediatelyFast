@@ -20,7 +20,6 @@ package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11C;
 
@@ -152,10 +151,6 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
     }
 
     private class FboTexture extends AbstractTexture {
-
-        @Override
-        public void load(ResourceManager manager) {
-        }
 
         @Override
         public void clearGlId() {
