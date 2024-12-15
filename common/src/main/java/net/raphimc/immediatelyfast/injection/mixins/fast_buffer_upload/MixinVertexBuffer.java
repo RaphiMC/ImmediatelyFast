@@ -39,7 +39,7 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeVertexDataUploading(int target, ByteBuffer data, int usage) {
-        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || data.remaining() > this.immediatelyFast$vertexBufferSize) {
+        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || usage == GL15C.GL_STATIC_DRAW || data.remaining() > this.immediatelyFast$vertexBufferSize) {
             this.immediatelyFast$vertexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
         } else {
@@ -49,7 +49,7 @@ public abstract class MixinVertexBuffer {
 
     @Redirect(method = {"uploadIndexBuffer(Lnet/minecraft/client/util/BufferAllocator$CloseableBuffer;)V", "uploadIndexBuffer(Lnet/minecraft/client/render/BuiltBuffer$DrawParameters;Ljava/nio/ByteBuffer;)Lcom/mojang/blaze3d/systems/RenderSystem$ShapeIndexBuffer;"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;glBufferData(ILjava/nio/ByteBuffer;I)V"))
     private void optimizeIndexDataUploading(int target, ByteBuffer data, int usage) {
-        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || data.remaining() > this.immediatelyFast$indexBufferSize) {
+        if (!ImmediatelyFast.runtimeConfig.fast_buffer_upload || usage == GL15C.GL_STATIC_DRAW || data.remaining() > this.immediatelyFast$indexBufferSize) {
             this.immediatelyFast$indexBufferSize = data.remaining();
             RenderSystem.glBufferData(target, data, usage);
         } else {
