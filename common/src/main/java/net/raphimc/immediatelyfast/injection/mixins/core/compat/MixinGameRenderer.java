@@ -57,9 +57,15 @@ public abstract class MixinGameRenderer {
         for (Map.Entry<String, Shader> shaderProgramEntry : this.shaders.entrySet()) {
             if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
 
-            final Identifier vertexIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
-            final Resource resource = manager.getResource(vertexIdentifier).orElse(null);
-            if (resource != null && !Objects.equals(resource.getResourcePackName(), this.client.getResourcePackProvider().getPack().getName())) {
+            final Identifier vertexShaderIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
+            final Resource vertexShaderResource = manager.getResource(vertexShaderIdentifier).orElse(null);
+            if (vertexShaderResource != null && !Objects.equals(vertexShaderResource.getResourcePackName(), this.client.getResourcePackProvider().getPack().getName())) {
+                modified = true;
+                break;
+            }
+            final Identifier fragmentShaderIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getFragmentShader().getName() + ".fsh");
+            final Resource fragmentShaderResource = manager.getResource(fragmentShaderIdentifier).orElse(null);
+            if (fragmentShaderResource != null && !Objects.equals(fragmentShaderResource.getResourcePackName(), this.client.getResourcePackProvider().getPack().getName())) {
                 modified = true;
                 break;
             }
