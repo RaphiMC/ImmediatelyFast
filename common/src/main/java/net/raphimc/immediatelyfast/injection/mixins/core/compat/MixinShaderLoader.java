@@ -18,37 +18,55 @@
 package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.CompiledShader;
 import net.minecraft.client.gl.ShaderLoader;
-import net.minecraft.client.gl.ShaderProgramDefinition;
+import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
+import net.raphimc.immediatelyfast.injection.interfaces.IShaderProgram;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
-
 @Mixin(ShaderLoader.class)
 public abstract class MixinShaderLoader {
+
+    @Shadow
+    private ShaderLoader.Cache cache;
 
     @Inject(method = "apply(Lnet/minecraft/client/gl/ShaderLoader$Definitions;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
     private void checkForCoreShaderModifications(ShaderLoader.Definitions definitions, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         boolean modified = false;
 
-        for (Map.Entry<Identifier, ShaderProgramDefinition> entry : definitions.programs().entrySet()) {
-            if (!CoreShaderBlacklist.isBlacklisted(entry.getKey())) continue;
-
-            final Resource resource = resourceManager.getResource(entry.getValue().vertex()).orElse(null);
-            if (resource != null && !resource.getPack().equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
-                modified = true;
-                break;
+        try {
+            for (ShaderProgramKey shaderProgramKey : CoreShaderBlacklist.getBlacklist()) {
+                if (this.cache.getOrLoadProgram(shaderProgramKey) instanceof IShaderProgram mixinShaderProgram) {
+                    if (mixinShaderProgram.immediatelyFast$getVertexShader() == null || mixinShaderProgram.immediatelyFast$getFragmentShader() == null) {
+                        continue;
+                    }
+                    final Identifier vertexShaderIdentifier = CompiledShader.Type.VERTEX.createFinder().toResourcePath(mixinShaderProgram.immediatelyFast$getVertexShader().getId());
+                    final Resource vertexShaderResource = resourceManager.getResource(vertexShaderIdentifier).orElse(null);
+                    if (vertexShaderResource != null && !vertexShaderResource.getPack().equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                        modified = true;
+                        break;
+                    }
+                    final Identifier fragmentShaderIdentifier = CompiledShader.Type.FRAGMENT.createFinder().toResourcePath(mixinShaderProgram.immediatelyFast$getFragmentShader().getId());
+                    final Resource fragmentShaderResource = resourceManager.getResource(fragmentShaderIdentifier).orElse(null);
+                    if (fragmentShaderResource != null && !fragmentShaderResource.getPack().equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                        modified = true;
+                        break;
+                    }
+                }
             }
+        } catch (ShaderLoader.LoadException e) {
+            ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
         }
 
         if (modified && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {

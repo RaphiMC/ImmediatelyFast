@@ -17,31 +17,27 @@
  */
 package net.raphimc.immediatelyfast.compat;
 
+import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.client.gl.ShaderProgramKeys;
-import net.minecraft.util.Identifier;
 
 import java.util.List;
 
 public class CoreShaderBlacklist {
 
-    private static final List<Identifier> BLACKLIST = List.of(
-            ShaderProgramKeys.POSITION_COLOR.configId(),
-            ShaderProgramKeys.POSITION_TEX.configId(),
-            ShaderProgramKeys.POSITION_TEX_COLOR.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH.configId(),
-            ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH.configId(),
-            ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL.configId()
+    private static final List<ShaderProgramKey> BLACKLIST = List.of(
+            ShaderProgramKeys.POSITION_COLOR,
+            ShaderProgramKeys.POSITION_TEX,
+            ShaderProgramKeys.POSITION_TEX_COLOR,
+            ShaderProgramKeys.RENDERTYPE_TEXT,
+            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND,
+            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH,
+            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY,
+            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH,
+            ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH,
+            ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
     );
 
-    public static boolean isBlacklisted(final Identifier identifier) {
-        return BLACKLIST.contains(identifier);
-    }
-
-    public static List<Identifier> getBlacklist() {
+    public static List<ShaderProgramKey> getBlacklist() {
         return BLACKLIST;
     }
 
