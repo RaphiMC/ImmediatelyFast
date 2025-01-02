@@ -4,7 +4,7 @@ accessWidener v1 named
 accessible class net/minecraft/client/font/TextRenderer$Drawer
 accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
 accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
-
+accessible class net/minecraft/client/gl/ShaderLoader$Cache
 accessible field net/minecraft/client/util/BufferAllocator pointer J
 accessible field net/minecraft/client/render/BufferBuilder allocator Lnet/minecraft/client/util/BufferAllocator;
 accessible field net/minecraft/client/render/BufferBuilder building Z
@@ -23,5 +23,4 @@ accessible class net/minecraft/client/texture/MapTextureManager$MapTexture
 accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate layerBuffers Ljava/util/SequencedMap;
 accessible field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
 mutable field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
-
 accessible field com/mojang/blaze3d/systems/RenderSystem shaderLightDirections [Lorg/joml/Vector3f;
