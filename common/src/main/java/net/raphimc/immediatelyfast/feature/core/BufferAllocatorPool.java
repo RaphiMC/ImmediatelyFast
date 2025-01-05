@@ -18,8 +18,8 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.Reference2LongMap;
-import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
 import net.minecraft.client.util.BufferAllocator;
@@ -27,37 +27,39 @@ import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 public class BufferAllocatorPool {
 
-    private static final ReferenceList<BufferAllocator> FREE = new ReferenceArrayList<>();
-    private static final ReferenceList<BufferAllocator> IN_USE = new ReferenceArrayList<>();
-    private static final Reference2LongMap<BufferAllocator> BUFFER_ALLOCATOR_ACCESS_TIME = new Reference2LongOpenHashMap<>();
+    private static final ReferenceList<Entry> FREE = new ReferenceArrayList<>();
+    private static final ReferenceList<Entry> IN_USE = new ReferenceArrayList<>();
+    private static final Reference2ObjectMap<BufferAllocator, Entry> BUFFER_ALLOCATOR_MAPPING = new Reference2ObjectOpenHashMap<>();
 
     private BufferAllocatorPool() {
     }
 
     public static BufferAllocator borrowBufferAllocator() {
         RenderSystem.assertOnRenderThread();
-        BufferAllocator bufferAllocator;
+        Entry entry;
         if (FREE.isEmpty()) {
-            bufferAllocator = new BufferAllocator(256);
+            entry = new Entry(new BufferAllocator(256));
         } else {
-            bufferAllocator = FREE.removeFirst();
-            if (bufferAllocator.pointer == 0L) { // If the buffer was closed while in the pool
-                BUFFER_ALLOCATOR_ACCESS_TIME.removeLong(bufferAllocator);
-                bufferAllocator = new BufferAllocator(256);
+            entry = FREE.removeFirst();
+            if (entry.bufferAllocator.pointer == 0L) { // If the buffer was closed while in the pool
+                BUFFER_ALLOCATOR_MAPPING.remove(entry.bufferAllocator);
+                entry = new Entry(new BufferAllocator(256));
             }
         }
-        IN_USE.add(bufferAllocator);
-        BUFFER_ALLOCATOR_ACCESS_TIME.put(bufferAllocator, System.currentTimeMillis());
-        return bufferAllocator;
+        IN_USE.add(entry);
+        BUFFER_ALLOCATOR_MAPPING.put(entry.bufferAllocator, entry);
+        entry.onBorrow();
+        return entry.bufferAllocator;
     }
 
     public static void returnBufferAllocatorSafe(final BufferAllocator bufferAllocator) {
         RenderSystem.assertOnRenderThread();
-        if (!IN_USE.remove(bufferAllocator)) {
+        final Entry entry = BUFFER_ALLOCATOR_MAPPING.get(bufferAllocator);
+        if (!IN_USE.remove(entry)) {
             return;
         }
-        bufferAllocator.reset();
-        FREE.add(bufferAllocator);
+        entry.onReturn();
+        FREE.addFirst(entry);
     }
 
     public static int getSize() {
@@ -66,23 +68,59 @@ public class BufferAllocatorPool {
 
     public static void onEndFrame() {
         if (!IN_USE.isEmpty()) {
-            ImmediatelyFast.LOGGER.warn(IN_USE.size() + " BufferAllocator(s) were not returned to the pool. Forcibly reclaiming them.");
-            for (BufferAllocator bufferAllocator : IN_USE) {
-                bufferAllocator.reset();
-            }
-            FREE.addAll(IN_USE);
-            IN_USE.clear();
-        }
-        BUFFER_ALLOCATOR_ACCESS_TIME.reference2LongEntrySet().removeIf(entry -> {
-            if (System.currentTimeMillis() - entry.getLongValue() > 60 * 1000) {
-                if (FREE.contains(entry.getKey())) {
-                    FREE.remove(entry.getKey());
-                    entry.getKey().close();
+            // Reclaim all buffers that were not returned to the pool this and the last frame
+            final boolean leak = IN_USE.removeIf(entry -> {
+                if (entry.inUseOverMultipleFrames) {
+                    entry.onReturn();
+                    FREE.addFirst(entry);
+                    return true;
                 }
+                return false;
+            });
+            if (leak) {
+                ImmediatelyFast.LOGGER.warn("Some BufferAllocators were not returned to the pool. Forcibly reclaiming them to prevent a memory leak.");
+            }
+
+            // Mark all as in use over multiple frames
+            for (Entry entry : IN_USE) {
+                entry.inUseOverMultipleFrames = true;
+            }
+        }
+
+        FREE.removeIf(entry -> {
+            if (entry.shouldBeClosed()) {
+                entry.bufferAllocator.close();
+                BUFFER_ALLOCATOR_MAPPING.remove(entry.bufferAllocator);
                 return true;
             }
             return false;
         });
+    }
+
+    private static class Entry {
+
+        private final BufferAllocator bufferAllocator;
+        private long lastAccessTime;
+        private boolean inUseOverMultipleFrames;
+
+        public Entry(final BufferAllocator bufferAllocator) {
+            this.bufferAllocator = bufferAllocator;
+            this.lastAccessTime = System.currentTimeMillis();
+        }
+
+        public boolean shouldBeClosed() {
+            return System.currentTimeMillis() - this.lastAccessTime > 60 * 1000;
+        }
+
+        public void onBorrow() {
+            this.lastAccessTime = System.currentTimeMillis();
+        }
+
+        public void onReturn() {
+            this.bufferAllocator.reset();
+            this.inUseOverMultipleFrames = false;
+        }
+
     }
 
 }

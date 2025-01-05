@@ -70,14 +70,14 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         final BufferBuilder bufferBuilder;
         boolean hasBufferForRenderLayer = layer.areVerticesNotShared() && this.pendingBuffers.containsKey(layer);
         if (!layer.areVerticesNotShared()) {
-            bufferBuilder = new BufferBuilder(BufferAllocatorPool.borrowBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
+            bufferBuilder = new BufferBuilder(this.getNextBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
             this.currentLayer = layer;
         } else if (hasBufferForRenderLayer) {
             bufferBuilder = this.pendingBuffers.get(layer).iterator().next();
         } else if (this.layerBuffers.containsKey(layer)) {
             bufferBuilder = new BufferBuilder(this.layerBuffers.get(layer), layer.getDrawMode(), layer.getVertexFormat());
         } else {
-            bufferBuilder = new BufferBuilder(BufferAllocatorPool.borrowBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
+            bufferBuilder = new BufferBuilder(this.getNextBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
             this.currentLayer = layer;
         }
 
@@ -168,13 +168,16 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
         this.activeLayers.remove(layer);
         for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-            final BufferAllocator prevBufferAllocator = bufferBuilder.allocator;
+            final BufferAllocator prevBufferAllocator = this.allocator;
             this.allocator = bufferBuilder.allocator;
             this.draw(layer, bufferBuilder);
             this.allocator = prevBufferAllocator;
             BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
         }
         this.pendingBuffers.remove(layer);
+        if (this.currentLayer == layer) {
+            this.currentLayer = null;
+        }
 
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(true);
@@ -222,6 +225,14 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             return Integer.MIN_VALUE;
         } else {
             return Integer.MAX_VALUE - 1;
+        }
+    }
+
+    private BufferAllocator getNextBufferAllocator() {
+        if (this.allocator != FALLBACK_BUFFER && this.currentLayer == null && this.allocator.pointer != 0L) {
+            return this.allocator;
+        } else {
+            return BufferAllocatorPool.borrowBufferAllocator();
         }
     }
 
