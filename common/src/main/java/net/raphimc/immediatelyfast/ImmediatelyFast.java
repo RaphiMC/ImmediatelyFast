@@ -52,14 +52,6 @@ public class ImmediatelyFast {
         if (config != null) return;
 
         ImmediatelyFast.loadConfig();
-
-        if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            if (config.hud_batching && PlatformCode.getModVersion("slight-gui-modifications").isPresent()) {
-                LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
-                config.hud_batching = false;
-            }
-        }
-
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
