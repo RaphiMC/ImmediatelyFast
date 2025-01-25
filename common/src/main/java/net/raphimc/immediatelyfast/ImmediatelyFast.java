@@ -54,9 +54,20 @@ public class ImmediatelyFast {
         ImmediatelyFast.loadConfig();
 
         if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            if (config.hud_batching && PlatformCode.getModVersion("slight-gui-modifications").isPresent()) {
-                LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD Batching optimization.");
-                config.hud_batching = false;
+            if (config.hud_batching) {
+                if (PlatformCode.getModVersion("scguns").isPresent()) {
+                    // https://github.com/ribs498/Scorched-Guns-1.20.1/issues/51
+                    LOGGER.warn("Scorched Guns 2 mod detected. Force disabling HUD Batching optimization.");
+                    config.hud_batching = false;
+                } else if (PlatformCode.getModVersion("mbd2").isPresent()) {
+                    // https://github.com/Low-Drag-MC/Multiblocked2/issues/80
+                    LOGGER.warn("Multiblocked2 mod detected. Force disabling HUD Batching optimization.");
+                    config.hud_batching = false;
+                } else if (PlatformCode.getModVersion("draconicevolution").isPresent()) {
+                    // https://github.com/Draconic-Inc/Draconic-Evolution/issues/1868
+                    LOGGER.warn("Draconic Evolution mod detected. Force disabling HUD Batching optimization.");
+                    config.hud_batching = false;
+                }
             }
         }
 
