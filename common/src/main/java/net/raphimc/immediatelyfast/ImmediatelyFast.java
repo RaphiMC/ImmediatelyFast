@@ -53,14 +53,6 @@ public class ImmediatelyFast {
 
         ImmediatelyFast.loadConfig();
 
-        if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            if (config.hud_batching && PlatformCode.getModVersion("slight-gui-modifications").isPresent()) {
-                LOGGER.warn("Slight GUI Modifications detected. Force disabling HUD and Screen Batching optimization.");
-                config.hud_batching = false;
-                config.experimental_screen_batching = false;
-            }
-        }
-
         if (config.experimental_screen_batching && !config.hud_batching) {
             LOGGER.warn("Screen Batching is enabled but HUD Batching is disabled. Disabling Screen Batching.");
             config.experimental_screen_batching = false;

@@ -27,12 +27,9 @@
   "recommends": {
     "sodium": "*"
   },
-  "conflicts": {
-    "slight-gui-modifications": "*",
-    "vulkanmod": "*"
-  },
   "breaks": {
     "optifabric": "*",
+    "vulkanmod": "*",
     "memoryleakfix": "<=1.1.1"
   },
   "custom": {
