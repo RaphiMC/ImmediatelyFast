@@ -19,11 +19,14 @@ package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import net.minecraft.client.gl.GlDebug;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GLCapabilities;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(GlDebug.class)
 public abstract class MixinGlDebug {
@@ -31,11 +34,19 @@ public abstract class MixinGlDebug {
     @Unique
     private static long immediatelyFast$lastTime;
 
-    @Inject(method = "info", at = @At("RETURN"))
-    private static void printAdditionalInfo(CallbackInfo ci) {
+    @ModifyVariable(method = "enableDebug", at = @At("HEAD"), index = 1, argsOnly = true)
+    private static boolean enableSyncDebug(boolean sync) {
+        final GLCapabilities capabilities = GL.getCapabilities();
+        return sync || (ImmediatelyFast.config.debug_only_print_additional_error_information && (capabilities.GL_KHR_debug || capabilities.GL_ARB_debug_output));
+    }
+
+    @Redirect(method = "info", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private static void appendStackTrace(Logger instance, String message, Object argument) {
         if (ImmediatelyFast.config.debug_only_print_additional_error_information && System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
             immediatelyFast$lastTime = System.currentTimeMillis();
-            Thread.dumpStack();
+            instance.info(message, argument, new Exception());
+        } else {
+            instance.info(message, argument);
         }
     }
 
