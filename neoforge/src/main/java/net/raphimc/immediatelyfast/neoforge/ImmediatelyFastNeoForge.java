@@ -17,8 +17,25 @@
  */
 package net.raphimc.immediatelyfast.neoforge;
 
+import net.minecraft.resource.SynchronousResourceReloader;
+import net.minecraft.util.Identifier;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 @Mod("immediatelyfast")
+@EventBusSubscriber(modid = "immediatelyfast", bus = EventBusSubscriber.Bus.MOD)
 public class ImmediatelyFastNeoForge {
+
+    private static final Identifier SIGN_TEXT_CACHE_RELOAD_LISTENER_ID = Identifier.of("immediatelyfast", "sign_text_cache_reload_listener");
+
+    @SubscribeEvent
+    private static void onAddClientReloadListeners(final AddClientReloadListenersEvent event) {
+        if (ImmediatelyFast.config.experimental_sign_text_buffering) {
+            event.addListener(SIGN_TEXT_CACHE_RELOAD_LISTENER_ID, (SynchronousResourceReloader) manager -> ImmediatelyFast.signTextCache.reload(manager));
+        }
+    }
+
 }

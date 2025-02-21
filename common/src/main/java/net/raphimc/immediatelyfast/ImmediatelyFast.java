@@ -105,7 +105,9 @@ public class ImmediatelyFast {
     public static void lateInit() {
         if (config.experimental_sign_text_buffering) {
             signTextCache = new SignTextCache();
-            ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(signTextCache);
+            if (!PlatformCode.getModVersion("neoforge").isPresent()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
+                ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(signTextCache);
+            }
         }
     }
 
