@@ -21,6 +21,7 @@
     "font_atlas_resizing.MixinGlyphAtlasTexture",
     "hud_batching.MixinDrawContext",
     "hud_batching.MixinGameRenderer",
+    "hud_batching.MixinItemRenderer",
     "hud_batching.MixinLayeredDrawer",
     "hud_batching.compat.MixinBufferRenderer",
     "hud_batching.compat.MixinDebugHud",

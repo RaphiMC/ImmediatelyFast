@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.neoforge.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -31,9 +31,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(ItemRenderer.class)
 public abstract class MixinItemRenderer {
 
-    // Architectury can't remap WrapMethod, so we have to add the mojmapped signature for NeoForge manually
-    @SuppressWarnings("UnresolvedMixinReference")
-    @WrapMethod(method = "renderItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/client/resources/model/BakedModel;Z)V")
+    @WrapMethod(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;Z)V")
     private void renderItem(ItemStack stack, ModelTransformationMode transformationMode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, boolean useInventoryModel, Operation<Void> original) {
         if (vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
             hudBatchingBufferSource.setRenderingItem(true);
