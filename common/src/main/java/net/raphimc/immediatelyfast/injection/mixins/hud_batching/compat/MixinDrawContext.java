@@ -35,7 +35,7 @@ public abstract class MixinDrawContext {
     @Shadow
     public VertexConsumerProvider.Immediate vertexConsumers;
 
-    @Inject(method = "drawCooldownProgress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", shift = At.Shift.BEFORE))
+    @Inject(method = "drawCooldownProgress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V"))
     private void forceDraw(CallbackInfo ci) {
         if (this.vertexConsumers instanceof BatchableBufferSource) {
             this.draw();
