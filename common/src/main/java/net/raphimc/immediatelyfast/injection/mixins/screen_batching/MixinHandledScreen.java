@@ -32,7 +32,7 @@ public abstract class MixinHandledScreen {
         BatchingBuffers.beginHudBatching();
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V"))
     private void endBatching(CallbackInfo ci) {
         BatchingBuffers.endHudBatching();
     }
