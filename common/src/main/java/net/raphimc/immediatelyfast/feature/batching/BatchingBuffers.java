@@ -30,7 +30,8 @@ import java.util.Set;
 public class BatchingBuffers {
 
     private static VertexConsumerProvider.Immediate nonBatchingEntityVertexConsumers;
-    private static VertexConsumerProvider.Immediate hudBatchingVertexConsumers;
+    private static HudBatchingBufferSource hudBatchingVertexConsumers;
+    private static boolean isHudBatching;
 
     public static VertexConsumerProvider.Immediate getNonBatchingEntityVertexConsumers() {
         if (nonBatchingEntityVertexConsumers == null) {
@@ -52,11 +53,28 @@ public class BatchingBuffers {
         drawContext.draw();
         final VertexConsumerProvider.Immediate prev = drawContext.vertexConsumers;
         drawContext.vertexConsumers = getHudBatchingVertexConsumers();
+        isHudBatching = true;
         try {
             runnable.run();
             drawContext.draw();
         } finally {
             drawContext.vertexConsumers = prev;
+            isHudBatching = false;
+        }
+    }
+
+    public static boolean isHudBatching() {
+        return isHudBatching;
+    }
+
+    public static void tryForceDrawHudBuffers() {
+        if (!hudBatchingVertexConsumers.isCurrentlyDrawing() && hudBatchingVertexConsumers.hasActiveLayers()) {
+            final RenderSystemState renderSystemState = RenderSystemState.current();
+            try {
+                hudBatchingVertexConsumers.draw();
+            } finally {
+                renderSystemState.apply();
+            }
         }
     }
 

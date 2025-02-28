@@ -31,6 +31,7 @@ public class HudBatchingBufferSource extends BatchableBufferSource {
     private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
     private final Reference2ObjectMap<RenderLayer, ReferenceSet<RenderLayer>> renderLayerMap = new Reference2ObjectOpenHashMap<>();
     private boolean renderingItem = false;
+    private boolean currentlyDrawing = false;
 
     public HudBatchingBufferSource(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
         super(fallbackBuffer, layerBuffers);
@@ -38,6 +39,10 @@ public class HudBatchingBufferSource extends BatchableBufferSource {
 
     public void setRenderingItem(final boolean renderingItem) {
         this.renderingItem = renderingItem;
+    }
+
+    public boolean isCurrentlyDrawing() {
+        return this.currentlyDrawing;
     }
 
     @Override
@@ -54,13 +59,18 @@ public class HudBatchingBufferSource extends BatchableBufferSource {
 
     @Override
     public void drawDirect(final RenderLayer layer) {
-        final Set<RenderLayer> renderLayers = this.renderLayerMap.remove(layer);
-        if (renderLayers != null) {
-            for (RenderLayer renderLayer : renderLayers) {
-                super.drawDirect(renderLayer);
+        this.currentlyDrawing = true;
+        try {
+            final Set<RenderLayer> renderLayers = this.renderLayerMap.remove(layer);
+            if (renderLayers != null) {
+                for (RenderLayer renderLayer : renderLayers) {
+                    super.drawDirect(renderLayer);
+                }
+            } else {
+                super.drawDirect(layer);
             }
-        } else {
-            super.drawDirect(layer);
+        } finally {
+            this.currentlyDrawing = false;
         }
     }
 
