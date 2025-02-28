@@ -38,7 +38,7 @@ public abstract class MixinHandledScreen {
         this.immediatelyFast$prevVertexConsumers = BatchingBuffers.beginHudBatching(drawContext);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V"))
     private void endBatching(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         BatchingBuffers.endHudBatching(context, this.immediatelyFast$prevVertexConsumers);
     }
