@@ -6,7 +6,6 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "core.MixinNeoForgeRenderTypes",
-    "hud_batching.MixinItemRenderer",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler"
   ],
   "injectors": {
