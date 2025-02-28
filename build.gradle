@@ -1,7 +1,7 @@
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
-    id "me.modmuss50.mod-publish-plugin" version "0.7.4" apply false
+    id "architectury-plugin" version "3.4.161"
+    id "dev.architectury.loom" version "1.9.426" apply false
+    id "me.modmuss50.mod-publish-plugin" version "0.8.4" apply false
 }
 
 architectury {
