@@ -15,20 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gui.DrawContext;
-import net.raphimc.immediatelyfast.feature.batching.HudBatchingBufferSource;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DrawContext.class)
 public abstract class MixinDrawContext {
 
-    @WrapWithCondition(method = "drawItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V"))
-    private boolean dontDrawIfBatching(DrawContext instance) {
-        return !(instance.vertexConsumers instanceof HudBatchingBufferSource);
+    @Shadow
+    public abstract void draw();
+
+    @Shadow
+    public VertexConsumerProvider.Immediate vertexConsumers;
+
+    @Inject(method = "drawCooldownProgress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", shift = At.Shift.BEFORE))
+    private void forceDraw(CallbackInfo ci) {
+        if (this.vertexConsumers instanceof BatchableBufferSource) {
+            this.draw();
+        }
     }
 
 }
