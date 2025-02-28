@@ -15,38 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.armorchroma;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.LayeredDrawer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "nukeduck.armorchroma.GuiArmor", remap = false)
-@Pseudo
-public abstract class MixinArmorChroma_GuiArmor {
+@Mixin(LayeredDrawer.class)
+public abstract class MixinLayeredDrawer {
 
-    @Unique
-    private boolean immediatelyFast$wasHudBatching;
-
-    @Inject(method = "draw", at = @At("HEAD"))
-    private void endHudBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching && BatchingBuffers.isHudBatching()) {
-            BatchingBuffers.endHudBatching();
-            this.immediatelyFast$wasHudBatching = true;
-        }
-    }
-
-    @Inject(method = "draw", at = @At("RETURN"))
-    private void beginHudBatching(CallbackInfo ci) {
-        if (this.immediatelyFast$wasHudBatching) {
-            BatchingBuffers.beginHudBatching();
-            this.immediatelyFast$wasHudBatching = false;
+    @Inject(method = "renderInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer$Layer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
+    private void renderBatch(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching && !ImmediatelyFast.config.experimental_universal_hud_batching) {
+            context.draw();
         }
     }
 

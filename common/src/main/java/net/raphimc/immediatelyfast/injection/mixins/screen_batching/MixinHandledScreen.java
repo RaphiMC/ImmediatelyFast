@@ -17,9 +17,12 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.screen_batching;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,14 +30,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = HandledScreen.class, priority = 500)
 public abstract class MixinHandledScreen {
 
+    @Unique
+    private VertexConsumerProvider.Immediate immediatelyFast$prevVertexConsumers;
+
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;focusedSlot:Lnet/minecraft/screen/slot/Slot;", ordinal = 0))
-    private void beginBatching(CallbackInfo ci) {
-        BatchingBuffers.beginHudBatching();
+    private void beginBatching(DrawContext drawContext, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        this.immediatelyFast$prevVertexConsumers = BatchingBuffers.beginHudBatching(drawContext);
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawForeground(Lnet/minecraft/client/gui/DrawContext;II)V", shift = At.Shift.BEFORE))
-    private void endBatching(CallbackInfo ci) {
-        BatchingBuffers.endHudBatching();
+    private void endBatching(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        BatchingBuffers.endHudBatching(context, this.immediatelyFast$prevVertexConsumers);
     }
 
 }

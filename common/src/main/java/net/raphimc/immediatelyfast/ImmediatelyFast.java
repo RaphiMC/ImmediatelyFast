@@ -52,6 +52,12 @@ public class ImmediatelyFast {
         if (config != null) return;
 
         ImmediatelyFast.loadConfig();
+
+        if (config.experimental_screen_batching && !config.hud_batching) {
+            LOGGER.warn("Screen Batching is enabled but HUD Batching is disabled. Disabling Screen Batching.");
+            config.experimental_screen_batching = false;
+        }
+
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 

@@ -15,36 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.feature.batching;
+package net.raphimc.immediatelyfast.injection.mixins.screen_batching.compat;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.util.BufferAllocator;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ChatScreen;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.SequencedMap;
+@Mixin(ChatScreen.class)
+public abstract class MixinChatScreen {
 
-public class BatchingBuffer extends BatchableBufferSource {
-
-    public static boolean IS_DRAWING;
-
-    public BatchingBuffer() {
-    }
-
-    public BatchingBuffer(final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
-        super(layerBuffers);
-    }
-
-    public BatchingBuffer(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
-        super(fallbackBuffer, layerBuffers);
-    }
-
-    @Override
-    public void draw(final RenderLayer layer) {
-        try {
-            IS_DRAWING = true;
-            super.draw(layer);
-        } finally {
-            IS_DRAWING = false;
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ChatInputSuggestor;render(Lnet/minecraft/client/gui/DrawContext;II)V"))
+    private void forceDraw(DrawContext drawContext, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (drawContext.vertexConsumers instanceof BatchableBufferSource) {
+            drawContext.draw();
         }
     }
 

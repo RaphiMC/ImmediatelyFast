@@ -17,32 +17,26 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching;
 
-import net.minecraft.client.gui.hud.ChatHud;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
-import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverything;
-import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturns;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ChatHud.class, priority = 1500)
-public abstract class MixinChatHud {
+@Mixin(GameRenderer.class)
+public abstract class MixinGameRenderer {
 
-    @InjectAboveEverything
-    @Inject(method = "render", at = @At("HEAD"))
-    private void beginBatching(CallbackInfo ci) {
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V"))
+    private void hudBatching(InGameHud instance, DrawContext context, RenderTickCounter tickCounter, Operation<Void> original) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.beginHudBatching();
-        }
-    }
-
-    @InjectOnAllReturns
-    @Inject(method = "render", at = @At("RETURN"))
-    private void endBatching(CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching) {
-            BatchingBuffers.endHudBatching();
+            BatchingBuffers.runBatched(context, () -> original.call(instance, context, tickCounter));
+        } else {
+            original.call(instance, context, tickCounter);
         }
     }
 

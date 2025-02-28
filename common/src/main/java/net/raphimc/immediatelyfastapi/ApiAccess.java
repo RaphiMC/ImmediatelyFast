@@ -22,6 +22,7 @@ public interface ApiAccess {
     /**
      * @return An interface to access the HUD batching system of ImmediatelyFast.
      */
+    @Deprecated
     BatchingAccess getBatching();
 
     /**

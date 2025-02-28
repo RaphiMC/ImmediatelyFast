@@ -18,10 +18,8 @@
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
 import net.minecraft.client.render.BufferRenderer;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffer;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,21 +27,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BufferRenderer.class)
 public abstract class MixinBufferRenderer {
 
-    @Unique
-    private static boolean immediatelyFast$isForceDrawing;
-
     @Inject(method = {"draw", "drawWithGlobalProgramInternal"}, at = @At("HEAD"))
     private static void checkForDrawCallWhileBatching(CallbackInfo ci) {
-        // Force draw the current batch if
-        // we are not already force drawing (prevent recursion)
-        // and the buffer being drawn is not one of the IF batching buffers
-        // and we are currently batching (just checks if one of the vertex consumers is set)
-        // and there is data to draw
-        if (!immediatelyFast$isForceDrawing && !BatchingBuffer.IS_DRAWING && BatchingBuffers.FILL_CONSUMER != null && BatchingBuffers.hasDataToDraw()) {
+        if (BatchingBuffers.isHudBatching()) {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
-            immediatelyFast$isForceDrawing = true;
-            BatchingBuffers.forceDrawBuffers();
-            immediatelyFast$isForceDrawing = false;
+            BatchingBuffers.tryForceDrawHudBuffers();
         }
     }
 

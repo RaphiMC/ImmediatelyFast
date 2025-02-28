@@ -15,28 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.highlighter;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "com.anthonyhilyard.highlighter.Highlighter", remap = false)
-@Pseudo
-public abstract class MixinHighlighter_Highlighter {
+@Mixin(GameRenderer.class)
+public abstract class MixinGameRenderer {
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private static void renderItemOverlayIntoBufferStart(CallbackInfo ci) {
-        BatchingBuffers.beginItemOverlayRendering();
-    }
-
-    @Inject(method = "render", at = @At("RETURN"))
-    private static void renderItemOverlayIntoBufferEnd(CallbackInfo ci) {
-        BatchingBuffers.endItemOverlayRendering();
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getEntityVertexConsumers()Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;"))
+    private VertexConsumerProvider.Immediate returnNonBatchingVertexConsumer(BufferBuilderStorage instance) {
+        return BatchingBuffers.getNonBatchingEntityVertexConsumers();
     }
 
 }
