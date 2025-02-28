@@ -80,8 +80,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/squeek502/AppleSkin
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.iceberg") && PlatformCode.getModVersion("iceberg").isEmpty()) { // https://github.com/AHilyard/Iceberg
-            return false;
         } else if (packageName.startsWith("hud_batching.compat.highlighter") && PlatformCode.getModVersion("highlighter").isEmpty()) { // https://github.com/AHilyard/Highlighter
             return false;
         } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformCode.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
