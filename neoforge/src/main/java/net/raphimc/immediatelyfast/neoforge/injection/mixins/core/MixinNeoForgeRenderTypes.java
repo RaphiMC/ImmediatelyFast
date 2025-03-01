@@ -17,39 +17,37 @@
  */
 package net.raphimc.immediatelyfast.neoforge.injection.mixins.core;
 
-import net.minecraft.client.render.RenderLayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(targets = "net.neoforged.neoforge.client.NeoForgeRenderTypes$Internal", priority = 500)
 public abstract class MixinNeoForgeRenderTypes {
 
     // Pre NeoForge 21.3.23-beta
-    @Inject(method = {
+    @ModifyArg(method = {
             "getText",
             "getTextIntensity",
             "getTextPolygonOffset",
             "getTextIntensityPolygonOffset",
             "getTextSeeThrough",
             "getTextIntensitySeeThrough"
-    }, at = @At(value = "RETURN"), remap = false, require = 0) // Forge doesn't allow me to target the of() call for some reason
-    private static void changeTranslucencyOld(CallbackInfoReturnable<RenderLayer> cir) {
-        cir.getReturnValue().translucent = false;
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0, remap = false)
+    private static boolean changeTranslucencyOld(boolean value) {
+        return false;
     }
 
     // Post NeoForge 21.3.23-beta
-    @Inject(method = {
+    @ModifyArg(method = {
             "getTextFiltered",
             "getTextIntensityFiltered",
             "getTextPolygonOffsetFiltered",
             "getTextIntensityPolygonOffsetFiltered",
             "getTextSeeThroughFiltered",
             "getTextIntensitySeeThroughFiltered"
-    }, at = @At(value = "RETURN"), remap = false, require = 0) // Forge doesn't allow me to target the of() call for some reason
-    private static void changeTranslucencyNew(CallbackInfoReturnable<RenderLayer> cir) {
-        cir.getReturnValue().translucent = false;
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0, remap = false)
+    private static boolean changeTranslucencyNew(boolean value) {
+        return false;
     }
 
 }
