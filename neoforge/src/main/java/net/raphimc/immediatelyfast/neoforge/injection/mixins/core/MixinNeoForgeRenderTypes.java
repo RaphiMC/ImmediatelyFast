@@ -17,25 +17,23 @@
  */
 package net.raphimc.immediatelyfast.neoforge.injection.mixins.core;
 
-import net.minecraft.client.render.RenderLayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(targets = "net.neoforged.neoforge.client.NeoForgeRenderTypes$Internal", priority = 500)
 public abstract class MixinNeoForgeRenderTypes {
 
-    @Inject(method = {
+    @ModifyArg(method = {
             "getText",
             "getTextIntensity",
             "getTextPolygonOffset",
             "getTextIntensityPolygonOffset",
             "getTextSeeThrough",
             "getTextIntensitySeeThrough"
-    }, at = @At(value = "RETURN"), remap = false) // Forge doesn't allow me to target the of() call for some reason
-    private static void changeTranslucency(CallbackInfoReturnable<RenderLayer> cir) {
-        cir.getReturnValue().translucent = false;
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0, remap = false)
+    private static boolean changeTranslucency(boolean value) {
+        return false;
     }
 
 }
