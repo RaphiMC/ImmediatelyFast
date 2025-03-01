@@ -7,6 +7,7 @@
   "client": [
     "core.MixinNeoForgeRenderTypes",
     "core.MixinRenderLayer",
+    "hud_batching.MixinGuiLayerManager",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler"
   ],
   "injectors": {
