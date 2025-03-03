@@ -24,18 +24,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(targets = "net.neoforged.neoforge.client.NeoForgeRenderTypes$Internal", priority = 500)
 public abstract class MixinNeoForgeRenderTypes {
 
-    // Pre NeoForge 21.3.23-beta
-    @ModifyArg(method = {
+    // Pre NeoForge 21.3.23-beta (Removed because barely anyone uses NeoForge 1.21.2)
+    /*@ModifyArg(method = {
             "getText",
             "getTextIntensity",
             "getTextPolygonOffset",
             "getTextIntensityPolygonOffset",
             "getTextSeeThrough",
             "getTextIntensitySeeThrough"
-    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0, remap = false)
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0)
     private static boolean changeTranslucencyOld(boolean value) {
         return false;
-    }
+    }*/
 
     // Post NeoForge 21.3.23-beta
     @ModifyArg(method = {
@@ -45,7 +45,7 @@ public abstract class MixinNeoForgeRenderTypes {
             "getTextIntensityPolygonOffsetFiltered",
             "getTextSeeThroughFiltered",
             "getTextIntensitySeeThroughFiltered"
-    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0, remap = false)
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;Lnet/minecraft/client/render/VertexFormat;Lnet/minecraft/client/render/VertexFormat$DrawMode;IZZLnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 5, require = 0)
     private static boolean changeTranslucencyNew(boolean value) {
         return false;
     }
