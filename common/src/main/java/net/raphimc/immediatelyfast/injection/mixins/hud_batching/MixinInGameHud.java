@@ -66,4 +66,11 @@ public abstract class MixinInGameHud {
         }
     }
 
+    @Inject(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
+    private void renderTextureBeforeItems(CallbackInfo ci) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
+            BatchingBuffers.forceDrawBuffers();
+        }
+    }
+
 }
