@@ -1,4 +1,3 @@
-* (1.21.2+) Fixed AppleSkin graphical issue (The exhaustion bar is now correctly displayed)
-* (1.21.4) Fixed crash when enabling the sign buffering optimization on NeoForge
-* (1.21.4) Readded (Lex)Forge support
-* Improved thread stacktrace logging (It now uses the correct logger)
+* Fixed rendering issues with Ars Nouveau
+* Removed Scorched Guns 2 from the HUD batching disable list (A new fix resolves the graphical issues without disabling HUD batching)
+* Avoid brittle injections (Might reduce crashes caused by mod incompatibilities)
