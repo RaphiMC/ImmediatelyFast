@@ -76,6 +76,8 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
 
         if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
             return false;
+        } else if (packageName.startsWith("hud_batching.compat.journeymap") && PlatformCode.getModVersion("journeymap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/316
+            return false;
         }
 
         return true;
