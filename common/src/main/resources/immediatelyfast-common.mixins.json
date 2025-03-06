@@ -29,7 +29,6 @@
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderer_MapTexture",
-    "screen_batching.MixinGameRenderer",
     "screen_batching.MixinHandledScreen",
     "screen_batching.compat.MixinChatScreen",
     "sign_text_buffering.MixinSignBlockEntityRenderer",
