@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "core.MixinForgeRenderTypes"
+    "core.MixinForgeRenderTypes",
+    "screen_batching.MixinForgeHooksClient"
   ],
   "injectors": {
     "defaultRequire": 1
