@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -71,6 +72,7 @@ public class BatchingBuffers {
         if (!hudBatchingVertexConsumers.isCurrentlyDrawing() && hudBatchingVertexConsumers.hasActiveLayers()) {
             final RenderSystemState renderSystemState = RenderSystemState.current();
             try {
+                RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
                 hudBatchingVertexConsumers.draw();
             } finally {
                 renderSystemState.apply();
