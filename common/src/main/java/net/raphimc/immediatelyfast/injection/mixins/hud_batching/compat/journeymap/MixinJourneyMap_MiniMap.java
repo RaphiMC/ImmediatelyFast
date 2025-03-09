@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @SuppressWarnings("UnresolvedMixinReference")
 @Mixin(targets = "journeymap.client.ui.minimap.MiniMap", remap = false)
 @Pseudo
-public abstract class MixinMixinJourneyMap_MiniMap {
+public abstract class MixinJourneyMap_MiniMap {
 
     @Inject(method = "drawMap", at = @At("HEAD"))
     private void forceDrawBatch(CallbackInfo ci, @Local(argsOnly = true) DrawContext drawContext) {
