@@ -25,6 +25,7 @@
     "hud_batching.compat.MixinBufferRenderer",
     "hud_batching.compat.MixinDebugHud",
     "hud_batching.compat.MixinDrawContext",
+    "hud_batching.compat.MixinRenderSystem",
     "hud_batching.compat.journeymap.MixinJourneyMap_MiniMap",
     "hud_batching.consumer.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
