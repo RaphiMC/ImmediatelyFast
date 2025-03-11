@@ -22,9 +22,11 @@ import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFactory;
+import net.minecraft.resource.ResourcePack;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
+import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,14 +35,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
-
-    @Shadow
-    @Final
-    MinecraftClient client;
 
     @Shadow
     @Final
@@ -48,39 +49,69 @@ public abstract class MixinGameRenderer {
 
     @Inject(method = "loadPrograms", at = @At("RETURN"))
     private void checkForCoreShaderModifications(ResourceFactory factory, CallbackInfo ci) {
-        boolean modified = false;
-        for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
-            if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
-
-            final Identifier vertexShaderIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
-            final Resource vertexShaderResource = factory.getResource(vertexShaderIdentifier).orElse(null);
-            if (vertexShaderResource != null && !vertexShaderResource.getPack().equals(this.client.getDefaultResourcePack())) {
-                modified = true;
-                break;
-            }
-            final Identifier fragmentShaderIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getFragmentShader().getName() + ".fsh");
-            final Resource fragmentShaderResource = factory.getResource(fragmentShaderIdentifier).orElse(null);
-            if (fragmentShaderResource != null && !fragmentShaderResource.getPack().equals(this.client.getDefaultResourcePack())) {
-                modified = true;
-                break;
-            }
+        if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
+            return;
         }
 
-        if (modified && !ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
-            ImmediatelyFast.LOGGER.warn("Core shader modifications detected. Temporarily disabling some parts of ImmediatelyFast.");
-            if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
-                ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
-                this.immediatelyFast$reloadFontStorages();
-            }
+        ResourcePack resourcePackWhichBreaksFontAtlasResizing = null;
+        ResourcePack resourcePackWhichBreaksHudBatching = null;
+        ResourcePack resourcePackWhichBreaksScreenBatching = null;
+        try {
+            final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
+            for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
+                if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
 
-            ImmediatelyFast.runtimeConfig.hud_batching = false;
+                final Identifier vertexShaderIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
+                final ResourcePack vertexShaderResourcePack = factory.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
+                if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                    breakingResourcePacks.add(vertexShaderResourcePack);
+                }
+                final Identifier fragmentShaderIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getFragmentShader().getName() + ".fsh");
+                final ResourcePack fragmentShaderResourcePack = factory.getResource(fragmentShaderIdentifier).map(Resource::getPack).orElse(null);
+                if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                    breakingResourcePacks.add(fragmentShaderResourcePack);
+                }
+            }
+            for (ResourcePack resourcePack : breakingResourcePacks) {
+                ImmediatelyFastResourcePackMetadata metadata = resourcePack.parseMetadata(ImmediatelyFastResourcePackMetadata.SERIALIZER);
+                if (metadata == null) {
+                    metadata = ImmediatelyFastResourcePackMetadata.DEFAULT;
+                }
+                if (!metadata.compatibleFeatures().contains("font_atlas_resizing")) {
+                    resourcePackWhichBreaksFontAtlasResizing = resourcePack;
+                }
+                if (!metadata.compatibleFeatures().contains("hud_batching")) {
+                    resourcePackWhichBreaksHudBatching = resourcePack;
+                }
+                if (!metadata.compatibleFeatures().contains("experimental_screen_batching")) {
+                    resourcePackWhichBreaksScreenBatching = resourcePack;
+                }
+            }
+        } catch (IOException e) {
+            ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
+        }
+
+        if (ImmediatelyFast.runtimeConfig.font_atlas_resizing && resourcePackWhichBreaksFontAtlasResizing != null) {
+            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
+            ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
+            this.immediatelyFast$reloadFontStorages();
         } else {
             if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing && ImmediatelyFast.config.font_atlas_resizing) {
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
                 this.immediatelyFast$reloadFontStorages();
             }
-
+        }
+        if (ImmediatelyFast.runtimeConfig.hud_batching && resourcePackWhichBreaksHudBatching != null) {
+            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksHudBatching.getId() + " is not compatible with HUD batching. Temporarily disabling HUD batching.");
+            ImmediatelyFast.runtimeConfig.hud_batching = false;
+        } else {
             ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
+        }
+        if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && resourcePackWhichBreaksScreenBatching != null) {
+            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksScreenBatching.getId() + " is not compatible with experimental screen batching. Temporarily disabling experimental screen batching.");
+            ImmediatelyFast.runtimeConfig.experimental_screen_batching = false;
+        } else {
+            ImmediatelyFast.runtimeConfig.experimental_screen_batching = ImmediatelyFast.config.experimental_screen_batching;
         }
     }
 
