@@ -199,8 +199,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
             if (textureId != null) {
-                if (textureId.toString().startsWith("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
-                    final String horseTexturePath = textureId.toString().substring(("minecraft:" + HorseArmorItem.ENTITY_TEXTURE_PREFIX).length());
+                if (textureId.getPath().startsWith(HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
+                    final String horseTexturePath = textureId.getPath().substring(HorseArmorItem.ENTITY_TEXTURE_PREFIX.length());
                     if (horseTexturePath.startsWith("horse_markings")) {
                         return 2;
                     } else if (horseTexturePath.startsWith("armor/")) {
