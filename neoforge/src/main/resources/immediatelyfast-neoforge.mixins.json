@@ -9,7 +9,6 @@
     "hud_batching.MixinGuiLayerManager",
     "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
     "hud_batching.compat.ftbchunks.MixinFTBChunks_FTBChunksClient",
-    "hud_batching.compat.sodiumextras.MixinSodiumExtras_DebugOverlayEvent",
     "screen_batching.MixinClientHooks"
   ],
   "injectors": {

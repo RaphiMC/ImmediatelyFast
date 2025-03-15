@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.neoforge.injection.mixins.hud_batching.compat.sodiumextras;
+package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat.xaerominimap;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
@@ -27,12 +27,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("UnresolvedMixinReference")
-@Mixin(targets = "toni.sodiumextras.foundation.fps.DebugOverlayEvent", remap = false)
+@Mixin(targets = "xaero.common.events.ClientEvents", remap = false)
 @Pseudo
-public abstract class MixinSodiumExtras_DebugOverlayEvent {
+public abstract class MixinXaerosMinimap_ClientEvents {
 
-    @Inject(method = "renderFPSChar", at = @At("RETURN"))
-    private static void forceDrawBatch(CallbackInfo ci, @Local(argsOnly = true) DrawContext drawContext) {
+    @Inject(method = "handleRenderGameOverlayEventPre", at = @At("HEAD"))
+    private void forceDrawBatch(CallbackInfo ci, @Local(argsOnly = true) DrawContext drawContext) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
             drawContext.draw();
         }

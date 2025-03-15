@@ -78,7 +78,7 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         } else if (packageName.startsWith("hud_batching.compat.journeymap") && PlatformCode.getModVersion("journeymap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/316
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.sodiumextras") && PlatformCode.getModVersion("sodiumextras").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/319
+        } else if (packageName.startsWith("hud_batching.compat.xaerominimap") && PlatformCode.getModVersion("xaerominimap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/319
             return false;
         } else if (packageName.startsWith("hud_batching.compat.ftbchunks") && PlatformCode.getModVersion("ftbchunks").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/318
             return false;
