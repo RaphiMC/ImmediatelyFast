@@ -17,13 +17,17 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
@@ -31,6 +35,11 @@ public abstract class MixinGameRenderer {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilderStorage;getEntityVertexConsumers()Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;"))
     private VertexConsumerProvider.Immediate returnNonBatchingVertexConsumer(BufferBuilderStorage instance) {
         return BatchingBuffers.getNonBatchingEntityVertexConsumers();
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.AFTER))
+    private void drawDataFromModsWhichRenderIntoTheWrongBuffer(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
+        MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().draw();
     }
 
 }
