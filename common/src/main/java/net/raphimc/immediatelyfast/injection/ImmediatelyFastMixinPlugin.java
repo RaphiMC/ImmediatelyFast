@@ -61,9 +61,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
             return false;
         }
-        if (!ImmediatelyFast.config.fast_buffer_upload && packageName.startsWith("fast_buffer_upload")) {
-            return false;
-        }
         if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
             return false;
         }

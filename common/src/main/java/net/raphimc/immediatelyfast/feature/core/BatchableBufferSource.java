@@ -199,7 +199,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
     protected int getLayerOrder(final RenderLayer layer) {
         if (layer == null) return Integer.MAX_VALUE;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
-            final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
+            final Identifier textureId = multiPhase.phases.texture.getId().orElse(null);
             if (textureId != null) {
                 if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
                     if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {

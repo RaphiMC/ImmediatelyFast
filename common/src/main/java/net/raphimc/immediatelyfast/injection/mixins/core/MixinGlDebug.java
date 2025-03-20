@@ -40,8 +40,8 @@ public abstract class MixinGlDebug {
         return sync || (ImmediatelyFast.config.debug_only_print_additional_error_information && (capabilities.GL_KHR_debug || capabilities.GL_ARB_debug_output));
     }
 
-    @Redirect(method = "info", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
-    private static void appendStackTrace(Logger instance, String message, Object argument) {
+    @Redirect(method = "onDebugMessage", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    private void appendStackTrace(Logger instance, String message, Object argument) {
         if (ImmediatelyFast.config.debug_only_print_additional_error_information && System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
             immediatelyFast$lastTime = System.currentTimeMillis();
             instance.info(message, argument, new Exception());

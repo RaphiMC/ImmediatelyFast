@@ -17,14 +17,19 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
 
+import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
 
@@ -90,14 +95,52 @@ public class BatchingBuffers {
 
     public static class WrappedRenderLayer extends RenderLayer {
 
+        private final RenderLayer renderLayer;
+        private final Runnable additionalStartAction;
+        private final Runnable additionalEndAction;
+
         public WrappedRenderLayer(final RenderLayer renderLayer, final Runnable additionalStartAction, final Runnable additionalEndAction) {
-            super(renderLayer.name, renderLayer.getVertexFormat(), renderLayer.getDrawMode(), renderLayer.getExpectedBufferSize(), renderLayer.hasCrumbling(), renderLayer.isTranslucent(), () -> {
-                renderLayer.startDrawing();
-                additionalStartAction.run();
-            }, () -> {
-                renderLayer.endDrawing();
-                additionalEndAction.run();
-            });
+            super(renderLayer.name, renderLayer.getExpectedBufferSize(), renderLayer.hasCrumbling(), renderLayer.isTranslucent(), renderLayer::startDrawing, renderLayer::endDrawing);
+            this.renderLayer = renderLayer;
+            this.additionalStartAction = additionalStartAction;
+            this.additionalEndAction = additionalEndAction;
+        }
+
+        @Override
+        public void draw(final BuiltBuffer buffer) {
+            this.additionalStartAction.run();
+            this.renderLayer.draw(buffer);
+            this.additionalEndAction.run();
+        }
+
+        @Override
+        public Framebuffer getTarget() {
+            return this.renderLayer.getTarget();
+        }
+
+        @Override
+        public RenderPipeline getPipeline() {
+            return this.renderLayer.getPipeline();
+        }
+
+        @Override
+        public VertexFormat getVertexFormat() {
+            return this.renderLayer.getVertexFormat();
+        }
+
+        @Override
+        public VertexFormat.DrawMode getDrawMode() {
+            return this.renderLayer.getDrawMode();
+        }
+
+        @Override
+        public Optional<RenderLayer> getAffectedOutline() {
+            return this.renderLayer.getAffectedOutline();
+        }
+
+        @Override
+        public boolean isOutline() {
+            return this.renderLayer.isOutline();
         }
 
     }

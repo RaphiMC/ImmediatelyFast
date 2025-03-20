@@ -15,28 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.fast_buffer_upload;
+package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import net.minecraft.client.gl.GlUsage;
-import net.minecraft.client.gl.GpuBuffer;
-import net.minecraft.client.gl.VertexBuffer;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(VertexBuffer.class)
-public abstract class MixinVertexBuffer {
+@Mixin(GlStateManager.class)
+public abstract class MixinGlStateManager {
 
-    @Shadow
-    @Final
-    private GlUsage usage;
+    @Inject(method = {"_glBindFramebuffer"}, at = @At("HEAD"), cancellable = true)
+    private static void lockFramebuffer(CallbackInfo ci) {
+        if (ImmediatelyFast.signTextCache != null && ImmediatelyFast.signTextCache.lockFramebuffer) {
+            ci.cancel();
+        }
+    }
 
-    @WrapWithCondition(method = "uploadVertexBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/GpuBuffer;resize(I)V"))
-    private boolean onlyResizeIfNeeded(GpuBuffer instance, int newSize) {
-        return !ImmediatelyFast.runtimeConfig.fast_buffer_upload || this.usage == GlUsage.STATIC_WRITE || newSize > instance.size;
+    @Inject(method = {"_viewport"}, at = @At("HEAD"), cancellable = true)
+    private static void lockViewport(CallbackInfo ci) {
+        if (ImmediatelyFast.signTextCache != null && ImmediatelyFast.signTextCache.lockViewport) {
+            ci.cancel();
+        }
     }
 
 }

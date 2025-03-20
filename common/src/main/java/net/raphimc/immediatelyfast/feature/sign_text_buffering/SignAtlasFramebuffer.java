@@ -17,33 +17,52 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.GlBackend;
 import net.minecraft.client.texture.AbstractTexture;
+import net.minecraft.client.texture.GlTexture;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL30C;
 
 public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
+    private static int nextId = 0;
     public static final int ATLAS_SIZE = 4096;
 
     private final Identifier textureId;
     private final Slot rootSlot;
 
     public SignAtlasFramebuffer() {
-        super(false);
+        super("ImmediatelyFast Sign Atlas FBO", false);
         this.resize(ATLAS_SIZE, ATLAS_SIZE);
-        MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
-        this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + this.colorAttachment);
+        this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + nextId++);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, new FboTexture());
 
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
     }
 
+    public int bind(final boolean setViewport) {
+        final int previousFramebuffer = GL11C.glGetInteger(GL30C.GL_FRAMEBUFFER_BINDING);
+        final int fbo = ((GlTexture) SignAtlasFramebuffer.this.colorAttachment).getOrCreateFramebuffer(((GlBackend) RenderSystem.getDevice()).getFramebufferManager(), null);
+        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, fbo);
+        if (setViewport) {
+            GL11C.glViewport(0, 0, ATLAS_SIZE, ATLAS_SIZE);
+        }
+        return previousFramebuffer;
+    }
+
+    public void unbind(final int previousFbo) {
+        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, previousFbo);
+        GL11C.glViewport(0, 0, MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
+    }
+
     @Override
     public void close() {
         this.delete();
-        MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
     }
 
     public Slot findSlot(final int width, final int height) {
@@ -51,8 +70,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
     }
 
     public void clearAtlas() {
-        this.clear();
-        MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
+        RenderSystem.getDevice().createCommandEncoder().clearColorTexture(this.getColorAttachment(), 0);
 
         this.rootSlot.subSlot1 = null;
         this.rootSlot.subSlot2 = null;
@@ -91,11 +109,12 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
             this.occupied = false;
             removeUnoccupiedSubSlots(this);
 
-            GL11C.glScissor(this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
-            GL11C.glEnable(GL11C.GL_SCISSOR_TEST);
-            SignAtlasFramebuffer.this.clear();
-            GL11C.glDisable(GL11C.GL_SCISSOR_TEST);
-            MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
+            GlStateManager._scissorBox(this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
+            GlStateManager._enableScissorTest();
+            final int previousFbo = SignAtlasFramebuffer.this.bind(false);
+            GL11C.glClear(GL11C.GL_COLOR_BUFFER_BIT);
+            SignAtlasFramebuffer.this.unbind(previousFbo);
+            GlStateManager._disableScissorTest();
         }
 
         public Slot findSlot(final int width, final int height) {
@@ -152,13 +171,12 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
     private class FboTexture extends AbstractTexture {
 
-        @Override
-        public void clearGlId() {
+        private FboTexture() {
+            this.glTexture = SignAtlasFramebuffer.this.colorAttachment;
         }
 
         @Override
-        public int getGlId() {
-            return SignAtlasFramebuffer.this.colorAttachment;
+        public void close() {
         }
 
     }

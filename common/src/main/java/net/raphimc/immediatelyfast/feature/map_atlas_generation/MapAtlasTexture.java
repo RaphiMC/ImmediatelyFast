@@ -36,7 +36,7 @@ public class MapAtlasTexture implements AutoCloseable {
         this.id = id;
 
         this.identifier = Identifier.of("immediatelyfast", "map_atlas/" + id);
-        this.texture = new NativeImageBackedTexture(ATLAS_SIZE, ATLAS_SIZE, true);
+        this.texture = new NativeImageBackedTexture("ImmediatelyFast Map Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.identifier, this.texture);
     }
 

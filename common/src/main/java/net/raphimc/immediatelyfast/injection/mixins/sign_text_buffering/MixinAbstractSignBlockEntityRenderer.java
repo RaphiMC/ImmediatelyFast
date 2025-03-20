@@ -94,8 +94,9 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
                 final Fog fog = RenderSystem.getShaderFog();
                 RenderSystem.setShaderFog(Fog.DUMMY);
                 final BufferAllocator bufferAllocator = BufferAllocatorPool.borrowBufferAllocator();
-                ImmediatelyFast.signTextCache.signAtlasFramebuffer.beginWrite(true);
+                final int previousFbo = ImmediatelyFast.signTextCache.signAtlasFramebuffer.bind(true);
                 ImmediatelyFast.signTextCache.lockFramebuffer = true;
+                ImmediatelyFast.signTextCache.lockViewport = true;
 
                 try {
                     final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
@@ -105,8 +106,9 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
                     this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
                     immediate.draw();
                 } finally {
+                    ImmediatelyFast.signTextCache.lockViewport = false;
                     ImmediatelyFast.signTextCache.lockFramebuffer = false;
-                    MinecraftClient.getInstance().getFramebuffer().beginWrite(true);
+                    ImmediatelyFast.signTextCache.signAtlasFramebuffer.unbind(previousFbo);
                     BufferAllocatorPool.returnBufferAllocatorSafe(bufferAllocator);
                     RenderSystem.setShaderFog(fog);
                     modelViewMatrix.popMatrix();

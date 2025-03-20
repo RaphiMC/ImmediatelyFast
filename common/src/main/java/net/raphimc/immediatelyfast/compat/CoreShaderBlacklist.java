@@ -17,27 +17,46 @@
  */
 package net.raphimc.immediatelyfast.compat;
 
-import net.minecraft.client.gl.ShaderProgramKey;
-import net.minecraft.client.gl.ShaderProgramKeys;
+import com.mojang.blaze3d.shaders.ShaderType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
 
-import java.util.List;
+import java.util.Set;
 
 public class CoreShaderBlacklist {
 
-    private static final List<ShaderProgramKey> BLACKLIST = List.of(
-            ShaderProgramKeys.POSITION_COLOR,
-            ShaderProgramKeys.POSITION_TEX,
-            ShaderProgramKeys.POSITION_TEX_COLOR,
-            ShaderProgramKeys.RENDERTYPE_TEXT,
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND,
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY,
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
+    private static final Set<Identifier> BLACKLIST = Set.of(
+            Identifier.ofVanilla("core/position_color"),
+            Identifier.ofVanilla("core/position_tex"),
+            Identifier.ofVanilla("core/position_tex_color"),
+            Identifier.ofVanilla("core/rendertype_text"),
+            Identifier.ofVanilla("core/rendertype_text_background"),
+            Identifier.ofVanilla("core/rendertype_text_background_see_through"),
+            Identifier.ofVanilla("core/rendertype_text_intensity"),
+            Identifier.ofVanilla("core/rendertype_text_intensity_see_through"),
+            Identifier.ofVanilla("core/rendertype_text_see_through"),
+            Identifier.ofVanilla("core/rendertype_item_entity_translucent_cull")
     );
 
-    public static List<ShaderProgramKey> getBlacklist() {
+    static {
+        if (false /* Set to true if updating the game version to validate the identifiers */) {
+            final ResourceManager resourceManager = MinecraftClient.getInstance().getResourceManager();
+            for (Identifier shaderIdentifier : BLACKLIST) {
+                final Resource vertexShaderResource = resourceManager.getResource(ShaderType.VERTEX.idConverter().toResourcePath(shaderIdentifier)).orElse(null);
+                if (vertexShaderResource == null) {
+                    throw new RuntimeException("Couldn't find vertex shader " + shaderIdentifier);
+                }
+                final Resource fragmentShaderResource = resourceManager.getResource(ShaderType.FRAGMENT.idConverter().toResourcePath(shaderIdentifier)).orElse(null);
+                if (fragmentShaderResource == null) {
+                    throw new RuntimeException("Couldn't find fragment shader " + shaderIdentifier);
+                }
+            }
+        }
+    }
+
+    public static Set<Identifier> getBlacklist() {
         return BLACKLIST;
     }
 

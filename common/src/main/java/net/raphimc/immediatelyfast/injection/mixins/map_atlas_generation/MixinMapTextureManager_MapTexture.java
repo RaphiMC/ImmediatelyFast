@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.texture.*;
 import net.minecraft.item.map.MapState;
@@ -30,6 +31,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.function.Supplier;
 
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
@@ -72,13 +75,13 @@ public abstract class MixinMapTextureManager_MapTexture {
         }
     }
 
-    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
-    private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(int width, int height, boolean useMipmaps, @Local(argsOnly = true) MapTextureManager mapTextureManager, @Local(argsOnly = true) int id) {
+    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(Ljava/util/function/Supplier;IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
+    private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(Supplier<String> nameSupplier, int width, int height, boolean useStb, @Local(argsOnly = true) MapTextureManager mapTextureManager, @Local(argsOnly = true) int id) {
         final int packedLocation = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlasMapping(id);
         if (packedLocation == -1) {
             ImmediatelyFast.LOGGER.warn("Map " + id + " is not in an atlas");
             // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
-            return new NativeImageBackedTexture(width, height, useMipmaps);
+            return new NativeImageBackedTexture(nameSupplier, width, height, useStb);
         }
 
         this.immediatelyFast$atlasX = ((packedLocation >> 8) & 0xFF) * MAP_SIZE;
@@ -117,8 +120,7 @@ public abstract class MixinMapTextureManager_MapTexture {
                     atlasImage.setColorArgb(this.immediatelyFast$atlasX + x, this.immediatelyFast$atlasY + y, MapColor.getRenderColor(this.state.colors[i]));
                 }
             }
-            atlasTexture.bindTexture();
-            atlasImage.upload(0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, false);
+            RenderSystem.getDevice().createCommandEncoder().writeToTexture(atlasTexture.getGlTexture(), atlasImage, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
             this.needsUpdate = false;
         }
     }

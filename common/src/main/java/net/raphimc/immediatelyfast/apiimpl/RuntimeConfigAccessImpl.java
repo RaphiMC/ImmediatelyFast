@@ -27,7 +27,6 @@ public class RuntimeConfigAccessImpl implements ConfigAccess {
         return switch (key) {
             case "font_atlas_resizing" -> ImmediatelyFast.runtimeConfig.font_atlas_resizing;
             case "hud_batching" -> ImmediatelyFast.runtimeConfig.hud_batching;
-            case "fast_buffer_upload" -> ImmediatelyFast.runtimeConfig.fast_buffer_upload;
             case "experimental_screen_batching" -> ImmediatelyFast.runtimeConfig.experimental_screen_batching;
             default -> defaultValue;
         };

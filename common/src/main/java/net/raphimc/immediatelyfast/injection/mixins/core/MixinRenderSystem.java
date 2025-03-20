@@ -15,24 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.minecraft.client.render.BufferRenderer;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BufferRenderer.class)
-public abstract class MixinBufferRenderer {
+@Mixin(RenderSystem.class)
+public abstract class MixinRenderSystem {
 
-    @Inject(method = {"draw", "drawWithGlobalProgram"}, at = @At("HEAD"))
-    private static void checkForDrawCallWhileBatching(CallbackInfo ci) {
-        if (BatchingBuffers.isHudBatching()) {
-            // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
-            BatchingBuffers.tryForceDrawHudBuffers();
-        }
+    @Inject(method = "initRenderer", at = @At("RETURN"))
+    private static void initImmediatelyFast(CallbackInfo ci) {
+        ImmediatelyFast.onRenderSystemInit();
+    }
+
+    @Inject(method = "flipFrame", at = @At("HEAD"))
+    private static void endFrame(CallbackInfo ci) {
+        BufferAllocatorPool.onEndFrame();
     }
 
 }

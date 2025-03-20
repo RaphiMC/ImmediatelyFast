@@ -29,7 +29,6 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "map_atlas_generation" -> ImmediatelyFast.config.map_atlas_generation;
             case "hud_batching" -> ImmediatelyFast.config.hud_batching;
             case "fast_text_lookup" -> ImmediatelyFast.config.fast_text_lookup;
-            case "fast_buffer_upload" -> ImmediatelyFast.config.fast_buffer_upload;
             case "dont_add_info_into_debug_hud" -> ImmediatelyFast.config.dont_add_info_into_debug_hud;
             case "experimental_disable_error_checking" -> ImmediatelyFast.config.experimental_disable_error_checking;
             case "experimental_disable_resource_pack_conflict_handling" -> ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling;

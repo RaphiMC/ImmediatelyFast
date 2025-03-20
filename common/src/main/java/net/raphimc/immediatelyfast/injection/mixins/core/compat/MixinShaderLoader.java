@@ -17,10 +17,9 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core.compat;
 
+import com.mojang.blaze3d.shaders.ShaderType;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.CompiledShader;
 import net.minecraft.client.gl.ShaderLoader;
-import net.minecraft.client.gl.ShaderProgramKey;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourcePack;
@@ -29,9 +28,7 @@ import net.minecraft.util.profiler.Profiler;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
-import net.raphimc.immediatelyfast.injection.interfaces.IShaderProgram;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,9 +41,6 @@ import java.util.Set;
 @Mixin(ShaderLoader.class)
 public abstract class MixinShaderLoader {
 
-    @Shadow
-    private ShaderLoader.Cache cache;
-
     @Inject(method = "apply(Lnet/minecraft/client/gl/ShaderLoader$Definitions;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
     private void checkForCoreShaderModifications(ShaderLoader.Definitions definitions, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
@@ -58,21 +52,16 @@ public abstract class MixinShaderLoader {
         ResourcePack resourcePackWhichBreaksScreenBatching = null;
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
-            for (ShaderProgramKey shaderProgramKey : CoreShaderBlacklist.getBlacklist()) {
-                if (this.cache.getOrLoadProgram(shaderProgramKey) instanceof IShaderProgram mixinShaderProgram) {
-                    if (mixinShaderProgram.immediatelyFast$getVertexShader() == null || mixinShaderProgram.immediatelyFast$getFragmentShader() == null) {
-                        continue;
-                    }
-                    final Identifier vertexShaderIdentifier = CompiledShader.Type.VERTEX.createFinder().toResourcePath(mixinShaderProgram.immediatelyFast$getVertexShader().getId());
-                    final ResourcePack vertexShaderResourcePack = resourceManager.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
-                    if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
-                        breakingResourcePacks.add(vertexShaderResourcePack);
-                    }
-                    final Identifier fragmentShaderIdentifier = CompiledShader.Type.FRAGMENT.createFinder().toResourcePath(mixinShaderProgram.immediatelyFast$getFragmentShader().getId());
-                    final ResourcePack fragmentShaderResourcePack = resourceManager.getResource(fragmentShaderIdentifier).map(Resource::getPack).orElse(null);
-                    if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
-                        breakingResourcePacks.add(fragmentShaderResourcePack);
-                    }
+            for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
+                final Identifier vertexShaderIdentifier = ShaderType.VERTEX.idConverter().toResourcePath(shaderIdentifier);
+                final ResourcePack vertexShaderResourcePack = resourceManager.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
+                if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                    breakingResourcePacks.add(vertexShaderResourcePack);
+                }
+                final Identifier fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().toResourcePath(shaderIdentifier);
+                final ResourcePack fragmentShaderResourcePack = resourceManager.getResource(fragmentShaderIdentifier).map(Resource::getPack).orElse(null);
+                if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                    breakingResourcePacks.add(fragmentShaderResourcePack);
                 }
             }
             for (ResourcePack resourcePack : breakingResourcePacks) {
@@ -90,7 +79,7 @@ public abstract class MixinShaderLoader {
                     resourcePackWhichBreaksScreenBatching = resourcePack;
                 }
             }
-        } catch (ShaderLoader.LoadException | IOException e) {
+        } catch (IOException e) {
             ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
         }
 

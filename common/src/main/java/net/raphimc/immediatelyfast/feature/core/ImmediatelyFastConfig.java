@@ -25,7 +25,6 @@ public class ImmediatelyFastConfig {
     public boolean map_atlas_generation = true;
     public boolean hud_batching = true;
     public boolean fast_text_lookup = true;
-    public boolean fast_buffer_upload = true;
 
     // Cosmetic config values
     private String COSMETIC_INFO = "----- Cosmetic only config values below (Does not optimize anything) -----";

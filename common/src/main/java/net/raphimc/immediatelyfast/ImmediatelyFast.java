@@ -67,7 +67,7 @@ public class ImmediatelyFast {
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
 
-    public static void windowInit() {
+    public static void onRenderSystemInit() {
         final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
         final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
         final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
@@ -88,11 +88,6 @@ public class ImmediatelyFast {
 
         Objects.requireNonNull(config, "Config not loaded yet");
         Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
-
-        if (config.fast_buffer_upload && isApple && !config.debug_only_and_not_recommended_disable_hardware_conflict_handling) {
-            LOGGER.warn("Apple GPU detected. Disabling fast buffer upload.");
-            runtimeConfig.fast_buffer_upload = false;
-        }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
             PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {

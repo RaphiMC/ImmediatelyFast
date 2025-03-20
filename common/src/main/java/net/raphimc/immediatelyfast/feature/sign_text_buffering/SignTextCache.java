@@ -43,6 +43,7 @@ public class SignTextCache implements SynchronousResourceReloader {
             .build();
     public final RenderLayer renderLayer = RenderLayer.getText(this.signAtlasFramebuffer.getTextureId());
     public boolean lockFramebuffer = false;
+    public boolean lockViewport = false;
 
     public void clearCache() {
         this.slotCache.invalidateAll();
