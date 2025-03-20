@@ -45,10 +45,22 @@ public abstract class MixinDrawContext {
     @Final
     private MatrixStack matrices;
 
+    @Shadow
+    protected abstract void drawIfRunning();
+
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ItemCooldownManager;getCooldownProgress(Lnet/minecraft/item/Item;F)F")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIII)V"))
     private void forceDraw(CallbackInfo ci) {
         if (this.vertexConsumers instanceof BatchableBufferSource) {
             this.draw();
+        }
+    }
+
+    @Redirect(method = {"setScissor", "setShaderColor"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawIfRunning()V"))
+    private void drawIfBatching(DrawContext instance) {
+        if (this.vertexConsumers instanceof BatchableBufferSource) {
+            this.draw();
+        } else {
+            this.drawIfRunning();
         }
     }
 
