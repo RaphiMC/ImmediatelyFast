@@ -1,9 +1,15 @@
 version: 2
+registries:
+  architectury-maven:
+    type: maven-repository
+    url: "https://maven.architectury.dev/"
 updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "daily"
+    registries:
+      - architectury-maven
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
