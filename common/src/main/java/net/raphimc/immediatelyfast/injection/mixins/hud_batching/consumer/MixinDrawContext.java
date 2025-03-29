@@ -26,6 +26,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.math.MathHelper;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
 import net.raphimc.immediatelyfast.feature.batching.BatchingRenderLayers;
 import net.raphimc.immediatelyfast.feature.batching.BlendFuncDepthFuncState;
@@ -79,9 +80,7 @@ public abstract class MixinDrawContext {
                 y1 = y1 ^ y2;
             }
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
-            final float[] shaderColor = RenderSystem.getShaderColor();
-            final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
-            color = ColorHelper.Argb.mixColor(color, argb);
+            color = this.immediatelyFast$mixWithShaderColor(color);
 
             final VertexConsumer vertexConsumer = BatchingBuffers.FILL_CONSUMER.getBuffer(layer);
             vertexConsumer.vertex(matrix, x1, y2, z).color(color).next();
@@ -95,10 +94,8 @@ public abstract class MixinDrawContext {
     private void fillIntoBuffer(RenderLayer layer, int startX, int startY, int endX, int endY, int colorStart, int colorEnd, int z, CallbackInfo ci) {
         if (BatchingBuffers.FILL_CONSUMER != null) {
             ci.cancel();
-            final float[] shaderColor = RenderSystem.getShaderColor();
-            final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
-            colorStart = ColorHelper.Argb.mixColor(colorStart, argb);
-            colorEnd = ColorHelper.Argb.mixColor(colorEnd, argb);
+            colorStart = this.immediatelyFast$mixWithShaderColor(colorStart);
+            colorEnd = this.immediatelyFast$mixWithShaderColor(colorEnd);
             this.fillGradient(BatchingBuffers.FILL_CONSUMER.getBuffer(layer), startX, startY, endX, endY, z, colorStart, colorEnd);
         }
     }
@@ -109,10 +106,10 @@ public abstract class MixinDrawContext {
             ci.cancel();
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
             final float[] shaderColor = RenderSystem.getShaderColor();
-            final int r = (int) (shaderColor[0] * 255);
-            final int g = (int) (shaderColor[1] * 255);
-            final int b = (int) (shaderColor[2] * 255);
-            final int a = (int) (shaderColor[3] * 255);
+            final int r = MathHelper.clamp((int) (shaderColor[0] * 255), 0, 255);
+            final int g = MathHelper.clamp((int) (shaderColor[1] * 255), 0, 255);
+            final int b = MathHelper.clamp((int) (shaderColor[2] * 255), 0, 255);
+            final int a = MathHelper.clamp((int) (shaderColor[3] * 255), 0, 255);
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
             vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a).next();
             vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a).next();
@@ -126,9 +123,7 @@ public abstract class MixinDrawContext {
         if (BatchingBuffers.TEXTURE_CONSUMER != null) {
             ci.cancel();
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
-            final float[] shaderColor = RenderSystem.getShaderColor();
-            final int argb = (int) (shaderColor[3] * 255) << 24 | (int) (shaderColor[0] * 255) << 16 | (int) (shaderColor[1] * 255) << 8 | (int) (shaderColor[2] * 255);
-            final int color = ColorHelper.Argb.mixColor((int) (alpha * 255) << 24 | (int) (red * 255) << 16 | (int) (green * 255) << 8 | (int) (blue * 255), argb);
+            final int color = this.immediatelyFast$mixWithShaderColor((int) (alpha * 255) << 24 | (int) (red * 255) << 16 | (int) (green * 255) << 8 | (int) (blue * 255));
 
             RenderSystem.enableBlend();
             final VertexConsumer vertexConsumer = BatchingBuffers.TEXTURE_CONSUMER.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
@@ -186,6 +181,16 @@ public abstract class MixinDrawContext {
         if (BatchingBuffers.isHudBatching() && BatchingBuffers.hasDataToDraw()) {
             BatchingBuffers.forceDrawBuffers();
         }
+    }
+
+    @Unique
+    private int immediatelyFast$mixWithShaderColor(final int color) {
+        final float[] shaderColor = RenderSystem.getShaderColor();
+        final int argb = MathHelper.clamp((int) (shaderColor[3] * 255) << 24, 0, 255)
+                | MathHelper.clamp((int) (shaderColor[0] * 255) << 16, 0, 255)
+                | MathHelper.clamp((int) (shaderColor[1] * 255) << 8, 0, 255)
+                | MathHelper.clamp((int) (shaderColor[2] * 255), 0, 255);
+        return ColorHelper.Argb.mixColor(color, argb);
     }
 
 }
