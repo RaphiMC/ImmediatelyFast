@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
+    "avoid_redundant_framebuffer_switching.MixinGlResourceManager",
     "core.MixinDebugHud",
     "core.MixinGameRenderer",
     "core.MixinGlDebug",

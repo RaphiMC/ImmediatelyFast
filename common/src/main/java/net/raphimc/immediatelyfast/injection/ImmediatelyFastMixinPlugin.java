@@ -70,6 +70,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.experimental_screen_batching && packageName.startsWith("screen_batching")) {
             return false;
         }
+        if (!ImmediatelyFast.config.experimental_avoid_redundant_framebuffer_switching && packageName.startsWith("avoid_redundant_framebuffer_switching")) {
+            return false;
+        }
 
         if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
             return false;
