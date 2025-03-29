@@ -58,6 +58,16 @@ public class ImmediatelyFast {
             config.experimental_screen_batching = false;
         }
 
+        if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            if (config.experimental_sign_text_buffering) {
+                if (PlatformCode.getModVersion("effective").isPresent()) {
+                    // https://github.com/RaphiMC/ImmediatelyFast/issues/339
+                    LOGGER.warn("Effective mod detected. Force disabling sign text buffering optimization.");
+                    config.experimental_sign_text_buffering = false;
+                }
+            }
+        }
+
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
