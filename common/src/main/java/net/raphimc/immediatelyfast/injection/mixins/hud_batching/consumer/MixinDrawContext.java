@@ -55,7 +55,7 @@ public abstract class MixinDrawContext {
     @ModifyVariable(method = "fill(Lnet/minecraft/client/render/RenderLayer;IIIIII)V", at = @At("HEAD"), index = 6, argsOnly = true)
     private int mixColor(int color) {
         if (this.vertexConsumers instanceof HudBatchingBufferSource) {
-            return immediatelyFast$mixWithShaderColor(color);
+            return this.immediatelyFast$mixWithShaderColor(color);
         }
         return color;
     }
@@ -63,7 +63,7 @@ public abstract class MixinDrawContext {
     @ModifyVariable(method = "fillGradient(Lnet/minecraft/client/render/RenderLayer;IIIIIII)V", at = @At("HEAD"), index = 5, argsOnly = true)
     private int mixStartColor(int color) {
         if (this.vertexConsumers instanceof HudBatchingBufferSource) {
-            return immediatelyFast$mixWithShaderColor(color);
+            return this.immediatelyFast$mixWithShaderColor(color);
         }
         return color;
     }
@@ -71,7 +71,7 @@ public abstract class MixinDrawContext {
     @ModifyVariable(method = "fillGradient(Lnet/minecraft/client/render/RenderLayer;IIIIIII)V", at = @At("HEAD"), index = 6, argsOnly = true)
     private int mixEndColor(int color) {
         if (this.vertexConsumers instanceof HudBatchingBufferSource) {
-            return immediatelyFast$mixWithShaderColor(color);
+            return this.immediatelyFast$mixWithShaderColor(color);
         }
         return color;
     }
@@ -99,7 +99,7 @@ public abstract class MixinDrawContext {
         if (this.vertexConsumers instanceof HudBatchingBufferSource) {
             ci.cancel();
             final Matrix4f matrix = this.matrices.peek().getPositionMatrix();
-            final int color = immediatelyFast$mixWithShaderColor((int) (alpha * 255) << 24 | (int) (red * 255) << 16 | (int) (green * 255) << 8 | (int) (blue * 255));
+            final int color = this.immediatelyFast$mixWithShaderColor((int) (alpha * 255) << 24 | (int) (red * 255) << 16 | (int) (green * 255) << 8 | (int) (blue * 255));
 
             RenderSystem.enableBlend();
             final VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));

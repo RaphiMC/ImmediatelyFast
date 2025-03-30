@@ -55,7 +55,7 @@ public abstract class MixinDrawContext {
         }
     }
 
-    @Redirect(method = {"setScissor", "setShaderColor"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawIfRunning()V"))
+    @Redirect(method = "setScissor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawIfRunning()V"))
     private void drawIfBatching(DrawContext instance) {
         if (this.vertexConsumers instanceof BatchableBufferSource) {
             this.draw();
