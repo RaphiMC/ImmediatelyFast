@@ -1,3 +1,5 @@
-* Added support for Minecraft 1.21.5
-  * Removed the fast_buffer_upload optimization, because Mojang implemented it in the base game
-  * NeoForge and LexForge will be added in the next release
+* Readded NeoForge support
+* Added new experimental optimization: Avoid redundant framebuffer switching
+  * It can be enabled in the config file (`immediatelyfast.json`) by enabling `experimental_avoid_redundant_framebuffer_switching`
+  * This optimization shouldn't cause any issues and will be enabled by default in an upcoming release if no issues are reported
+  * Any feedback regarding rendering issues or performance improvements is appreciated (You can find the discord link in the mod description)
