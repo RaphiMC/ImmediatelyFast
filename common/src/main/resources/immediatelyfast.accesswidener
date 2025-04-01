@@ -22,3 +22,5 @@ accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate la
 accessible field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
 mutable field net/minecraft/client/gui/DrawContext vertexConsumers Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;
 accessible field com/mojang/blaze3d/systems/RenderSystem shaderLightDirections [Lorg/joml/Vector3f;
+accessible field net/minecraft/client/gl/GlResourceManager renderPassOpen Z
+accessible field net/minecraft/client/gl/GlResourceManager currentPipeline Lcom/mojang/blaze3d/pipeline/RenderPipeline;

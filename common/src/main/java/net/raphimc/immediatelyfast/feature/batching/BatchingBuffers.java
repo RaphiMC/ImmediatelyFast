@@ -23,11 +23,13 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.gl.GlResourceManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
+import net.raphimc.immediatelyfast.injection.interfaces.IGlResourceManager;
 
 import java.util.Optional;
 import java.util.SequencedMap;
@@ -76,10 +78,19 @@ public class BatchingBuffers {
     public static void tryForceDrawHudBuffers() {
         if (!hudBatchingVertexConsumers.isCurrentlyDrawing() && hudBatchingVertexConsumers.hasActiveLayers()) {
             final RenderSystemState renderSystemState = RenderSystemState.current();
+            final GlResourceManager glResourceManager = (GlResourceManager) RenderSystem.getDevice().createCommandEncoder();
+            final boolean prevRenderPassOpen = glResourceManager.renderPassOpen;
+            final RenderPipeline prevRenderPipeline = glResourceManager.currentPipeline;
+            glResourceManager.renderPassOpen = false;
+            glResourceManager.currentPipeline = null;
+            ((IGlResourceManager) glResourceManager).immediatelyfast$skipRenderPassClose(true);
             try {
                 RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
                 hudBatchingVertexConsumers.draw();
             } finally {
+                ((IGlResourceManager) glResourceManager).immediatelyfast$skipRenderPassClose(false);
+                glResourceManager.currentPipeline = prevRenderPipeline;
+                glResourceManager.renderPassOpen = prevRenderPassOpen;
                 renderSystemState.apply();
             }
         }

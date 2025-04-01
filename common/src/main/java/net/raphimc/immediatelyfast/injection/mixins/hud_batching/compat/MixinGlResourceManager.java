@@ -19,13 +19,22 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
 import net.minecraft.client.gl.GlResourceManager;
 import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import net.raphimc.immediatelyfast.injection.interfaces.IGlResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GlResourceManager.class)
-public abstract class MixinGlResourceManager {
+public abstract class MixinGlResourceManager implements IGlResourceManager {
+
+    @Shadow
+    public boolean renderPassOpen;
+
+    @Unique
+    private boolean immediatelyFast$skipRenderPassClose = false;
 
     @Inject(method = {"drawObjectsWithRenderPass", "drawBoundObjectWithRenderPass"}, at = @At("HEAD"))
     private void checkForDrawCallWhileBatching(CallbackInfo ci) {
@@ -33,6 +42,19 @@ public abstract class MixinGlResourceManager {
             // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
             BatchingBuffers.tryForceDrawHudBuffers();
         }
+    }
+
+    @Inject(method = "closePass", at = @At("HEAD"), cancellable = true)
+    private void skipRenderPassClose(CallbackInfo ci) {
+        if (this.immediatelyFast$skipRenderPassClose) {
+            this.renderPassOpen = false;
+            ci.cancel();
+        }
+    }
+
+    @Override
+    public void immediatelyfast$skipRenderPassClose(final boolean skipRenderPassClose) {
+        this.immediatelyFast$skipRenderPassClose = skipRenderPassClose;
     }
 
 }
