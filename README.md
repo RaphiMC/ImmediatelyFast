@@ -120,7 +120,7 @@ ImmediatelyFast has a config file which can be found in the `config` folder of y
 * `experimental_disable_resource_pack_conflict_handling`: Controls if ImmediatelyFast should scan resource packs for incompatible core shader modifications in oder to disable some conflicting optimizations. This can be disabled to force optimizations even if they may cause graphical issues with certain resource packs.
 * `experimental_sign_text_buffering`: Buffers text on signs instead of re-rendering it every frame. May cause issues with high resolution or custom fonts.
 * `experimental_screen_batching`: Improves the performance of some in-game screens rendering by submitting less draw calls.
-* `experimental_universal_hud_batching`: More aggressive HUD batching. More likely to cause issues with HUD elements.
+* `experimental_avoid_redundant_framebuffer_switching`: Avoids unneeded framebuffer switching to boost FPS.
 
 ## Developer API
 You can read the API docs [here](docs/API_DOCS.md).

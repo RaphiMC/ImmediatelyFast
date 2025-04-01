@@ -37,7 +37,6 @@ public class ImmediatelyFastConfig {
     public boolean experimental_sign_text_buffering = false;
     public boolean experimental_screen_batching = false;
     public boolean experimental_avoid_redundant_framebuffer_switching = false;
-    public boolean experimental_universal_hud_batching = false;
 
     // Debug config values
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";

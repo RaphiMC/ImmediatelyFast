@@ -39,7 +39,7 @@ public abstract class MixinGuiLayerManager {
             )
     )
     private void renderBatch(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching && !ImmediatelyFast.config.experimental_universal_hud_batching) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
             context.draw();
         }
     }
