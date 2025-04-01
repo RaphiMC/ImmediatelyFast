@@ -31,7 +31,7 @@ public abstract class MixinLayeredDrawer {
 
     @Inject(method = "renderInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer$Layer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
     private void renderBatch(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (ImmediatelyFast.runtimeConfig.hud_batching && !ImmediatelyFast.config.experimental_universal_hud_batching) {
+        if (ImmediatelyFast.runtimeConfig.hud_batching) {
             context.draw();
         }
     }
