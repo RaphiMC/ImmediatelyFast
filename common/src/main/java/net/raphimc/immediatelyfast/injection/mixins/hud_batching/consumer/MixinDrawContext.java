@@ -186,9 +186,9 @@ public abstract class MixinDrawContext {
     @Unique
     private int immediatelyFast$mixWithShaderColor(final int color) {
         final float[] shaderColor = RenderSystem.getShaderColor();
-        final int argb = MathHelper.clamp((int) (shaderColor[3] * 255) << 24, 0, 255)
-                | MathHelper.clamp((int) (shaderColor[0] * 255) << 16, 0, 255)
-                | MathHelper.clamp((int) (shaderColor[1] * 255) << 8, 0, 255)
+        final int argb = MathHelper.clamp((int) (shaderColor[3] * 255), 0, 255) << 24
+                | MathHelper.clamp((int) (shaderColor[0] * 255), 0, 255) << 16
+                | MathHelper.clamp((int) (shaderColor[1] * 255), 0, 255) << 8
                 | MathHelper.clamp((int) (shaderColor[2] * 255), 0, 255);
         return ColorHelper.Argb.mixColor(color, argb);
     }
