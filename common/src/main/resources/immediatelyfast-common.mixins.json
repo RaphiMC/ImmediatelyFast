@@ -6,6 +6,7 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "avoid_redundant_framebuffer_switching.MixinGlResourceManager",
+    "avoid_redundant_framebuffer_switching.MixinRenderSystem",
     "core.MixinDebugHud",
     "core.MixinGameRenderer",
     "core.MixinGlDebug",
