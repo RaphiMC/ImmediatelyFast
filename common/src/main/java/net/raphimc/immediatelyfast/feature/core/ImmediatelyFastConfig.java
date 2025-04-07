@@ -25,6 +25,7 @@ public class ImmediatelyFastConfig {
     public boolean map_atlas_generation = true;
     public boolean hud_batching = true;
     public boolean fast_text_lookup = true;
+    public boolean avoid_redundant_framebuffer_switching = true;
 
     // Cosmetic config values
     private String COSMETIC_INFO = "----- Cosmetic only config values below (Does not optimize anything) -----";
@@ -36,7 +37,6 @@ public class ImmediatelyFastConfig {
     public boolean experimental_disable_resource_pack_conflict_handling = false;
     public boolean experimental_sign_text_buffering = false;
     public boolean experimental_screen_batching = false;
-    public boolean experimental_avoid_redundant_framebuffer_switching = false;
 
     // Debug config values
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";

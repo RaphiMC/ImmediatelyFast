@@ -61,6 +61,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
             return false;
         }
+        if (!ImmediatelyFast.config.avoid_redundant_framebuffer_switching && packageName.startsWith("avoid_redundant_framebuffer_switching")) {
+            return false;
+        }
         if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
             return false;
         }
@@ -68,9 +71,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (!ImmediatelyFast.config.experimental_screen_batching && packageName.startsWith("screen_batching")) {
-            return false;
-        }
-        if (!ImmediatelyFast.config.experimental_avoid_redundant_framebuffer_switching && packageName.startsWith("avoid_redundant_framebuffer_switching")) {
             return false;
         }
 

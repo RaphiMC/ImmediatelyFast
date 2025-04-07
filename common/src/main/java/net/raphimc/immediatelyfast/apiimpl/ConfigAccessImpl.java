@@ -29,12 +29,12 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "map_atlas_generation" -> ImmediatelyFast.config.map_atlas_generation;
             case "hud_batching" -> ImmediatelyFast.config.hud_batching;
             case "fast_text_lookup" -> ImmediatelyFast.config.fast_text_lookup;
+            case "avoid_redundant_framebuffer_switching" -> ImmediatelyFast.config.avoid_redundant_framebuffer_switching;
             case "dont_add_info_into_debug_hud" -> ImmediatelyFast.config.dont_add_info_into_debug_hud;
             case "experimental_disable_error_checking" -> ImmediatelyFast.config.experimental_disable_error_checking;
             case "experimental_disable_resource_pack_conflict_handling" -> ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling;
             case "experimental_sign_text_buffering" -> ImmediatelyFast.config.experimental_sign_text_buffering;
             case "experimental_screen_batching" -> ImmediatelyFast.config.experimental_screen_batching;
-            case "experimental_avoid_redundant_framebuffer_switching" -> ImmediatelyFast.config.experimental_avoid_redundant_framebuffer_switching;
             case "debug_only_and_not_recommended_disable_universal_batching" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching;
             case "debug_only_and_not_recommended_disable_mod_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling;
             case "debug_only_and_not_recommended_disable_hardware_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling;

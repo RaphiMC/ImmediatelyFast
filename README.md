@@ -116,11 +116,11 @@ ImmediatelyFast has a config file which can be found in the `config` folder of y
 * `map_atlas_generation`: Puts the map textures into a single texture instead of multiple textures. This improves performance when many maps are on screen.
 * `hud_batching`: Improves the performance of the HUD rendering by submitting less draw calls. If you experience issues with HUD elements, try disabling this optimization.
 * `fast_text_lookup`: Caches some data between rendering text characters. This slightly improves performance when rendering a lot of text.
+* `avoid_redundant_framebuffer_switching`: This optimization reduces the number of framebuffer switches when rendering many different things in the world (entities, particles, block entities, ...) or the HUD to increase FPS.
 * `experimental_disable_error_checking`: Disables OpenGL error checking. This may improve performance on certain systems, but can cause hard to debug issues if enabled.
 * `experimental_disable_resource_pack_conflict_handling`: Controls if ImmediatelyFast should scan resource packs for incompatible core shader modifications in oder to disable some conflicting optimizations. This can be disabled to force optimizations even if they may cause graphical issues with certain resource packs.
 * `experimental_sign_text_buffering`: Buffers text on signs instead of re-rendering it every frame. May cause issues with high resolution or custom fonts.
 * `experimental_screen_batching`: Improves the performance of some in-game screens rendering by submitting less draw calls.
-* `experimental_avoid_redundant_framebuffer_switching`: Avoids unneeded framebuffer switching to boost FPS.
 
 ## Developer API
 You can read the API docs [here](docs/API_DOCS.md).

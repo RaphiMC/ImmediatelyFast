@@ -1,5 +1,5 @@
-* Readded NeoForge support
-* Added new experimental optimization: Avoid redundant framebuffer switching
-  * It can be enabled in the config file (`immediatelyfast.json`) by enabling `experimental_avoid_redundant_framebuffer_switching`
-  * This optimization shouldn't cause any issues and will be enabled by default in an upcoming release if no issues are reported
-  * Any feedback regarding rendering issues or performance improvements is appreciated (You can find the discord link in the mod description)
+* Added new optimization: Avoid redundant framebuffer switching
+  * This optimization reduces the number of framebuffer switches when rendering many different things in the world (entities, particles, block entities, ...) or the HUD to increase FPS.
+* Fixed force draw handling (Fixes compatibility with Tweakermore and MiniHUD)
+* Removed experimental universal HUD batching optimization
+  * This optimization was disabled by default, but caused too many graphical issues when enabled, which are difficult to fix for a relatively small performance increase
