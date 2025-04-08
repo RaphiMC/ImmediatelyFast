@@ -18,9 +18,13 @@
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import net.minecraft.client.gl.GlResourceManager;
+import org.lwjgl.opengl.GL30C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GlResourceManager.class)
 public abstract class MixinGlResourceManager {
@@ -28,6 +32,12 @@ public abstract class MixinGlResourceManager {
     @WrapWithCondition(method = "closePass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
     private boolean dontUnbindFramebuffer(int target, int framebuffer) {
         return false;
+    }
+
+    @Inject(method = "presentTexture", at = @At("HEAD"))
+    private void unbindFramebufferBeforePresenting(CallbackInfo ci) {
+        // https://github.com/RaphiMC/ImmediatelyFast/issues/351
+        GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
     }
 
 }
