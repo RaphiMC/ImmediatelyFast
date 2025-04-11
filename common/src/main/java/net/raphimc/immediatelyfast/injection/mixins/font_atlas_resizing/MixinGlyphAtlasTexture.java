@@ -20,8 +20,12 @@ package net.raphimc.immediatelyfast.injection.mixins.font_atlas_resizing;
 import net.minecraft.client.font.GlyphAtlasTexture;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Modifies the size of the glyph atlas texture to 2048x2048.
@@ -32,15 +36,23 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(GlyphAtlasTexture.class)
 public abstract class MixinGlyphAtlasTexture {
 
+    @Unique
+    private boolean immediatelyFast$shouldResizeFontAtlas;
+
+    @Inject(method = "<init>", at = @At("CTOR_HEAD"))
+    private void checkFontAtlasResizing(CallbackInfo ci) {
+        this.immediatelyFast$shouldResizeFontAtlas = ImmediatelyFast.runtimeConfig.font_atlas_resizing;
+    }
+
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
     private int modifyGlyphAtlasTextureSize(int original) {
-        return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048 : 256;
+        return this.immediatelyFast$shouldResizeFontAtlas ? 2048 : 256;
     }
 
     @SuppressWarnings("MixinAnnotationTarget")
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
     private float modifyGlyphAtlasTextureSize(float original) {
-        return ImmediatelyFast.runtimeConfig.font_atlas_resizing ? 2048F : 256F;
+        return this.immediatelyFast$shouldResizeFontAtlas ? 2048F : 256F;
     }
 
 }
