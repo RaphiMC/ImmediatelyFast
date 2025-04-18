@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = RenderSystem.class, remap = false)
 public abstract class MixinRenderSystem {
 
-    @Inject(method = "applyModelViewMatrix", at = @At("HEAD"))
+    @Inject(method = {"applyModelViewMatrix", "backupProjectionMatrix", "restoreProjectionMatrix"}, at = @At("HEAD"))
     private static void checkForModificationWhileBatching(CallbackInfo ci) {
         if (BatchingBuffers.isHudBatching()) {
             // If some mod tries to modify the model view matrix while we are batching, we should end the current batch and start a new one, so that the result is correct.
