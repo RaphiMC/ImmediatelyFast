@@ -1,0 +1,27 @@
+plugins {
+    id "base.exclude-run-folder"
+    id "immediatelyfast.base-conventions"
+    id "immediatelyfast.publishing-conventions"
+    id "base.include-in-jar-configuration"
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+loom {
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+}
+
+configurations {
+    common
+
+    compileClasspath.extendsFrom(common)
+    runtimeClasspath.extendsFrom(common)
+}
+
+dependencies {
+    common(project(path: ":common", configuration: "namedElements")) {
+        transitive = false
+    }
+}
