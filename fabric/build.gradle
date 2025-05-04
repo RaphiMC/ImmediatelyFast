@@ -1,50 +1,34 @@
+plugins {
+    id "immediatelyfast.platform-conventions"
+}
+
 architectury {
-    platformSetupLoomIde()
     fabric()
 }
 
-loom {
-    accessWidenerPath = project(":common").loom.accessWidenerPath
-}
-
 configurations {
-    common
-    shadowCommon
-
-    compileClasspath.extendsFrom common
-    runtimeClasspath.extendsFrom common
-    developmentFabric.extendsFrom common
+    developmentFabric.extendsFrom(common)
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
-    implementation(include("net.lenni0451:Reflect:${rootProject.reflect_version}"))
+    implementation(include("net.lenni0451:Reflect:${project.reflect_version}"))
 
-    common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+    includeInJar(project(path: ":common", configuration: "transformProductionFabric")) {
+        transitive = false
+    }
 }
 
 remapJar {
     injectAccessWidener = true
 }
 
-jar {
-    dependsOn configurations.shadowCommon
-    from {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        configurations.shadowCommon.collect {
-            zipTree(it)
-        }
-    } {
-        exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
-    }
-}
-
 processResources {
-    inputs.property "version", project.version
+    inputs.property("version", project.version)
 
+    def projectVersion = project.version
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand("version": projectVersion)
     }
 }

@@ -1,0 +1,32 @@
+plugins {
+    id "java-library"
+    id "base.base-conventions"
+    id "architectury-plugin"
+    id "dev.architectury.loom"
+    id "me.modmuss50.mod-publish-plugin"
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    //mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.layered() {
+        it.mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+        it.mappings file("../mappings/yarnpatch.tiny")
+    }
+}
+
+publishMods {
+    type = STABLE
+    displayName = rootProject.name + ' ' + project.version.substring(0, project.version.lastIndexOf('+'))
+    changelog = file("../CHANGELOG.md").text
+    dryRun = project.maven_version.contains("SNAPSHOT")
+
+    github {
+        accessToken = providers.gradleProperty("github.immediatelyfast_publishing_token")
+        repository = "RaphiMC/ImmediatelyFast"
+        changelog = "**Changelog**\n" + file("../CHANGELOG.md").text
+        commitish = project.git_branch
+        tagName = 'v' + project.version.substring(0, project.version.lastIndexOf('+'))
+        allowEmptyFiles = true
+    }
+}

@@ -1,0 +1,34 @@
+base {
+    java.toolchain.languageVersion = JavaLanguageVersion.of(project.java_version)
+
+    group = project.maven_group
+    archivesName = project.maven_name
+    version = project.maven_version
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    if (layout.projectDirectory.file("LICENSE").asFile.exists()) {
+        def projectName = project.name
+        from(layout.projectDirectory.file("LICENSE")) {
+            rename { "${it}_${projectName}" }
+        }
+    } else if (rootProject.layout.projectDirectory.file("LICENSE").asFile.exists()) {
+        def projectName = rootProject.name
+        from(rootProject.layout.projectDirectory.file("LICENSE")) {
+            rename { "${it}_${projectName}" }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.addStringOption("Xdoclint:none", "-quiet")
+}
