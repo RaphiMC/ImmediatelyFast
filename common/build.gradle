@@ -1,3 +1,7 @@
+plugins {
+    id "immediatelyfast.base-conventions"
+}
+
 architectury {
     common("fabric")
     common("forge")
@@ -9,14 +13,8 @@ loom {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${rootProject.mixin_extras_version}"))
-    implementation("net.lenni0451:Reflect:${rootProject.reflect_version}")
-}
-
-jar {
-    from("../LICENSE") {
-        rename { "${it}_${rootProject.name}" }
-    }
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
+    implementation("net.lenni0451:Reflect:${project.reflect_version}")
 }

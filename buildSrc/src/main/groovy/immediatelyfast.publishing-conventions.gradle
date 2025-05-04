@@ -1,0 +1,29 @@
+plugins {
+    id "me.modmuss50.mod-publish-plugin"
+}
+
+publishMods {
+    file = remapJar.archiveFile
+    version = project.version + '-' + project.loom.platform.get().id()
+    modLoaders.add(project.loom.platform.get().id())
+    if (project.name == "fabric") {
+        modLoaders.add("quilt")
+    }
+
+    curseforge {
+        accessToken = providers.gradleProperty("curseforge.publishing_token")
+        projectId = "686911"
+        minecraftVersions.addAll(project.supported_minecraft_versions.split(','))
+        javaVersions.add(JavaVersion.toVersion(java.toolchain.getLanguageVersion().get().asInt()))
+        clientRequired = true
+        serverRequired = false
+    }
+    modrinth {
+        accessToken = providers.gradleProperty("modrinth.publishing_token")
+        projectId = "5ZwdcRci"
+        minecraftVersions.addAll(project.supported_minecraft_versions.split(','))
+    }
+    github {
+        parent project(":common").tasks.named("publishGithub")
+    }
+}

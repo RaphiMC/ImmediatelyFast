@@ -1,0 +1,18 @@
+configurations {
+    includeInJar
+
+    implementation.extendsFrom(includeInJar)
+    api.extendsFrom(includeInJar)
+}
+
+jar {
+    dependsOn(configurations.includeInJar)
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.includeInJar.collect {
+            zipTree(it)
+        }
+    } {
+        exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+    }
+}
