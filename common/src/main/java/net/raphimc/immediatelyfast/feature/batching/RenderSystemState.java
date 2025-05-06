@@ -20,14 +20,15 @@ package net.raphimc.immediatelyfast.feature.batching;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 
-public record RenderSystemState(GpuTexture texture0, GpuTexture texture1, GpuTexture texture2, float[] shaderColor) {
+public record RenderSystemState(GpuTexture texture0, GpuTexture texture1, GpuTexture texture2, float[] color, float lineWidth) {
 
     public static RenderSystemState current() {
         return new RenderSystemState(
                 RenderSystem.getShaderTexture(0),
                 RenderSystem.getShaderTexture(1),
                 RenderSystem.getShaderTexture(2),
-                RenderSystem.getShaderColor().clone()
+                RenderSystem.getShaderColor().clone(),
+                RenderSystem.getShaderLineWidth()
         );
     }
 
@@ -35,7 +36,8 @@ public record RenderSystemState(GpuTexture texture0, GpuTexture texture1, GpuTex
         RenderSystem.setShaderTexture(0, this.texture0);
         RenderSystem.setShaderTexture(1, this.texture1);
         RenderSystem.setShaderTexture(2, this.texture2);
-        RenderSystem.setShaderColor(this.shaderColor[0], this.shaderColor[1], this.shaderColor[2], this.shaderColor[3]);
+        RenderSystem.setShaderColor(this.color[0], this.color[1], this.color[2], this.color[3]);
+        RenderSystem.lineWidth(this.lineWidth);
     }
 
 }
