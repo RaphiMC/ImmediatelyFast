@@ -18,14 +18,14 @@
 package net.raphimc.immediatelyfast.injection.mixins.font_atlas_resizing;
 
 import net.minecraft.client.font.GlyphAtlasTexture;
+import net.minecraft.client.font.TextRenderLayerSet;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 /**
  * Modifies the size of the glyph atlas texture to 2048x2048.
@@ -39,9 +39,10 @@ public abstract class MixinGlyphAtlasTexture {
     @Unique
     private boolean immediatelyFast$shouldResizeFontAtlas;
 
-    @Inject(method = "<init>", at = @At("CTOR_HEAD"))
-    private void checkFontAtlasResizing(CallbackInfo ci) {
+    @ModifyVariable(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/AbstractTexture;<init>()V", shift = At.Shift.AFTER), argsOnly = true)
+    private TextRenderLayerSet checkFontAtlasResizing(TextRenderLayerSet value) {
         this.immediatelyFast$shouldResizeFontAtlas = ImmediatelyFast.runtimeConfig.font_atlas_resizing;
+        return value;
     }
 
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
