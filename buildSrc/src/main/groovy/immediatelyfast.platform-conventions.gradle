@@ -5,6 +5,10 @@ plugins {
     id "base.include-in-jar-configuration"
 }
 
+base {
+    archivesName = project.jar_name
+}
+
 architectury {
     platformSetupLoomIde()
 }
