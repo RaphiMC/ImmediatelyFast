@@ -39,7 +39,7 @@ public abstract class MixinGlyphAtlasTexture {
     @Unique
     private boolean immediatelyFast$shouldResizeFontAtlas;
 
-    @Inject(method = "<init>", at = @At("CTOR_HEAD"))
+    @Inject(method = "<init>", at = @At(value = "CTOR_HEAD", unsafe = true))
     private void checkFontAtlasResizing(CallbackInfo ci) {
         this.immediatelyFast$shouldResizeFontAtlas = ImmediatelyFast.runtimeConfig.font_atlas_resizing;
     }
