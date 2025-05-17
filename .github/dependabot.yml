@@ -1,5 +1,8 @@
 version: 2
 registries:
+  maven-central:
+    type: maven-repository
+    url: "https://repo.maven.apache.org/maven2/"
   architectury-maven:
     type: maven-repository
     url: "https://maven.architectury.dev/"
@@ -9,6 +12,28 @@ updates:
     schedule:
       interval: "daily"
     registries:
+      - maven-central
+      - architectury-maven
+  - package-ecosystem: "gradle"
+    directory: "/common/"
+    schedule:
+      interval: "daily"
+    registries:
+      - maven-central
+      - architectury-maven
+  - package-ecosystem: "gradle"
+    directory: "/fabric/"
+    schedule:
+      interval: "daily"
+    registries:
+      - maven-central
+      - architectury-maven
+  - package-ecosystem: "gradle"
+    directory: "/neoforge/"
+    schedule:
+      interval: "daily"
+    registries:
+      - maven-central
       - architectury-maven
   - package-ecosystem: "github-actions"
     directory: "/"
