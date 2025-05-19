@@ -89,6 +89,10 @@ public class ImmediatelyFast {
         Objects.requireNonNull(config, "Config not loaded yet");
         Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
 
+        if (config.fix_slow_buffer_upload_on_apple_gpu && isApple) {
+            runtimeConfig.disable_fast_buffer_upload = true;
+        }
+
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
             PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {
                 ImmediatelyFast.LOGGER.info("Found Iris/Oculus " + version + ". Enabling compatibility.");

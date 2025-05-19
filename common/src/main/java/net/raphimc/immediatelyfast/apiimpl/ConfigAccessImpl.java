@@ -30,6 +30,7 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "hud_batching" -> ImmediatelyFast.config.hud_batching;
             case "fast_text_lookup" -> ImmediatelyFast.config.fast_text_lookup;
             case "avoid_redundant_framebuffer_switching" -> ImmediatelyFast.config.avoid_redundant_framebuffer_switching;
+            case "fix_slow_buffer_upload_on_apple_gpu" -> ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu;
             case "dont_add_info_into_debug_hud" -> ImmediatelyFast.config.dont_add_info_into_debug_hud;
             case "experimental_disable_error_checking" -> ImmediatelyFast.config.experimental_disable_error_checking;
             case "experimental_disable_resource_pack_conflict_handling" -> ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling;

@@ -26,6 +26,7 @@ public class ImmediatelyFastConfig {
     public boolean hud_batching = true;
     public boolean fast_text_lookup = true;
     public boolean avoid_redundant_framebuffer_switching = true;
+    public boolean fix_slow_buffer_upload_on_apple_gpu = true;
 
     // Cosmetic config values
     private String COSMETIC_INFO = "----- Cosmetic only config values below (Does not optimize anything) -----";

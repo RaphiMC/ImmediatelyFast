@@ -64,6 +64,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.avoid_redundant_framebuffer_switching && packageName.startsWith("avoid_redundant_framebuffer_switching")) {
             return false;
         }
+        if (!ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && packageName.startsWith("fix_slow_buffer_upload_on_apple_gpu")) {
+            return false;
+        }
         if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
             return false;
         }
