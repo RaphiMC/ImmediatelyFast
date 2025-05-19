@@ -1,6 +1,6 @@
 plugins {
     id "architectury-plugin" version "3.4.161"
-    id "dev.architectury.loom" version "1.9.426" apply false
+    id "dev.architectury.loom" version "1.10.431" apply false
     id "me.modmuss50.mod-publish-plugin" version "0.8.4" apply false
 }
 
