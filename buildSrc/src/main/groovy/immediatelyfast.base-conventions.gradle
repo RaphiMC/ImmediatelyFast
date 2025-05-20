@@ -6,6 +6,13 @@ plugins {
     id "me.modmuss50.mod-publish-plugin"
 }
 
+loom {
+    mixin {
+        useLegacyMixinAp = true
+        defaultRefmapName = "immediatelyfast-${project.name}.refmap.json"
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     //mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
