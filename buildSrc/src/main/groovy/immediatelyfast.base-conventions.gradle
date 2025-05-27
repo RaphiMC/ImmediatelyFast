@@ -8,8 +8,7 @@ plugins {
 
 loom {
     mixin {
-        useLegacyMixinAp = true
-        defaultRefmapName = "immediatelyfast-${project.name}.refmap.json"
+        useLegacyMixinAp = false
     }
 }
 
