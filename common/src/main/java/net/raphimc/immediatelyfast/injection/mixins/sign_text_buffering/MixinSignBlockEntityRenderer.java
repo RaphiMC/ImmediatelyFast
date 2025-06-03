@@ -84,13 +84,12 @@ public abstract class MixinSignBlockEntityRenderer {
 
             slot = ImmediatelyFast.signTextCache.signAtlasFramebuffer.findSlot(width + padding, height + padding);
             if (slot != null) {
-                final Matrix4f projectionMatrix = new Matrix4f().setOrtho(0F, SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE, 0F, 1000F, 21000F);
+                final Matrix4f projectionMatrix = new Matrix4f().setOrtho(0F, SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE, 0F, -1000F, 1000F);
                 RenderSystem.backupProjectionMatrix();
                 RenderSystem.setProjectionMatrix(projectionMatrix, VertexSorter.BY_Z);
                 final Matrix4fStack modelViewMatrix = RenderSystem.getModelViewStack();
                 modelViewMatrix.pushMatrix();
                 modelViewMatrix.identity();
-                modelViewMatrix.translate(0F, 0F, -11000F);
                 RenderSystem.applyModelViewMatrix();
                 final float fogStart = RenderSystem.getShaderFogStart();
                 BackgroundRenderer.clearFog();
