@@ -17,16 +17,17 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.Fog;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.AbstractSignBlockEntityRenderer;
+import net.minecraft.client.render.fog.FogRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
@@ -84,15 +85,13 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
 
             slot = ImmediatelyFast.signTextCache.signAtlasFramebuffer.findSlot(width + padding, height + padding);
             if (slot != null) {
-                final Matrix4f projectionMatrix = new Matrix4f().setOrtho(0F, SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE, 0F, 1000F, 21000F);
                 RenderSystem.backupProjectionMatrix();
-                RenderSystem.setProjectionMatrix(projectionMatrix, ProjectionType.ORTHOGRAPHIC);
+                RenderSystem.setProjectionMatrix(ImmediatelyFast.signTextCache.signProjectionMatrixBuffer, ProjectionType.ORTHOGRAPHIC);
                 final Matrix4fStack modelViewMatrix = RenderSystem.getModelViewStack();
                 modelViewMatrix.pushMatrix();
                 modelViewMatrix.identity();
-                modelViewMatrix.translate(0F, 0F, -11000F);
-                final Fog fog = RenderSystem.getShaderFog();
-                RenderSystem.setShaderFog(Fog.DUMMY);
+                final GpuBufferSlice fog = RenderSystem.getShaderFog();
+                RenderSystem.setShaderFog(MinecraftClient.getInstance().gameRenderer.fogRenderer.getFogBuffer(FogRenderer.FogType.NONE));
                 final BufferAllocator bufferAllocator = BufferAllocatorPool.borrowBufferAllocator();
                 final int previousFbo = ImmediatelyFast.signTextCache.signAtlasFramebuffer.bind(true);
                 ImmediatelyFast.signTextCache.lockFramebuffer = true;

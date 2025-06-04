@@ -14,13 +14,3 @@ dependencies {
 
 ## Main Class
 The main class is ``net.raphimc.immediatelyfast.ImmediatelyFast``. It holds the currently loaded config, runtime config and the version of the mod.
-
-## Batching
-ImmediatelyFast batches HUD rendering by default. If your mod only renders HUD elements, you don't need to do anything, because ImmediatelyFast will automatically batch your HUD elements.
-
-To manually batch some of your rendering code, you can use the ``BatchingBuffers`` class. Simply wrap your code in ``BatchingBuffers.runBatched`` and it will be batched.
-
-## Old API
-
-### Main API class
-The main API class is ``net.raphimc.immediatelyfastapi.ImmediatelyFastApi``. It contains access to the batching system and the currently loaded config.

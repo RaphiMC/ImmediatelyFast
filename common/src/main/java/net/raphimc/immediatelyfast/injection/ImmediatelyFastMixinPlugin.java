@@ -18,7 +18,6 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -55,9 +54,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.map_atlas_generation && packageName.startsWith("map_atlas_generation")) {
             return false;
         }
-        if (!ImmediatelyFast.config.hud_batching && packageName.startsWith("hud_batching")) {
-            return false;
-        }
         if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
             return false;
         }
@@ -71,13 +67,6 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (!ImmediatelyFast.config.experimental_sign_text_buffering && packageName.startsWith("sign_text_buffering")) {
-            return false;
-        }
-        if (!ImmediatelyFast.config.experimental_screen_batching && packageName.startsWith("screen_batching")) {
-            return false;
-        }
-
-        if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
             return false;
         }
 

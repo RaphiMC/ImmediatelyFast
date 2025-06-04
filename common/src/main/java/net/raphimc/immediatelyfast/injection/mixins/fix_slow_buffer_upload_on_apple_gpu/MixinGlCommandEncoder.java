@@ -18,10 +18,9 @@
 package net.raphimc.immediatelyfast.injection.mixins.fix_slow_buffer_upload_on_apple_gpu;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import net.minecraft.client.gl.GlResourceManager;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import net.minecraft.client.gl.BufferManager;
+import net.minecraft.client.gl.GlCommandEncoder;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,15 +28,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.nio.ByteBuffer;
 
-@Mixin(GlResourceManager.class)
-public abstract class MixinGlResourceManager {
+@Mixin(GlCommandEncoder.class)
+public abstract class MixinGlCommandEncoder {
 
-    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBufferSubData(IILjava/nio/ByteBuffer;)V"))
-    private void fixSlowBufferUploadOnAppleGpu(int target, int offset, ByteBuffer data, @Local(argsOnly = true) GpuBuffer gpuBuffer) {
-        if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0) {
-            GlStateManager._glBufferData(target, data, GlConst.toGl(gpuBuffer.usage()));
+    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/BufferManager;setBufferSubData(IILjava/nio/ByteBuffer;)V"))
+    private void fixSlowBufferUploadOnAppleGpu(BufferManager instance, int buffer, int offset, ByteBuffer data, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
+        if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && instance instanceof BufferManager.DefaultBufferManager) {
+            instance.setBufferData(buffer, data, gpuBufferSlice.buffer().usage());
         } else {
-            GlStateManager._glBufferSubData(target, offset, data);
+            instance.setBufferSubData(buffer, offset, data);
         }
     }
 

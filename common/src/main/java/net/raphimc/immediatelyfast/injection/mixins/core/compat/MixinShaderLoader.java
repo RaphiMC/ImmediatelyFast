@@ -48,8 +48,6 @@ public abstract class MixinShaderLoader {
         }
 
         ResourcePack resourcePackWhichBreaksFontAtlasResizing = null;
-        ResourcePack resourcePackWhichBreaksHudBatching = null;
-        ResourcePack resourcePackWhichBreaksScreenBatching = null;
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
@@ -72,12 +70,6 @@ public abstract class MixinShaderLoader {
                 if (!metadata.compatibleFeatures().contains("font_atlas_resizing")) {
                     resourcePackWhichBreaksFontAtlasResizing = resourcePack;
                 }
-                if (!metadata.compatibleFeatures().contains("hud_batching")) {
-                    resourcePackWhichBreaksHudBatching = resourcePack;
-                }
-                if (!metadata.compatibleFeatures().contains("experimental_screen_batching")) {
-                    resourcePackWhichBreaksScreenBatching = resourcePack;
-                }
             }
         } catch (IOException e) {
             ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
@@ -92,18 +84,6 @@ public abstract class MixinShaderLoader {
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
                 this.immediatelyFast$reloadFontStorages();
             }
-        }
-        if (ImmediatelyFast.runtimeConfig.hud_batching && resourcePackWhichBreaksHudBatching != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksHudBatching.getId() + " is not compatible with HUD batching. Temporarily disabling HUD batching.");
-            ImmediatelyFast.runtimeConfig.hud_batching = false;
-        } else {
-            ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
-        }
-        if (ImmediatelyFast.runtimeConfig.experimental_screen_batching && resourcePackWhichBreaksScreenBatching != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksScreenBatching.getId() + " is not compatible with experimental screen batching. Temporarily disabling experimental screen batching.");
-            ImmediatelyFast.runtimeConfig.experimental_screen_batching = false;
-        } else {
-            ImmediatelyFast.runtimeConfig.experimental_screen_batching = ImmediatelyFast.config.experimental_screen_batching;
         }
     }
 

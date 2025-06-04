@@ -47,7 +47,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
     public int bind(final boolean setViewport) {
         final int previousFramebuffer = GL11C.glGetInteger(GL30C.GL_FRAMEBUFFER_BINDING);
-        final int fbo = ((GlTexture) SignAtlasFramebuffer.this.colorAttachment).getOrCreateFramebuffer(((GlBackend) RenderSystem.getDevice()).getFramebufferManager(), null);
+        final int fbo = ((GlTexture) SignAtlasFramebuffer.this.colorAttachment).getOrCreateFramebuffer(((GlBackend) RenderSystem.getDevice()).getBufferManager(), null);
         GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, fbo);
         if (setViewport) {
             GL11C.glViewport(0, 0, ATLAS_SIZE, ATLAS_SIZE);
@@ -173,6 +173,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
         private FboTexture() {
             this.glTexture = SignAtlasFramebuffer.this.colorAttachment;
+            this.glTextureView = RenderSystem.getDevice().createTextureView(this.glTexture);
         }
 
         @Override

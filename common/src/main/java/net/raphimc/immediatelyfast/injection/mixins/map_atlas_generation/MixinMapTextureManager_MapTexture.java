@@ -120,7 +120,7 @@ public abstract class MixinMapTextureManager_MapTexture {
                     atlasImage.setColorArgb(this.immediatelyFast$atlasX + x, this.immediatelyFast$atlasY + y, MapColor.getRenderColor(this.state.colors[i]));
                 }
             }
-            RenderSystem.getDevice().createCommandEncoder().writeToTexture(atlasTexture.getGlTexture(), atlasImage, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
+            RenderSystem.getDevice().createCommandEncoder().writeToTexture(atlasTexture.getGlTexture(), atlasImage, 0, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
             this.needsUpdate = false;
         }
     }

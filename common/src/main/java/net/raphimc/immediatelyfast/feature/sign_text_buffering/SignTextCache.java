@@ -20,7 +20,9 @@ package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.block.entity.SignText;
+import net.minecraft.client.render.ProjectionMatrix2;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.SynchronousResourceReloader;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 public class SignTextCache implements SynchronousResourceReloader {
 
     public final SignAtlasFramebuffer signAtlasFramebuffer = new SignAtlasFramebuffer();
+    public final ProjectionMatrix2 signProjectionMatrix = new ProjectionMatrix2("immediatelyfast:signs", -1000F, 1000F, true);
+    public final GpuBufferSlice signProjectionMatrixBuffer = this.signProjectionMatrix.set(SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE);
     public final Cache<SignText, SignAtlasFramebuffer.Slot> slotCache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .removalListener(notification -> {

@@ -21,12 +21,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.raphimc.immediatelyfast.apiimpl.ApiAccessImpl;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
-import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,13 +51,7 @@ public class ImmediatelyFast {
 
         ImmediatelyFast.loadConfig();
 
-        if (config.experimental_screen_batching && !config.hud_batching) {
-            LOGGER.warn("Screen Batching is enabled but HUD Batching is disabled. Disabling Screen Batching.");
-            config.experimental_screen_batching = false;
-        }
-
         ImmediatelyFast.createRuntimeConfig();
-        ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
         VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
         PlatformCode.checkModCompatibility();

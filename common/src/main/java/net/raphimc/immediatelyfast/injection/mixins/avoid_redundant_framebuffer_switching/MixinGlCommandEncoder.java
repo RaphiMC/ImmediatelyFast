@@ -15,25 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
+package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.raphimc.immediatelyfast.feature.batching.BatchingBuffers;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.mojang.blaze3d.opengl.GlStateManager;
+import net.minecraft.client.gl.GlCommandEncoder;
+import org.lwjgl.opengl.GL30C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(VertexFormat.class)
-public abstract class MixinVertexFormat {
+@Mixin(GlCommandEncoder.class)
+public abstract class MixinGlCommandEncoder {
 
-    @Inject(method = "uploadImmediateVertexBuffer", at = @At("HEAD"))
-    private void checkForDrawCallWhileBatching(CallbackInfoReturnable<GpuBuffer> cir) {
-        if (BatchingBuffers.isHudBatching()) {
-            // If some mod tries to directly draw something while we are batching, we should end the current batch and start a new one, so that the draw order is correct.
-            BatchingBuffers.tryForceDrawHudBuffers();
-        }
+    @WrapWithCondition(method = "closePass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
+    private boolean dontUnbindFramebuffer(int target, int framebuffer) {
+        return false;
+    }
+
+    @Inject(method = "presentTexture", at = @At("HEAD"))
+    private void unbindFramebufferBeforePresenting(CallbackInfo ci) {
+        // https://github.com/RaphiMC/ImmediatelyFast/issues/351
+        GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
     }
 
 }

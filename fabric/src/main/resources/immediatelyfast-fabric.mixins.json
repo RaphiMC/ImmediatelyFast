@@ -5,8 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "hud_batching.compat.appleskin.MixinAppleSkin_HUDOverlayHandler",
-    "screen_batching.MixinGameRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
