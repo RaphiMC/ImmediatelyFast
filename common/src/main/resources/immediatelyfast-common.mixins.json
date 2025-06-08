@@ -27,6 +27,7 @@
     "hud_batching.compat.MixinBufferRenderer",
     "hud_batching.compat.MixinDebugHud",
     "hud_batching.compat.MixinDrawContext",
+    "hud_batching.compat.MixinRenderSystem",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderState",
     "map_atlas_generation.MixinMapTextureManager",
