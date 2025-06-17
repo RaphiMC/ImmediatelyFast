@@ -25,4 +25,4 @@ rootProject.name = "ImmediatelyFast"
 
 include(":common")
 include(":fabric")
-//include(":neoforge")
+include(":neoforge")
