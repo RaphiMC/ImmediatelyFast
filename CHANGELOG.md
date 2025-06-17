@@ -1,1 +1,1 @@
-* Fixed crash when Hey Wiki mod is installed
+* Added support for Minecraft 1.21.6
