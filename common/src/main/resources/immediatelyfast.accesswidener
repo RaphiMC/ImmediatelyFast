@@ -21,4 +21,3 @@ accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate la
 accessible field net/minecraft/client/render/GameRenderer fogRenderer Lnet/minecraft/client/render/fog/FogRenderer;
 accessible method net/minecraft/client/gl/BufferManager setBufferSubData (IILjava/nio/ByteBuffer;)V
 accessible method net/minecraft/client/gl/BufferManager setBufferData (ILjava/nio/ByteBuffer;I)V
-accessible class net/minecraft/client/gl/BufferManager$DefaultBufferManager

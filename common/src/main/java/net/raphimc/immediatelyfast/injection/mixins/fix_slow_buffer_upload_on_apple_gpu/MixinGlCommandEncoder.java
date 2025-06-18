@@ -33,7 +33,7 @@ public abstract class MixinGlCommandEncoder {
 
     @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/BufferManager;setBufferSubData(IILjava/nio/ByteBuffer;)V"))
     private void fixSlowBufferUploadOnAppleGpu(BufferManager instance, int buffer, int offset, ByteBuffer data, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
-        if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && instance instanceof BufferManager.DefaultBufferManager) {
+        if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && gpuBufferSlice.length() == gpuBufferSlice.buffer().size()) {
             instance.setBufferData(buffer, data, gpuBufferSlice.buffer().usage());
         } else {
             instance.setBufferSubData(buffer, offset, data);

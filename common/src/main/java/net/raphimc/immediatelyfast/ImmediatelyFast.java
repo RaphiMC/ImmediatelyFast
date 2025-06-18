@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
@@ -81,7 +82,7 @@ public class ImmediatelyFast {
         Objects.requireNonNull(config, "Config not loaded yet");
         Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
 
-        if (config.fix_slow_buffer_upload_on_apple_gpu && isApple) {
+        if (config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
             runtimeConfig.disable_fast_buffer_upload = true;
         }
 
