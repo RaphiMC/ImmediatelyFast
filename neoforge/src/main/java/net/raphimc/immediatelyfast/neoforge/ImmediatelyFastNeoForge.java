@@ -26,7 +26,7 @@ import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 @Mod("immediatelyfast")
-@EventBusSubscriber(modid = "immediatelyfast", bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = "immediatelyfast")
 public class ImmediatelyFastNeoForge {
 
     private static final Identifier SIGN_TEXT_CACHE_RELOAD_LISTENER_ID = Identifier.of("immediatelyfast", "sign_text_cache_reload_listener");
