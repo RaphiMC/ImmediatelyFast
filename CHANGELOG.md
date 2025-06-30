@@ -1,1 +1,1 @@
-* Fixed item lighting issue when using macOS
+* Added support for Minecraft 1.21.7
