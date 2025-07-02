@@ -208,6 +208,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                         return 1;
                     }
                 } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
+                    return 2;
+                } else if (layer.name.startsWith("armor")) {
                     return 1;
                 } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text")) {
                     // Draws vanilla text over custom font layers
