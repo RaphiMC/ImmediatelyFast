@@ -198,33 +198,35 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
     protected int getLayerOrder(final RenderLayer layer) {
         if (layer == null) return Integer.MAX_VALUE;
+
+        int order = 0;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
             if (textureId != null) {
                 if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
                     if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
-                        return 2;
+                        order = 2;
                     } else {
-                        return 1;
+                        order = 1;
                     }
                 } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
-                    return 1;
+                    order = 1;
                 } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text") || layer.name.startsWith("forge_text")) {
                     // Draws vanilla text over custom font layers
                     // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
                     if (textureId.getNamespace().equals("minecraft")) {
-                        return 2;
+                        order = 2;
                     } else {
-                        return 1;
+                        order = 1;
                     }
                 }
             }
         }
 
         if (!layer.isTranslucent()) {
-            return Integer.MIN_VALUE;
+            return order;
         } else {
-            return Integer.MAX_VALUE - 1;
+            return 100_000_000 + order;
         }
     }
 
