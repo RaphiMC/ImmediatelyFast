@@ -1,3 +1,5 @@
-* Fixed shader color mixing calculation
-* Removed experimental universal HUD batching optimization
-  * This optimization was disabled by default, but caused too many graphical issues when enabled, which are difficult to fix for a relatively small performance increase
+* Fixed font atlas resizing state inconsistency (Fixes rare JVM crash)
+* Draw current batch when mods modify the projection matrix (Fixes rendering issue with VoxelMap)
+* Improved compatibility with mods which don't render into the batching buffer while batching
+* Fixed Cataclysm Phantom Halberds render order
+* Fixed some overlays not rendering correctly
