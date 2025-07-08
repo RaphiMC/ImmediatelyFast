@@ -1,3 +1,4 @@
-* Made horse armor layering fix compatible with modded horse armor
-* Added mechanism to allow resource packs with modified core shaders to declare compatible features
-* Changed the versioning of ImmediatelyFast. The minor version is now incremented with every Minecraft update. The patch version is incremented with every ImmediatelyFast release. This aims to group all releases for a specific Minecraft version together. It also allows for more frequent releases because I can do a release for a single Minecraft version instead having to accumulate enough changes to justify a release for all supported versions.
+* Clamp out of bounds shader color (Fixes Dragon Survival "Magic Cast Meter" rendering)
+* Fixed font atlas resizing state inconsistency (Fixes rare JVM crash)
+* Improved compatibility with mods which don't render into the batching buffer while batching
+* Fixed Cataclysm Phantom Halberds render order
