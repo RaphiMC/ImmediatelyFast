@@ -86,11 +86,19 @@ public abstract class MixinDrawContext {
             final int g = MathHelper.clamp((int) (shaderColor[1] * 255), 0, 255);
             final int b = MathHelper.clamp((int) (shaderColor[2] * 255), 0, 255);
             final int a = MathHelper.clamp((int) (shaderColor[3] * 255), 0, 255);
-            final VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
-            vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a);
-            vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a);
-            vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a);
-            vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a);
+            if (r == 255 && g == 255 && b == 255 && a == 255) {
+                final VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(BatchingRenderLayers.TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
+                vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2);
+                vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2);
+                vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1);
+                vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1);
+            } else {
+                final VertexConsumer vertexConsumer = this.vertexConsumers.getBuffer(BatchingRenderLayers.COLORED_TEXTURE.apply(this.client.getTextureManager().getTexture(texture).getGlId(), BlendFuncDepthFuncState.current()));
+                vertexConsumer.vertex(matrix, x1, y2, z).texture(u1, v2).color(r, g, b, a);
+                vertexConsumer.vertex(matrix, x2, y2, z).texture(u2, v2).color(r, g, b, a);
+                vertexConsumer.vertex(matrix, x2, y1, z).texture(u2, v1).color(r, g, b, a);
+                vertexConsumer.vertex(matrix, x1, y1, z).texture(u1, v1).color(r, g, b, a);
+            }
         }
     }
 
