@@ -20,6 +20,7 @@
     "fast_text_lookup.MixinTextRenderer_GlyphDrawer",
     "fix_slow_buffer_upload_on_apple_gpu.MixinGlCommandEncoder",
     "font_atlas_resizing.MixinGlyphAtlasTexture",
+    "map_atlas_generation.MixinDrawContext",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderState",
     "map_atlas_generation.MixinMapTextureManager",
