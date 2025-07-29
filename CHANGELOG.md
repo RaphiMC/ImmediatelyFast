@@ -1,1 +1,1 @@
-* Added support for Minecraft 1.21.8
+* Fixed cartography table map rendering
