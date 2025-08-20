@@ -17,6 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.batching;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.RenderLayer;
 
 public class GuiOverlayFirstBatchingBuffer extends BatchingBuffer {
@@ -24,7 +25,9 @@ public class GuiOverlayFirstBatchingBuffer extends BatchingBuffer {
     @Override
     public void draw() {
         this.drawFallbackLayersFirst = false;
+        RenderSystem.disableDepthTest(); // Hack fix for https://github.com/RaphiMC/ImmediatelyFast/issues/407
         this.draw(RenderLayer.getGuiOverlay());
+        RenderSystem.enableDepthTest();
         super.draw();
     }
 
