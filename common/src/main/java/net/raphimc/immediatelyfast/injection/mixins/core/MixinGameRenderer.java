@@ -40,6 +40,7 @@ public abstract class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;draw()V", shift = At.Shift.AFTER))
     private void drawDataFromModsWhichRenderIntoTheWrongBuffer(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().draw();
+        MinecraftClient.getInstance().getBufferBuilders().getOutlineVertexConsumers().draw();
     }
 
 }
