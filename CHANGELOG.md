@@ -1,2 +1,1 @@
-* Draw current batch when mods modify the projection matrix
-* Ensure render layers are ordered even when transparent (Fixes rendering issue with Shoulder Surfing Reloaded)
+* Fixed crash when rendering outlined entities with a certain combination of mods.
