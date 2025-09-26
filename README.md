@@ -125,6 +125,12 @@ ImmediatelyFast has a config file which can be found in the `config` folder of y
 You can read the API docs [here](docs/API_DOCS.md).
 
 ## Partners
+Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals visit **[kinetichosting.com](https://billing.kinetichosting.com/aff.php?aff=47)**.
+
+![Kinetic Hosting](https://i.imgur.com/FVJYxAV.png)
+
+---
+
 YourKit supports open source projects with innovative and intelligent tools
 for monitoring and profiling Java and .NET applications.
 YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/),
@@ -132,12 +138,6 @@ YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/p
 and [YourKit YouMonitor](https://www.yourkit.com/youmonitor/).
 
 [![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com)
-
----
-
-Kinetic Hosting offers extremely affordable deals on servers with very good hardware! If you'd like to cash in on the good deals click **[here](https://billing.kinetichosting.net/aff.php?aff=47)** or use code **RaphiMC** at checkout for 25% off your first month!
-
-![Kinetic Hosting](https://i.imgur.com/EiNcW82.png)
 
 ---
 
