@@ -30,7 +30,7 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
     private String mixinPackage;
 
     @Override
-    public void onLoad(String mixinPackage) {
+    public void onLoad(final String mixinPackage) {
         this.mixinPackage = mixinPackage + ".";
 
         ImmediatelyFast.earlyInit();
@@ -42,16 +42,22 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+    public boolean shouldApplyMixin(final String targetClassName, final String mixinClassName) {
         if (!mixinClassName.startsWith(this.mixinPackage)) return false;
 
         final String mixinName = mixinClassName.substring(this.mixinPackage.length());
         final String packageName = mixinName.substring(0, mixinName.lastIndexOf('.'));
 
+        if (!ImmediatelyFast.config.enhanced_batching && packageName.startsWith("enhanced_batching")) {
+            return false;
+        }
         if (!ImmediatelyFast.config.font_atlas_resizing && packageName.startsWith("font_atlas_resizing")) {
             return false;
         }
         if (!ImmediatelyFast.config.map_atlas_generation && packageName.startsWith("map_atlas_generation")) {
+            return false;
+        }
+        if (!ImmediatelyFast.config.skip_text_translucency_sorting && packageName.startsWith("skip_text_translucency_sorting")) {
             return false;
         }
         if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
@@ -63,10 +69,13 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && packageName.startsWith("fix_slow_buffer_upload_on_apple_gpu")) {
             return false;
         }
-        if (!ImmediatelyFast.config.experimental_disable_error_checking && packageName.startsWith("disable_error_checking")) {
+        if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling && packageName.startsWith("resource_pack_conflict_handling")) {
             return false;
         }
         if (!ImmediatelyFast.config.experimental_sign_text_buffering && packageName.startsWith("sign_text_buffering")) {
+            return false;
+        }
+        if (!ImmediatelyFast.config.debug_only_print_additional_error_information && packageName.startsWith("print_additional_error_information")) {
             return false;
         }
 
@@ -74,7 +83,7 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
+    public void acceptTargets(final Set<String> myTargets, final Set<String> otherTargets) {
     }
 
     @Override
@@ -83,11 +92,11 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
     }
 
     @Override
-    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    public void preApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) {
     }
 
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    public void postApply(final String targetClassName, final ClassNode targetClass, final String mixinClassName, final IMixinInfo mixinInfo) {
     }
 
 }

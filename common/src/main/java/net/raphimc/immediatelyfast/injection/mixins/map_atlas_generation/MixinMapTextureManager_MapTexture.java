@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(value = MapTextureManager.MapTexture.class, priority = 1100) // Workaround for Porting-Lib which relies on the LVT to be intact
+@Mixin(MapTextureManager.MapTexture.class)
 public abstract class MixinMapTextureManager_MapTexture {
 
     @Shadow
@@ -98,7 +98,7 @@ public abstract class MixinMapTextureManager_MapTexture {
     private void getAtlasTextureIdentifier(TextureManager instance, Identifier id, AbstractTexture texture) {
         if (this.immediatelyFast$atlasTexture != null) {
             this.texture = null; // Don't leave the texture field pointing to the uninitialized dummy texture
-            this.textureId = this.immediatelyFast$atlasTexture.getIdentifier();
+            this.textureId = this.immediatelyFast$atlasTexture.getTextureId();
         } else {
             instance.registerTexture(id, texture);
         }

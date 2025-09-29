@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.compat;
+package net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling;
 
 import com.mojang.blaze3d.shaders.ShaderType;
 import net.minecraft.client.MinecraftClient;

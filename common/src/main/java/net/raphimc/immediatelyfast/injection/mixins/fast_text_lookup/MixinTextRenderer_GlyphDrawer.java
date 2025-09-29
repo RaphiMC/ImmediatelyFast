@@ -17,7 +17,6 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
-import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -35,18 +34,15 @@ public abstract class MixinTextRenderer_GlyphDrawer {
     @Unique
     private VertexConsumer immediatelyFast$lastVertexConsumer;
 
-    @SuppressWarnings("UnresolvedMixinReference")
-    @Redirect(method = {"drawGlyph", "drawRectangle"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
+    @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
-        // The buffer got drawn while rendering the text, so we need to reset the cached data
-        final boolean isBufferInvalid = this.immediatelyFast$lastVertexConsumer instanceof BufferBuilder bufferBuilder && !bufferBuilder.building;
-
-        if (!isBufferInvalid && this.immediatelyFast$lastRenderLayer == renderLayer) {
+        if (this.immediatelyFast$lastRenderLayer == renderLayer) {
             return this.immediatelyFast$lastVertexConsumer;
         }
 
         this.immediatelyFast$lastRenderLayer = renderLayer;
-        return this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderLayer);
+        this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderLayer);
+        return this.immediatelyFast$lastVertexConsumer;
     }
 
 }

@@ -22,10 +22,11 @@ import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.raphimc.immediatelyfast.compat.IrisCompat;
+import net.minecraft.util.math.MathHelper;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
+import net.raphimc.immediatelyfast.util.IrisCompat;
 import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +49,9 @@ public class ImmediatelyFast {
     public static SignTextCache signTextCache;
 
     public static void earlyInit() {
-        if (config != null) return;
-
+        if (ImmediatelyFast.config != null) return;
         ImmediatelyFast.loadConfig();
-
         ImmediatelyFast.createRuntimeConfig();
-
         VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
         PlatformCode.checkModCompatibility();
 
@@ -79,11 +77,11 @@ public class ImmediatelyFast {
             isApple = gpuVendorLower.startsWith("apple");
         }
 
-        Objects.requireNonNull(config, "Config not loaded yet");
-        Objects.requireNonNull(runtimeConfig, "Runtime config not created yet");
+        Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
+        Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
-            runtimeConfig.disable_fast_buffer_upload = true;
+        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
+            ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
         }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
@@ -95,17 +93,17 @@ public class ImmediatelyFast {
     }
 
     public static void lateInit() {
-        if (config.experimental_sign_text_buffering) {
-            signTextCache = new SignTextCache();
-            if (!PlatformCode.getModVersion("neoforge").isPresent()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
-                ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(signTextCache);
+        if (ImmediatelyFast.config.experimental_sign_text_buffering) {
+            ImmediatelyFast.signTextCache = new SignTextCache();
+            if (PlatformCode.getModVersion("neoforge").isEmpty()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
+                ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(ImmediatelyFast.signTextCache);
             }
         }
     }
 
     public static void onWorldJoin() {
-        if (signTextCache != null) {
-            signTextCache.clearCache();
+        if (ImmediatelyFast.signTextCache != null) {
+            ImmediatelyFast.signTextCache.clearCache();
         }
     }
 
@@ -113,23 +111,32 @@ public class ImmediatelyFast {
         final File configFile = PlatformCode.getConfigDirectory().resolve("immediatelyfast.json").toFile();
         if (configFile.exists()) {
             try {
-                config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+                ImmediatelyFast.config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
             } catch (Throwable e) {
                 LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
             }
         }
-        if (config == null) {
-            config = new ImmediatelyFastConfig();
+        if (ImmediatelyFast.config == null) {
+            ImmediatelyFast.config = new ImmediatelyFastConfig();
         }
         try {
-            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(config));
+            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
+        }
+
+        if (!MathHelper.isPowerOfTwo(ImmediatelyFast.config.font_atlas_size)) {
+            LOGGER.warn("Font atlas size " + ImmediatelyFast.config.font_atlas_size + " is not a power of two! Rounding up to the next power of two.");
+            ImmediatelyFast.config.font_atlas_size = MathHelper.smallestEncompassingPowerOfTwo(ImmediatelyFast.config.font_atlas_size);
+        }
+        if (!MathHelper.isPowerOfTwo(ImmediatelyFast.config.map_atlas_size)) {
+            LOGGER.warn("Map atlas size " + ImmediatelyFast.config.map_atlas_size + " is not a power of two! Rounding up to the next power of two.");
+            ImmediatelyFast.config.map_atlas_size = MathHelper.smallestEncompassingPowerOfTwo(ImmediatelyFast.config.map_atlas_size);
         }
     }
 
     public static void createRuntimeConfig() {
-        runtimeConfig = new ImmediatelyFastRuntimeConfig(config);
+        ImmediatelyFast.runtimeConfig = new ImmediatelyFastRuntimeConfig(ImmediatelyFast.config);
     }
 
     private static Unsafe getUnsafe() {

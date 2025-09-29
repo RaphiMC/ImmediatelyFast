@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.core.compat;
+package net.raphimc.immediatelyfast.injection.mixins.resource_pack_conflict_handling;
 
 import com.mojang.blaze3d.shaders.ShaderType;
 import net.minecraft.client.MinecraftClient;
@@ -26,8 +26,8 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
+import net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling.CoreShaderBlacklist;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,10 +43,6 @@ public abstract class MixinShaderLoader {
 
     @Inject(method = "apply(Lnet/minecraft/client/gl/ShaderLoader$Definitions;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
     private void checkForCoreShaderModifications(ShaderLoader.Definitions definitions, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
-        if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling) {
-            return;
-        }
-
         ResourcePack resourcePackWhichBreaksFontAtlasResizing = null;
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();

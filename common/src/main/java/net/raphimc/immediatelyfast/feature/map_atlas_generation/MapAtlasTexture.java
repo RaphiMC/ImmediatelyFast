@@ -20,24 +20,24 @@ package net.raphimc.immediatelyfast.feature.map_atlas_generation;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 public class MapAtlasTexture implements AutoCloseable {
 
-    public static final int ATLAS_SIZE = 4096;
+    public static final int ATLAS_SIZE = ImmediatelyFast.config.map_atlas_size;
     public static final int MAP_SIZE = 128;
     public static final int MAPS_PER_ATLAS = (ATLAS_SIZE / MAP_SIZE) * (ATLAS_SIZE / MAP_SIZE);
 
     private final int id;
-    private final Identifier identifier;
+    private final Identifier textureId;
     private final NativeImageBackedTexture texture;
     private int mapCount;
 
     public MapAtlasTexture(final int id) {
         this.id = id;
-
-        this.identifier = Identifier.of("immediatelyfast", "map_atlas/" + id);
+        this.textureId = Identifier.of("immediatelyfast", "map_atlas/" + id);
         this.texture = new NativeImageBackedTexture("ImmediatelyFast Map Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
-        MinecraftClient.getInstance().getTextureManager().registerTexture(this.identifier, this.texture);
+        MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, this.texture);
     }
 
     public int getNextMapLocation() {
@@ -56,18 +56,21 @@ public class MapAtlasTexture implements AutoCloseable {
         return this.id;
     }
 
-    public Identifier getIdentifier() {
-        return this.identifier;
+    public Identifier getTextureId() {
+        return this.textureId;
     }
 
     public NativeImageBackedTexture getTexture() {
         return this.texture;
     }
 
+    public int getMapCount() {
+        return this.mapCount;
+    }
+
     @Override
     public void close() {
-        this.texture.close();
-        MinecraftClient.getInstance().getTextureManager().destroyTexture(this.identifier);
+        MinecraftClient.getInstance().getTextureManager().destroyTexture(this.textureId);
     }
 
 }

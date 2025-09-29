@@ -28,9 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderSystem.class)
 public abstract class MixinRenderSystem {
 
+    // https://github.com/RaphiMC/ImmediatelyFast/issues/350
     @Inject(method = "flipFrame", at = @At("HEAD"))
     private static void unbindFramebufferBeforeSwappingBuffers(CallbackInfo ci) {
-        // https://github.com/RaphiMC/ImmediatelyFast/issues/350
         GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
     }
 

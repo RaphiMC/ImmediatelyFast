@@ -31,12 +31,12 @@ import java.nio.ByteBuffer;
 @Mixin(GlCommandEncoder.class)
 public abstract class MixinGlCommandEncoder {
 
-    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/BufferManager;setBufferSubData(IILjava/nio/ByteBuffer;)V"))
-    private void fixSlowBufferUploadOnAppleGpu(BufferManager instance, int buffer, int offset, ByteBuffer data, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
+    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/BufferManager;setBufferSubData(IILjava/nio/ByteBuffer;I)V"))
+    private void fixSlowBufferUploadOnAppleGpu(BufferManager instance, int buffer, int offset, ByteBuffer data, int usage, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
         if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && gpuBufferSlice.length() == gpuBufferSlice.buffer().size()) {
-            instance.setBufferData(buffer, data, gpuBufferSlice.buffer().usage());
+            instance.setBufferData(buffer, data, usage);
         } else {
-            instance.setBufferSubData(buffer, offset, data);
+            instance.setBufferSubData(buffer, offset, data, usage);
         }
     }
 

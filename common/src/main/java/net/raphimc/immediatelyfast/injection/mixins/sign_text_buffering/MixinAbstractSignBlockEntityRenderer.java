@@ -24,21 +24,22 @@ import net.minecraft.block.entity.SignText;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.AbstractSignBlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.SignBlockEntityRenderState;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.render.fog.FogRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.OrderedText;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.NoTextTransformMatrixStack;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignAtlasFramebuffer;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
-import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,7 +60,7 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
     private TextRenderer textRenderer;
 
     @Shadow
-    protected abstract void renderText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front);
+    protected abstract void renderText(SignBlockEntityRenderState renderState, MatrixStack matrices, OrderedRenderCommandQueue queue, boolean front);
 
     @Shadow
     protected abstract void applyTextTransforms(MatrixStack matrices, boolean front, Vec3d textOffset);
@@ -68,17 +69,18 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
     protected abstract Vec3d getTextOffset();
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
-    private void renderBufferedSignText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front, CallbackInfo ci) {
+    private void renderBufferedSignText(SignBlockEntityRenderState renderState, MatrixStack matrices, OrderedRenderCommandQueue queue, boolean front, CallbackInfo ci) {
         if (matrices instanceof NoTextTransformMatrixStack) return;
-        final ISignText iSignText = (ISignText) signText;
-        if (!iSignText.immediatelyFast$shouldCache()) return;
+        final SignText signText = front ? renderState.frontText : renderState.backText;
+        if (!(signText instanceof ISignText mixinSignText)) return;
+        if (!mixinSignText.immediatelyFast$shouldCache()) return;
 
         SignAtlasFramebuffer.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
-            final int width = this.immediatelyFast$getTextWidth(signText, lineWidth);
-            final int height = 4 * lineHeight;
+            final int width = this.immediatelyFast$getTextWidth(signText, renderState.filterText, renderState.maxTextWidth);
+            final int height = 4 * renderState.textLineHeight;
             if (width <= 0 || height <= 0) {
-                iSignText.immediatelyFast$setShouldCache(false);
+                mixinSignText.immediatelyFast$setShouldCache(false);
                 return;
             }
             final int padding = signText.isGlowing() ? 2 : 0;
@@ -99,11 +101,15 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
 
                 try {
                     final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(bufferAllocator);
+                    final OrderedRenderCommandQueueImpl orderedRenderCommandQueue = new OrderedRenderCommandQueueImpl();
+                    final RenderDispatcher renderDispatcher = new RenderDispatcher(orderedRenderCommandQueue, MinecraftClient.getInstance().getBlockRenderManager(), immediate, MinecraftClient.getInstance().getAtlasManager(), null, null, this.textRenderer);
                     final MatrixStack matrixStack = new NoTextTransformMatrixStack();
                     matrixStack.translate(slot.x, slot.y, 0F);
                     matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
-                    this.renderText(MinecraftClient.getInstance().cameraEntity.getBlockPos(), signText, matrixStack, immediate, light, lineHeight, lineWidth, front);
+                    this.renderText(renderState, matrixStack, orderedRenderCommandQueue, front);
+                    renderDispatcher.render();
                     immediate.draw();
+                    renderDispatcher.close();
                 } finally {
                     ImmediatelyFast.signTextCache.lockViewport = false;
                     ImmediatelyFast.signTextCache.lockFramebuffer = false;
@@ -117,7 +123,7 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
                 ImmediatelyFast.signTextCache.slotCache.put(signText, slot);
             } else {
                 ImmediatelyFast.LOGGER.warn("Failed to find a free slot for sign text (" + ImmediatelyFast.signTextCache.slotCache.size() + " sign texts in atlas). Falling back to immediate mode rendering.");
-                iSignText.immediatelyFast$setShouldCache(false);
+                mixinSignText.immediatelyFast$setShouldCache(false);
                 return;
             }
         }
@@ -126,20 +132,18 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
         float u2 = ((float) slot.x + (float) slot.width) / SignAtlasFramebuffer.ATLAS_SIZE;
         float v1 = 1F - ((float) slot.y) / SignAtlasFramebuffer.ATLAS_SIZE;
         float v2 = 1F - ((float) slot.y + (float) slot.height) / SignAtlasFramebuffer.ATLAS_SIZE;
-
-        if (signText.isGlowing()) {
-            light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
-        }
+        final int light = signText.isGlowing() ? LightmapTextureManager.MAX_LIGHT_COORDINATE : renderState.lightmapCoordinates;
 
         matrices.push();
         this.applyTextTransforms(matrices, front, this.getTextOffset());
         matrices.translate(-slot.width / 2F, -slot.height / 2F, 0F);
-        final Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        final VertexConsumer vertexConsumer = vertexConsumers.getBuffer(ImmediatelyFast.signTextCache.renderLayer);
-        vertexConsumer.vertex(matrix4f, 0F, slot.height, 0F).color(255, 255, 255, 255).texture(u1, v2).light(light);
-        vertexConsumer.vertex(matrix4f, slot.width, slot.height, 0F).color(255, 255, 255, 255).texture(u2, v2).light(light);
-        vertexConsumer.vertex(matrix4f, slot.width, 0F, 0F).color(255, 255, 255, 255).texture(u2, v1).light(light);
-        vertexConsumer.vertex(matrix4f, 0F, 0F, 0F).color(255, 255, 255, 255).texture(u1, v1).light(light);
+        final SignAtlasFramebuffer.Slot finalSlot = slot;
+        queue.submitCustom(matrices, ImmediatelyFast.signTextCache.renderLayer, (entry, vertexConsumer) -> {
+            vertexConsumer.vertex(entry, 0F, finalSlot.height, 0F).color(255, 255, 255, 255).texture(u1, v2).light(light);
+            vertexConsumer.vertex(entry, finalSlot.width, finalSlot.height, 0F).color(255, 255, 255, 255).texture(u2, v2).light(light);
+            vertexConsumer.vertex(entry, finalSlot.width, 0F, 0F).color(255, 255, 255, 255).texture(u2, v1).light(light);
+            vertexConsumer.vertex(entry, 0F, 0F, 0F).color(255, 255, 255, 255).texture(u1, v1).light(light);
+        });
         matrices.pop();
 
         ci.cancel();
@@ -153,9 +157,9 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
     }
 
     @Unique
-    private int immediatelyFast$getTextWidth(final SignText signText, final int lineWidth) {
-        final OrderedText[] orderedTexts = signText.getOrderedMessages(MinecraftClient.getInstance().shouldFilterText(), text -> {
-            final List<OrderedText> list = this.textRenderer.wrapLines(text, lineWidth);
+    private int immediatelyFast$getTextWidth(final SignText signText, final boolean filterText, final int maxLineWidth) {
+        final OrderedText[] orderedTexts = signText.getOrderedMessages(filterText, text -> {
+            final List<OrderedText> list = this.textRenderer.wrapLines(text, maxLineWidth);
             return list.isEmpty() ? OrderedText.EMPTY : list.get(0);
         });
 

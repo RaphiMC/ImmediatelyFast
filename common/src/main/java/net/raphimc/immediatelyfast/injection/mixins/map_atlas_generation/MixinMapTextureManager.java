@@ -33,6 +33,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Collection;
+
 @Mixin(MapTextureManager.class)
 public abstract class MixinMapTextureManager implements IMapTextureManager {
 
@@ -76,6 +78,11 @@ public abstract class MixinMapTextureManager implements IMapTextureManager {
     @Override
     public int immediatelyFast$getAtlasMapping(final int mapId) {
         return this.immediatelyFast$mapIdToAtlasMapping.getOrDefault(mapId, -1);
+    }
+
+    @Override
+    public Collection<MapAtlasTexture> immediatelyFast$getAllMapAtlasTextures() {
+        return this.immediatelyFast$mapAtlasTextures.values();
     }
 
 }

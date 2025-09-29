@@ -27,7 +27,7 @@ public class ImmediatelyFastRuntimeConfig {
         this.disable_fast_buffer_upload = false;
     }
 
-    public boolean getBoolean(String key, boolean defaultValue) {
+    public boolean getBoolean(final String key, final boolean defaultValue) {
         return switch (key) {
             case "font_atlas_resizing" -> this.font_atlas_resizing;
             case "disable_fast_buffer_upload" -> this.disable_fast_buffer_upload;
@@ -35,15 +35,15 @@ public class ImmediatelyFastRuntimeConfig {
         };
     }
 
-    public int getInt(String key, int defaultValue) {
+    public int getInt(final String key, final int defaultValue) {
         return defaultValue;
     }
 
-    public long getLong(String key, long defaultValue) {
+    public long getLong(final String key, final long defaultValue) {
         return defaultValue;
     }
 
-    public String getString(String key, String defaultValue) {
+    public String getString(final String key, final String defaultValue) {
         return defaultValue;
     }
 

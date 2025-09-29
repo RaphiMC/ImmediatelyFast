@@ -23,7 +23,7 @@ import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.compat.IrisCompat;
+import net.raphimc.immediatelyfast.util.IrisCompat;
 
 import java.util.Arrays;
 import java.util.Collections;

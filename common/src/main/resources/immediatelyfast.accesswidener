@@ -6,7 +6,6 @@ accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRen
 accessible class net/minecraft/client/gl/ShaderLoader$Cache
 accessible field net/minecraft/client/util/BufferAllocator pointer J
 accessible field net/minecraft/client/render/BufferBuilder allocator Lnet/minecraft/client/util/BufferAllocator;
-accessible field net/minecraft/client/render/BufferBuilder building Z
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/util/BufferAllocator;Ljava/util/SequencedMap;)V
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate draw (Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/BufferBuilder;)V
 mutable field net/minecraft/client/render/VertexConsumerProvider$Immediate allocator Lnet/minecraft/client/util/BufferAllocator;
@@ -19,5 +18,5 @@ accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
 accessible class net/minecraft/client/texture/MapTextureManager$MapTexture
 accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate layerBuffers Ljava/util/SequencedMap;
 accessible field net/minecraft/client/render/GameRenderer fogRenderer Lnet/minecraft/client/render/fog/FogRenderer;
-accessible method net/minecraft/client/gl/BufferManager setBufferSubData (IILjava/nio/ByteBuffer;)V
+accessible method net/minecraft/client/gl/BufferManager setBufferSubData (IILjava/nio/ByteBuffer;I)V
 accessible method net/minecraft/client/gl/BufferManager setBufferData (ILjava/nio/ByteBuffer;I)V

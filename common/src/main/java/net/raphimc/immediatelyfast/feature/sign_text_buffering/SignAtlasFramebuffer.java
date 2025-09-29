@@ -30,18 +30,16 @@ import org.lwjgl.opengl.GL30C;
 
 public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
-    private static int nextId = 0;
     public static final int ATLAS_SIZE = 4096;
 
     private final Identifier textureId;
     private final Slot rootSlot;
 
-    public SignAtlasFramebuffer() {
+    public SignAtlasFramebuffer(final int id) {
         super("ImmediatelyFast Sign Atlas FBO", false);
         this.resize(ATLAS_SIZE, ATLAS_SIZE);
-        this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + nextId++);
+        this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + id);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, new FboTexture());
-
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
     }
 
@@ -60,16 +58,11 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
         GL11C.glViewport(0, 0, MinecraftClient.getInstance().getWindow().getFramebufferWidth(), MinecraftClient.getInstance().getWindow().getFramebufferHeight());
     }
 
-    @Override
-    public void close() {
-        this.delete();
-    }
-
     public Slot findSlot(final int width, final int height) {
         return this.rootSlot.findSlot(width, height);
     }
 
-    public void clearAtlas() {
+    public void clear() {
         RenderSystem.getDevice().createCommandEncoder().clearColorTexture(this.getColorAttachment(), 0);
 
         this.rootSlot.subSlot1 = null;
@@ -78,6 +71,11 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
     public Identifier getTextureId() {
         return this.textureId;
+    }
+
+    @Override
+    public void close() {
+        this.delete();
     }
 
     public class Slot {

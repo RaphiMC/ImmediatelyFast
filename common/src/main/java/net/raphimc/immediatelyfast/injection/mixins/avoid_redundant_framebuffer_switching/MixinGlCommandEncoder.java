@@ -34,9 +34,9 @@ public abstract class MixinGlCommandEncoder {
         return false;
     }
 
+    // https://github.com/RaphiMC/ImmediatelyFast/issues/351
     @Inject(method = "presentTexture", at = @At("HEAD"))
     private void unbindFramebufferBeforePresenting(CallbackInfo ci) {
-        // https://github.com/RaphiMC/ImmediatelyFast/issues/351
         GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
     }
 

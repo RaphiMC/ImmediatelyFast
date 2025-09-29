@@ -20,7 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.render.MapRenderState;
 import net.minecraft.client.render.MapRenderer;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.texture.MapTextureManager;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.map.MapState;
@@ -32,39 +32,36 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(value = MapRenderer.class, priority = 1100) // Workaround for Porting-Lib which relies on the LVT to be intact
+@Mixin(MapRenderer.class)
 public abstract class MixinMapRenderer {
 
     @Shadow
     @Final
     private MapTextureManager textureManager;
 
-    @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;texture(FF)Lnet/minecraft/client/render/VertexConsumer;"), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;vertex(Lorg/joml/Matrix4f;FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 0), to = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;light(I)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 3)))
-    private VertexConsumer drawAtlasTexture(VertexConsumer instance, float u, float v, @Local(argsOnly = true) MapRenderState renderState) {
+    @ModifyArg(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitCustom(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue$Custom;)V", ordinal = 0))
+    private OrderedRenderCommandQueue.Custom drawAtlasTexture(OrderedRenderCommandQueue.Custom customRenderer, @Local(argsOnly = true) MapRenderState renderState, @Local(argsOnly = true) int light) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
         if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {
-            if (u == 0 && v == 1) {
-                u = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
-                v = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasY() + MAP_SIZE) / ATLAS_SIZE;
-            } else if (u == 1 && v == 1) {
-                u = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
-                v = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasY() + MAP_SIZE) / ATLAS_SIZE;
-            } else if (u == 1 && v == 0) {
-                u = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
-                v = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
-            } else if (u == 0 && v == 0) {
-                u = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
-                v = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
-            }
+            final float u1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
+            final float u2 = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
+            final float v1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
+            final float v2 = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasY() + MAP_SIZE) / ATLAS_SIZE;
+            return (entry, vertexConsumer) -> {
+                vertexConsumer.vertex(entry, 0F, MAP_SIZE, -0.01F).color(-1).texture(u1, v2).light(light);
+                vertexConsumer.vertex(entry, MAP_SIZE, MAP_SIZE, -0.01F).color(-1).texture(u2, v2).light(light);
+                vertexConsumer.vertex(entry, MAP_SIZE, 0F, -0.01F).color(-1).texture(u2, v1).light(light);
+                vertexConsumer.vertex(entry, 0F, 0F, -0.01F).color(-1).texture(u1, v1).light(light);
+            };
+        } else {
+            return customRenderer;
         }
-        return instance.texture(u, v);
     }
 
     @Inject(method = "update", at = @At("RETURN"))
@@ -75,8 +72,8 @@ public abstract class MixinMapRenderer {
             // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
             return;
         }
-        final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
 
+        final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
         immediatelyFast$renderState.immediatelyFast$setAtlasX(((packedLocation >> 8) & 0xFF) * MAP_SIZE);
         immediatelyFast$renderState.immediatelyFast$setAtlasY((packedLocation & 0xFF) * MAP_SIZE);
         immediatelyFast$renderState.immediatelyFast$setAtlasTexture(((IMapTextureManager) this.textureManager).immediatelyFast$getMapAtlasTexture(packedLocation >> 16));

@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.core;
+package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
 
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.RenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,18 +26,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Map;
-
-@Mixin(TextureManager.class)
-public abstract class MixinTextureManager {
+@Mixin(RenderDispatcher.class)
+public abstract class MixinRenderDispatcher {
 
     @Shadow
     @Final
-    private Map<Identifier, AbstractTexture> textures;
+    private VertexConsumerProvider.Immediate vertexConsumers;
 
-    @Inject(method = "destroyTexture", at = @At("RETURN"))
-    private void removeDestroyedTexture(Identifier id, CallbackInfo ci) {
-        this.textures.remove(id);
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/LayeredCustomCommandRenderer;render(Lnet/minecraft/client/render/command/BatchingRenderCommandQueue;)V"))
+    private void drawBatch(CallbackInfo ci) {
+        this.vertexConsumers.drawCurrentLayer();
     }
 
 }

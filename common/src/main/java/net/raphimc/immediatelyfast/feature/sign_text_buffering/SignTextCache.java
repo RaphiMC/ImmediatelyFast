@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 public class SignTextCache implements SynchronousResourceReloader {
 
-    public final SignAtlasFramebuffer signAtlasFramebuffer = new SignAtlasFramebuffer();
-    public final ProjectionMatrix2 signProjectionMatrix = new ProjectionMatrix2("immediatelyfast:signs", -1000F, 1000F, true);
+    public final SignAtlasFramebuffer signAtlasFramebuffer = new SignAtlasFramebuffer(0);
+    public final ProjectionMatrix2 signProjectionMatrix = new ProjectionMatrix2("immediatelyfast:sign_atlas_text", -1000F, 1000F, true);
     public final GpuBufferSlice signProjectionMatrixBuffer = this.signProjectionMatrix.set(SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE);
     public final Cache<SignText, SignAtlasFramebuffer.Slot> slotCache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.SECONDS)
@@ -51,11 +51,11 @@ public class SignTextCache implements SynchronousResourceReloader {
 
     public void clearCache() {
         this.slotCache.invalidateAll();
-        this.signAtlasFramebuffer.clearAtlas();
+        this.signAtlasFramebuffer.clear();
     }
 
     @Override
-    public void reload(ResourceManager manager) {
+    public void reload(final ResourceManager manager) {
         this.clearCache();
     }
 

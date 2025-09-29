@@ -15,33 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.core;
+package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
 
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.SequencedMap;
 
-@Mixin(VertexConsumerProvider.class)
-public interface MixinVertexConsumerProvider {
+@Mixin(BufferBuilderStorage.class)
+public abstract class MixinBufferBuilderStorage {
 
-    /**
-     * @author RK_01
-     * @reason Universal Batching
-     */
-    @Overwrite
-    static VertexConsumerProvider.Immediate immediate(SequencedMap<RenderLayer, BufferAllocator> layerBuffers, BufferAllocator fallbackBuffer) {
-        if (ImmediatelyFast.config.debug_only_and_not_recommended_disable_universal_batching) {
-            return new VertexConsumerProvider.Immediate(fallbackBuffer, layerBuffers);
-        }
-
-        // Don't free the fallback buffer. Who knows what else it might get used for outside of this method (https://github.com/RaphiMC/ImmediatelyFast/issues/101)
-        // Pass the fallback buffer because some mods access it directly (https://github.com/Team-EnderIO/EnderIO/blob/a67e6dc0dfebf67cd13075ac6aadb9d4598072e8/src/machines/java/com/enderio/machines/client/gui/widget/ioconfig/IOConfigWidget.java#L403)
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;immediate(Ljava/util/SequencedMap;Lnet/minecraft/client/util/BufferAllocator;)Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;", ordinal = 0))
+    private VertexConsumerProvider.Immediate replaceEntityVertexConsumers(SequencedMap<RenderLayer, BufferAllocator> layerBuffers, BufferAllocator fallbackBuffer) {
         return new BatchableBufferSource(fallbackBuffer, layerBuffers);
     }
 

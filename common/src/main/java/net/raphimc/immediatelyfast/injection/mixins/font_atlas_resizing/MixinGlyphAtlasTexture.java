@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Modifies the size of the glyph atlas texture to 2048x2048.
+ * Modifies the size of the glyph atlas texture.
  * <p>
  * Vanilla uses a 256x256 texture, which is too small for high resolution fonts.
  * If the texture is too small, there may only be under ten glyphs per texture which causes a lot of texture switching when rendering text.
@@ -39,20 +39,24 @@ public abstract class MixinGlyphAtlasTexture {
     @Unique
     private boolean immediatelyFast$shouldResizeFontAtlas;
 
+    @Unique
+    private int immediatelyFast$fontAtlasSize;
+
     @Inject(method = "<init>", at = @At(value = "CTOR_HEAD", unsafe = true))
-    private void checkFontAtlasResizing(CallbackInfo ci) {
+    private void cacheConfigState(CallbackInfo ci) {
         this.immediatelyFast$shouldResizeFontAtlas = ImmediatelyFast.runtimeConfig.font_atlas_resizing;
+        this.immediatelyFast$fontAtlasSize = ImmediatelyFast.config.font_atlas_size;
     }
 
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
     private int modifyGlyphAtlasTextureSize(int original) {
-        return this.immediatelyFast$shouldResizeFontAtlas ? 2048 : 256;
+        return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256;
     }
 
     @SuppressWarnings("MixinAnnotationTarget")
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
     private float modifyGlyphAtlasTextureSize(float original) {
-        return this.immediatelyFast$shouldResizeFontAtlas ? 2048F : 256F;
+        return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256F;
     }
 
 }

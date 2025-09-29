@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.compat;
+package net.raphimc.immediatelyfast.util;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.lenni0451.reflect.accessor.FieldAccessor;
