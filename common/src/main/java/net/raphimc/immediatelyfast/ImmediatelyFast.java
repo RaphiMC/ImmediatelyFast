@@ -22,12 +22,12 @@ import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.util.math.MathHelper;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
 import net.raphimc.immediatelyfast.util.IrisCompat;
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.system.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -125,13 +125,13 @@ public class ImmediatelyFast {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
 
-        if (!MathHelper.isPowerOfTwo(ImmediatelyFast.config.font_atlas_size)) {
+        if (!MathUtil.mathIsPoT(ImmediatelyFast.config.font_atlas_size)) {
             LOGGER.warn("Font atlas size " + ImmediatelyFast.config.font_atlas_size + " is not a power of two! Rounding up to the next power of two.");
-            ImmediatelyFast.config.font_atlas_size = MathHelper.smallestEncompassingPowerOfTwo(ImmediatelyFast.config.font_atlas_size);
+            ImmediatelyFast.config.font_atlas_size = MathUtil.mathRoundPoT(ImmediatelyFast.config.font_atlas_size);
         }
-        if (!MathHelper.isPowerOfTwo(ImmediatelyFast.config.map_atlas_size)) {
+        if (!MathUtil.mathIsPoT(ImmediatelyFast.config.map_atlas_size)) {
             LOGGER.warn("Map atlas size " + ImmediatelyFast.config.map_atlas_size + " is not a power of two! Rounding up to the next power of two.");
-            ImmediatelyFast.config.map_atlas_size = MathHelper.smallestEncompassingPowerOfTwo(ImmediatelyFast.config.map_atlas_size);
+            ImmediatelyFast.config.map_atlas_size = MathUtil.mathRoundPoT(ImmediatelyFast.config.map_atlas_size);
         }
     }
 
