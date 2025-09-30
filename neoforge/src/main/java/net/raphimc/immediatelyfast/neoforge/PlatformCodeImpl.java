@@ -35,7 +35,7 @@ public class PlatformCodeImpl {
 
     public static Optional<String> getModVersion(final String mod) {
         if (ModList.get() == null) {
-            return Optional.ofNullable(FMLLoader.getLoadingModList().getModFileById(mod)).map(ModFileInfo::versionString);
+            return Optional.ofNullable(FMLLoader.getCurrent().getLoadingModList().getModFileById(mod)).map(ModFileInfo::versionString);
         }
 
         return ModList.get().getModContainerById(mod).map(m -> m.getModInfo().getVersion().toString());
