@@ -21,12 +21,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Upload Fabric Artifacts to GitHub
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ImmediatelyFast Fabric
           path: fabric/build/libs/
       - name: Upload NeoForge Artifacts to GitHub
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ImmediatelyFast NeoForge
           path: neoforge/build/libs/
