@@ -19,10 +19,7 @@ package net.raphimc.immediatelyfast.feature.core;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.render.*;
 import net.minecraft.item.HorseArmorItem;
 import net.minecraft.util.Identifier;
@@ -39,8 +36,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
      */
     private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
 
-    protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = new Reference2ObjectLinkedOpenHashMap<>();
-    protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
+    protected final Map<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
+    protected final Set<RenderLayer> activeLayers = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
 
     protected boolean drawFallbackLayersFirst = false;
 
