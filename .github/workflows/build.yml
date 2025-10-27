@@ -26,7 +26,7 @@ jobs:
           name: ImmediatelyFast Fabric
           path: fabric/build/libs/
       - name: Upload Forge Artifacts to GitHub
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ImmediatelyFast Forge
           path: forge/build/libs/
