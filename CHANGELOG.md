@@ -1,1 +1,1 @@
-* Added support for Minecraft 1.21.10
+* Fixed performance issue with Iris
