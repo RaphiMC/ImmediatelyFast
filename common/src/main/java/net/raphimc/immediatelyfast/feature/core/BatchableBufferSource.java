@@ -25,10 +25,7 @@ import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.SequencedMap;
-import java.util.Set;
+import java.util.*;
 
 public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
@@ -38,8 +35,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
      */
     private final static BufferAllocator FALLBACK_BUFFER = new BufferAllocator(0);
 
-    protected final Reference2ObjectMap<RenderLayer, ReferenceSet<BufferBuilder>> pendingBuffers = new Reference2ObjectLinkedOpenHashMap<>();
-    protected final ReferenceSet<RenderLayer> activeLayers = new ReferenceLinkedOpenHashSet<>();
+    protected final Map<RenderLayer, ReferenceSet<BufferBuilder>> pendingBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
+    protected final Set<RenderLayer> activeLayers = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
 
     protected boolean drawFallbackLayersFirst = false;
 
