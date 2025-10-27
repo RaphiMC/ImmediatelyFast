@@ -1,1 +1,1 @@
-* Fixed cartography table map rendering
+* Fixed performance issue with Iris
