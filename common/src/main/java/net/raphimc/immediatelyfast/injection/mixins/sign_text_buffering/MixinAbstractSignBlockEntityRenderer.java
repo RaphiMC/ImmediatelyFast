@@ -106,6 +106,7 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
                     final MatrixStack matrixStack = new NoTextTransformMatrixStack();
                     matrixStack.translate(slot.x, slot.y, 0F);
                     matrixStack.translate(slot.width / 2F, slot.height / 2F, 0F);
+                    renderState.renderTextOutline = true; // Always render outline, regardless of distance to sign
                     this.renderText(renderState, matrixStack, orderedRenderCommandQueue, front);
                     renderDispatcher.render();
                     immediate.draw();
