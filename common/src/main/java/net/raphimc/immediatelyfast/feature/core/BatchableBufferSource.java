@@ -219,6 +219,12 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                     } else if (textureId.getPath().equals("textures/entity/maledictus/phantom_halberd_discard.png")) {
                         return 1;
                     }
+                } else if (textureId.getNamespace().equals("alexscaves")) { // https://github.com/RaphiMC/ImmediatelyFast/issues/454
+                    if (textureId.getPath().equals("textures/entity/hullbreaker_glow.png")) {
+                        return 2;
+                    } else if (textureId.getPath().equals("textures/entity/hullbreaker.png")) {
+                        return 1;
+                    }
                 }
             }
         }
