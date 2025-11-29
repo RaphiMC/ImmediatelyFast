@@ -84,6 +84,8 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformCode.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
             return false;
+        } else if (packageName.startsWith("core.compat.webdisplays") && PlatformCode.getModVersion("webdisplays").isEmpty()) { // https://github.com/CinemaMod/webdisplays
+            return false;
         }
 
         return true;
