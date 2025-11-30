@@ -26,7 +26,6 @@ import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
 import net.raphimc.immediatelyfast.util.IrisCompat;
-import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,28 +58,13 @@ public class ImmediatelyFast {
     }
 
     public static void onRenderSystemInit() {
-        final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
-        final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
-        final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
-        LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
-
-        boolean isNvidia = false;
-        boolean isAmd = false;
-        boolean isIntel = false;
-        boolean isApple = false;
-        if (gpuVendor != null) {
-            final String gpuVendorLower = gpuVendor.toLowerCase();
-
-            isNvidia = gpuVendorLower.startsWith("nvidia");
-            isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
-            isIntel = gpuVendorLower.startsWith("intel");
-            isApple = gpuVendorLower.startsWith("apple");
-        }
+        LOGGER.info("Initializing ImmediatelyFast");
+        boolean isMacOS = System.getProperty("os.name").toLowerCase().contains("mac");;
 
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
+        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isMacOS && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
             ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
         }
 

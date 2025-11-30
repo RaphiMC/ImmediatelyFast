@@ -28,8 +28,7 @@
     "sodium": "*"
   },
   "breaks": {
-    "optifabric": "*",
-    "vulkanmod": "*"
+    "optifabric": "*"
   },
   "custom": {
     "modmenu": {
