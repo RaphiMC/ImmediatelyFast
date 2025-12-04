@@ -225,6 +225,11 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                     } else if (textureId.getPath().equals("textures/entity/hullbreaker.png")) {
                         return 1;
                     }
+                    if (textureId.getPath().equals("textures/entity/tremorzilla/tremorzilla_glow_powered.png")) {
+                        return 2;
+                    } else if (textureId.getPath().equals("textures/entity/tremorzilla/tremorzilla.png")) {
+                        return 1;
+                    }
                 }
             }
         }
