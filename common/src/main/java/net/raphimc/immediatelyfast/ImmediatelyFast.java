@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.platform.GlDebugInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
 import net.raphimc.immediatelyfast.apiimpl.ApiAccessImpl;
@@ -27,7 +28,6 @@ import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
 import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
-import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
@@ -58,6 +58,15 @@ public class ImmediatelyFast {
             config.experimental_screen_batching = false;
         }
 
+        if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            if (config.experimental_sign_text_buffering) {
+                if (PlatformCode.getModVersion("vulkanmod").isPresent()) {
+                    LOGGER.warn("VulkanMod detected. Force disabling sign text buffering optimization.");
+                    config.experimental_sign_text_buffering = false;
+                }
+            }
+        }
+
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
@@ -68,9 +77,9 @@ public class ImmediatelyFast {
     }
 
     public static void windowInit() {
-        final String gpuVendor = GL11C.glGetString(GL11C.GL_VENDOR);
-        final String gpuModel = GL11C.glGetString(GL11C.GL_RENDERER);
-        final String glVersion = GL11C.glGetString(GL11C.GL_VERSION);
+        final String gpuVendor = GlDebugInfo.getVendor();
+        final String gpuModel = GlDebugInfo.getRenderer();
+        final String glVersion = GlDebugInfo.getVersion();
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
 
         boolean isNvidia = false;

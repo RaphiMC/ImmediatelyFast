@@ -27,8 +27,7 @@
   "recommends": {
     "sodium": "*"
   },
-  "breaks": {
-    "optifabric": "*",
+  "conflicts": {
     "vulkanmod": "*"
   },
   "custom": {
