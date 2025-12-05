@@ -17,9 +17,9 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
+import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.lwjgl.opengl.GL30C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,7 +31,7 @@ public abstract class MixinRenderSystem {
     // https://github.com/RaphiMC/ImmediatelyFast/issues/350
     @Inject(method = "flipFrame", at = @At("HEAD"))
     private static void unbindFramebufferBeforeSwappingBuffers(CallbackInfo ci) {
-        GlStateManager._glBindFramebuffer(GL30C.GL_FRAMEBUFFER, 0);
+        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
     }
 
 }
