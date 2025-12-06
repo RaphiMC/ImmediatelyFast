@@ -71,8 +71,9 @@ public class ImmediatelyFast {
     public static void onRenderSystemInit() {
         final String gpuVendor = RenderSystem.getDevice().getVendor();
         final String gpuModel = RenderSystem.getDevice().getRenderer();
-        final String glVersion = RenderSystem.getDevice().getVersion();
-        LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with OpenGL " + glVersion);
+        final String backendName = RenderSystem.getDevice().getBackendName();
+        final String backendVersion = RenderSystem.getDevice().getVersion();
+        LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with " + backendName + " " + backendVersion);
 
         boolean isNvidia = false;
         boolean isAmd = false;
