@@ -20,7 +20,7 @@ package net.raphimc.immediatelyfast.feature.core;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -33,8 +33,8 @@ import java.util.List;
 
 public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
 
-    public static final ResourceLocation ENTRY_ID = ResourceLocation.fromNamespaceAndPath("immediatelyfast", "immediatelyfast");
-    private static final ResourceLocation SECTION_ID = ENTRY_ID;
+    public static final Identifier ENTRY_ID = Identifier.fromNamespaceAndPath("immediatelyfast", "immediatelyfast");
+    private static final Identifier SECTION_ID = ENTRY_ID;
 
     @Override
     public void display(final DebugScreenDisplayer displayer, final Level level, final LevelChunk clientChunk, final LevelChunk serverChunk) {

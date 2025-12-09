@@ -31,8 +31,8 @@ import java.nio.ByteBuffer;
 @Mixin(GlCommandEncoder.class)
 public abstract class MixinGlCommandEncoder {
 
-    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/DirectStateAccess;bufferSubData(IILjava/nio/ByteBuffer;I)V"))
-    private void fixSlowBufferUploadOnAppleGpu(DirectStateAccess instance, int buffer, int offset, ByteBuffer data, int usage, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
+    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/DirectStateAccess;bufferSubData(IJLjava/nio/ByteBuffer;I)V"))
+    private void fixSlowBufferUploadOnAppleGpu(DirectStateAccess instance, int buffer, long offset, ByteBuffer data, int usage, @Local(argsOnly = true) GpuBufferSlice gpuBufferSlice) {
         if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && gpuBufferSlice.length() == gpuBufferSlice.buffer().size()) {
             instance.bufferData(buffer, data, usage);
         } else {

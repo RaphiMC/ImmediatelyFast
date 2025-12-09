@@ -17,24 +17,22 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.skip_text_translucency_sorting;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(value = RenderType.class, priority = 500)
-public abstract class MixinRenderType {
+@Mixin(value = RenderTypes.class, priority = 500)
+public abstract class MixinRenderTypes {
 
-    @ModifyArg(method = {
-            "method_34834" /*TEXT*/,
-            "method_34833" /*TEXT_INTENSITY*/,
-            "method_36437" /*TEXT_POLYGON_OFFSET*/,
-            "method_36436" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
-            "method_37348" /*TEXT_SEE_THROUGH*/,
-            "method_37347" /*TEXT_INTENSITY_SEE_THROUGH*/
-    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;create(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;"), index = 3)
-    private static boolean changeTranslucency(boolean value) {
-        return false;
+    @Redirect(method = {
+            "method_75949" /*TEXT_POLYGON_OFFSET*/,
+            "method_75948" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
+            "method_75946" /*TEXT_INTENSITY_SEE_THROUGH*/
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;sortOnUpload()Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;"))
+    private static RenderSetup.RenderSetupBuilder disableTranslucencySorting(RenderSetup.RenderSetupBuilder instance) {
+        return instance;
     }
 
 }

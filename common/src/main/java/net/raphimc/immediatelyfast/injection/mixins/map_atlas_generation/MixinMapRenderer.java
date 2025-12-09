@@ -45,7 +45,7 @@ public abstract class MixinMapRenderer {
     @Final
     private MapTextureManager mapTextureManager;
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitCustomGeometry(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/RenderType;Lnet/minecraft/client/renderer/SubmitNodeCollector$CustomGeometryRenderer;)V", ordinal = 0))
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitCustomGeometry(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/SubmitNodeCollector$CustomGeometryRenderer;)V", ordinal = 0))
     private SubmitNodeCollector.CustomGeometryRenderer modifyTextureCoordinates(SubmitNodeCollector.CustomGeometryRenderer customGeometryRenderer, @Local(argsOnly = true) MapRenderState renderState, @Local(argsOnly = true) int light) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
         if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {

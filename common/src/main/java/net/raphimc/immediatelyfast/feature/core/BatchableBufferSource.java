@@ -22,10 +22,9 @@ import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.entity.layers.WolfCollarLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.IrisCompat;
 
@@ -201,25 +200,16 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
         if (renderType == null) return Integer.MAX_VALUE;
 
         int order = 0;
-        if (renderType instanceof RenderType.CompositeRenderType compositeRenderType) {
-            final ResourceLocation textureId = compositeRenderType.state.textureState.cutoutTexture().orElse(null);
-            if (textureId != null) {
-                if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
-                    if (textureId.equals(WolfCollarLayer.WOLF_COLLAR_LOCATION)) {
-                        order = 2;
-                    } else {
-                        order = 1;
-                    }
-                } else if (textureId.equals(Sheets.ARMOR_TRIMS_SHEET)) {
+        final RenderSetup.TextureBinding textureBinding = renderType.state.textures.get("Sampler0");
+        if (textureBinding != null) {
+            final Identifier textureId = textureBinding.location();
+            if (renderType.name.startsWith("text") || renderType.name.startsWith("neoforge_text")) {
+                // Draws vanilla text over custom font text
+                // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
+                if (textureId.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
+                    order = 2;
+                } else {
                     order = 1;
-                } else if (renderType.name.startsWith("text") || renderType.name.startsWith("neoforge_text")) {
-                    // Draws vanilla text over custom font text
-                    // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
-                    if (textureId.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-                        order = 2;
-                    } else {
-                        order = 1;
-                    }
                 }
             }
         }

@@ -21,7 +21,7 @@ import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
 import net.minecraft.client.gui.components.debug.DebugScreenProfile;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastDebugScreenEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,20 +40,20 @@ public abstract class MixinDebugScreenEntries {
     @Shadow
     @Final
     @Mutable
-    public static Map<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> PROFILES;
+    public static Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> PROFILES;
 
     @Shadow
-    private static ResourceLocation register(ResourceLocation name, DebugScreenEntry entry) {
+    private static Identifier register(Identifier name, DebugScreenEntry entry) {
         return null;
     }
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void addImmediatelyFastEntry(CallbackInfo ci) {
-        final ResourceLocation entryId = register(ImmediatelyFastDebugScreenEntry.ENTRY_ID, new ImmediatelyFastDebugScreenEntry());
-        final Map<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> profiles = new HashMap<>();
-        for (Map.Entry<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
-            final Map<ResourceLocation, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
-            entries.put(entryId, DebugScreenEntryStatus.IN_F3);
+        final Identifier entryId = register(ImmediatelyFastDebugScreenEntry.ENTRY_ID, new ImmediatelyFastDebugScreenEntry());
+        final Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> profiles = new HashMap<>();
+        for (Map.Entry<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
+            final Map<Identifier, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
+            entries.put(entryId, DebugScreenEntryStatus.IN_OVERLAY);
             profiles.put(entry.getKey(), entries);
         }
         PROFILES = profiles;

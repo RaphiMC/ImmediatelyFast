@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "skip_text_translucency_sorting.MixinNeoForgeRenderTypes"
   ],
   "injectors": {
     "defaultRequire": 1

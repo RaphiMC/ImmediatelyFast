@@ -19,7 +19,7 @@ package net.raphimc.immediatelyfast.feature.map_atlas_generation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 public class MapAtlasTexture implements AutoCloseable {
@@ -29,13 +29,13 @@ public class MapAtlasTexture implements AutoCloseable {
     public static final int MAPS_PER_ATLAS = (ATLAS_SIZE / MAP_SIZE) * (ATLAS_SIZE / MAP_SIZE);
 
     private final int id;
-    private final ResourceLocation textureId;
+    private final Identifier textureId;
     private final DynamicTexture texture;
     private int mapCount;
 
     public MapAtlasTexture(final int id) {
         this.id = id;
-        this.textureId = ResourceLocation.fromNamespaceAndPath("immediatelyfast", "map_atlas/" + id);
+        this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "map_atlas/" + id);
         this.texture = new DynamicTexture("ImmediatelyFast Map Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
         Minecraft.getInstance().getTextureManager().register(this.textureId, this.texture);
     }
@@ -56,7 +56,7 @@ public class MapAtlasTexture implements AutoCloseable {
         return this.id;
     }
 
-    public ResourceLocation getTextureId() {
+    public Identifier getTextureId() {
         return this.textureId;
     }
 

@@ -22,7 +22,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.block.entity.SignText;
@@ -45,7 +46,7 @@ public class SignTextCache implements ResourceManagerReloadListener {
                 }
             })
             .build();
-    public final RenderType renderType = RenderType.text(this.signAtlasRenderTarget.getTextureId());
+    public final RenderType renderType = RenderTypes.text(this.signAtlasRenderTarget.getTextureId());
     public boolean lockFramebuffer = false;
     public boolean lockViewport = false;
 

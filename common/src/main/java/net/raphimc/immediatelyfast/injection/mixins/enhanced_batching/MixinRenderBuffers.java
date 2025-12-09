@@ -20,7 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

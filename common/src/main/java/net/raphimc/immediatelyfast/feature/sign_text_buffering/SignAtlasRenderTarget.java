@@ -22,9 +22,11 @@ import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL30C;
 
@@ -32,13 +34,13 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
 
     public static final int ATLAS_SIZE = 4096;
 
-    private final ResourceLocation textureId;
+    private final Identifier textureId;
     private final Slot rootSlot;
 
     public SignAtlasRenderTarget(final int id) {
         super("ImmediatelyFast Sign Atlas FBO", false);
         this.resize(ATLAS_SIZE, ATLAS_SIZE);
-        this.textureId = ResourceLocation.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
+        this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
         Minecraft.getInstance().getTextureManager().register(this.textureId, new FboTexture());
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
     }
@@ -69,7 +71,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
         this.rootSlot.subSlot2 = null;
     }
 
-    public ResourceLocation getTextureId() {
+    public Identifier getTextureId() {
         return this.textureId;
     }
 
@@ -172,6 +174,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
         private FboTexture() {
             this.texture = SignAtlasRenderTarget.this.colorTexture;
             this.textureView = RenderSystem.getDevice().createTextureView(this.texture);
+            this.sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false);
         }
 
         @Override

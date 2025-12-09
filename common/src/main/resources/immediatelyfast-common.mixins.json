@@ -25,7 +25,7 @@
     "sign_text_buffering.MixinAbstractSignRenderer",
     "sign_text_buffering.MixinGlStateManager",
     "sign_text_buffering.MixinSignText",
-    "skip_text_translucency_sorting.MixinRenderType"
+    "skip_text_translucency_sorting.MixinRenderTypes"
   ],
   "injectors": {
     "defaultRequire": 1
