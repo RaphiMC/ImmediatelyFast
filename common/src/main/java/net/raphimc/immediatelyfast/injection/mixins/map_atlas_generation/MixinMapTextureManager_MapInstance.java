@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.lenni0451.reflect.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -60,7 +61,7 @@ public abstract class MixinMapTextureManager_MapInstance {
     Identifier location;
 
     @Unique
-    private static final DynamicTexture DUMMY_TEXTURE;
+    private static final DynamicTexture DUMMY_TEXTURE = Objects.allocate(DynamicTexture.class);
 
     @Unique
     private int immediatelyFast$atlasX;
@@ -70,14 +71,6 @@ public abstract class MixinMapTextureManager_MapInstance {
 
     @Unique
     private MapAtlasTexture immediatelyFast$atlasTexture;
-
-    static {
-        try {
-            DUMMY_TEXTURE = (DynamicTexture) ImmediatelyFast.UNSAFE.allocateInstance(DynamicTexture.class);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Redirect(method = "<init>", at = @At(value = "NEW", target = "(Ljava/util/function/Supplier;IIZ)Lnet/minecraft/client/renderer/texture/DynamicTexture;"))
     private DynamicTexture initAtlasParametersAndDontAllocateTexture(Supplier<String> label, int width, int height, boolean useCalloc, @Local(argsOnly = true) MapTextureManager mapTextureManager, @Local(argsOnly = true) int id) {
