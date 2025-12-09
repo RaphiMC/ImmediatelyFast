@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import net.lenni0451.reflect.Objects;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.render.MapRenderer;
 import net.minecraft.client.render.VertexConsumer;
@@ -55,7 +56,7 @@ public abstract class MixinMapRenderer_MapTexture {
     MapRenderer field_2047;
 
     @Unique
-    private static final NativeImageBackedTexture DUMMY_TEXTURE;
+    private static final NativeImageBackedTexture DUMMY_TEXTURE = Objects.allocate(NativeImageBackedTexture.class);
 
     @Unique
     private int immediatelyFast$atlasX;
@@ -65,14 +66,6 @@ public abstract class MixinMapRenderer_MapTexture {
 
     @Unique
     private MapAtlasTexture immediatelyFast$atlasTexture;
-
-    static {
-        try {
-            DUMMY_TEXTURE = (NativeImageBackedTexture) ImmediatelyFast.UNSAFE.allocateInstance(NativeImageBackedTexture.class);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Redirect(method = "<init>", at = @At(value = "NEW", target = "(IIZ)Lnet/minecraft/client/texture/NativeImageBackedTexture;"))
     private NativeImageBackedTexture initAtlasParametersAndDontAllocateTexture(int width, int height, boolean useMipmaps, @Local int id) {

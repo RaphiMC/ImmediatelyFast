@@ -30,18 +30,15 @@ import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Unsafe;
 
 import java.io.File;
 import java.io.FileReader;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.Objects;
 
 public class ImmediatelyFast {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("ImmediatelyFast");
-    public static final Unsafe UNSAFE = getUnsafe();
     public static String VERSION;
     public static ImmediatelyFastConfig config;
     public static ImmediatelyFastRuntimeConfig runtimeConfig;
@@ -145,19 +142,6 @@ public class ImmediatelyFast {
 
     public static void createRuntimeConfig() {
         runtimeConfig = new ImmediatelyFastRuntimeConfig(config);
-    }
-
-    private static Unsafe getUnsafe() {
-        try {
-            for (Field field : Unsafe.class.getDeclaredFields()) {
-                if (field.getType().equals(Unsafe.class)) {
-                    field.setAccessible(true);
-                    return (Unsafe) field.get(null);
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        throw new IllegalStateException("Unable to get Unsafe instance");
     }
 
 }
