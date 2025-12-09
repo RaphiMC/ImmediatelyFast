@@ -15,26 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.core;
+package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
 
-import net.minecraft.client.MinecraftClient;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(MinecraftClient.class)
-public abstract class MixinMinecraftClient {
+@Mixin(FeatureRenderDispatcher.class)
+public abstract class MixinFeatureRenderDispatcher {
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void initImmediatelyFast(CallbackInfo ci) {
-        ImmediatelyFast.lateInit();
-    }
+    @Shadow
+    @Final
+    private MultiBufferSource.BufferSource bufferSource;
 
-    @Inject(method = "joinWorld", at = @At("HEAD"))
-    private void callOnWorldJoin(CallbackInfo ci) {
-        ImmediatelyFast.onWorldJoin();
+    @Inject(method = "renderAllFeatures", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/ParticleFeatureRenderer;render(Lnet/minecraft/client/renderer/SubmitNodeCollection;)V"))
+    private void drawBatch(CallbackInfo ci) {
+        this.bufferSource.endLastBatch();
     }
 
 }

@@ -15,27 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
+package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.RenderDispatcher;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.client.Minecraft;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(RenderDispatcher.class)
-public abstract class MixinRenderDispatcher {
+@Mixin(Minecraft.class)
+public abstract class MixinMinecraft {
 
-    @Shadow
-    @Final
-    private VertexConsumerProvider.Immediate vertexConsumers;
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void initImmediatelyFast(CallbackInfo ci) {
+        ImmediatelyFast.lateInit();
+    }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/LayeredCustomCommandRenderer;render(Lnet/minecraft/client/render/command/BatchingRenderCommandQueue;)V"))
-    private void drawBatch(CallbackInfo ci) {
-        this.vertexConsumers.drawCurrentLayer();
+    @Inject(method = "setLevel", at = @At("HEAD"))
+    private void hookLevelChange(CallbackInfo ci) {
+        ImmediatelyFast.onLevelChange();
     }
 
 }

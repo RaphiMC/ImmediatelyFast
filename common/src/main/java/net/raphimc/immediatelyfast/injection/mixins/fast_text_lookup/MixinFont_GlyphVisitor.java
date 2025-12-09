@@ -17,31 +17,32 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.fast_text_lookup;
 
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(targets = "net.minecraft.client.font.TextRenderer$GlyphDrawer$1")
-public abstract class MixinTextRenderer_GlyphDrawer {
+@Mixin(targets = "net.minecraft.client.gui.Font$GlyphVisitor$1")
+public abstract class MixinFont_GlyphVisitor {
 
     @Unique
-    private RenderLayer immediatelyFast$lastRenderLayer;
+    private RenderType immediatelyFast$lastRenderType;
 
     @Unique
     private VertexConsumer immediatelyFast$lastVertexConsumer;
 
-    @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;"))
-    private VertexConsumer reduceGetBufferCalls(VertexConsumerProvider instance, RenderLayer renderLayer) {
-        if (this.immediatelyFast$lastRenderLayer == renderLayer) {
+    @SuppressWarnings("UnresolvedMixinReference")
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource;getBuffer(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
+    private VertexConsumer reduceGetBufferCalls(MultiBufferSource instance, RenderType renderType) {
+        if (this.immediatelyFast$lastRenderType == renderType) {
             return this.immediatelyFast$lastVertexConsumer;
         }
 
-        this.immediatelyFast$lastRenderLayer = renderLayer;
-        this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderLayer);
+        this.immediatelyFast$lastRenderType = renderType;
+        this.immediatelyFast$lastVertexConsumer = instance.getBuffer(renderType);
         return this.immediatelyFast$lastVertexConsumer;
     }
 

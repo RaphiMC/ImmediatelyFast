@@ -1,22 +1,21 @@
 accessWidener v1 named
-#https://fabricmc.net/wiki/tutorial:accesswideners
 
-accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
-accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
-accessible class net/minecraft/client/gl/ShaderLoader$Cache
-accessible field net/minecraft/client/util/BufferAllocator pointer J
-accessible field net/minecraft/client/render/BufferBuilder allocator Lnet/minecraft/client/util/BufferAllocator;
-accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/util/BufferAllocator;Ljava/util/SequencedMap;)V
-accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate draw (Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/BufferBuilder;)V
-mutable field net/minecraft/client/render/VertexConsumerProvider$Immediate allocator Lnet/minecraft/client/util/BufferAllocator;
-accessible class net/minecraft/client/render/RenderLayer$MultiPhase
-accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
-accessible field net/minecraft/client/render/RenderLayer$MultiPhaseParameters texture Lnet/minecraft/client/render/RenderPhase$TextureBase;
-accessible field net/minecraft/client/render/RenderLayer$MultiPhase phases Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;
-accessible method net/minecraft/client/render/RenderPhase$TextureBase getId ()Ljava/util/Optional;
-accessible field net/minecraft/client/render/RenderPhase name Ljava/lang/String;
-accessible class net/minecraft/client/texture/MapTextureManager$MapTexture
-accessible field net/minecraft/client/render/VertexConsumerProvider$Immediate layerBuffers Ljava/util/SequencedMap;
-accessible field net/minecraft/client/render/GameRenderer fogRenderer Lnet/minecraft/client/render/fog/FogRenderer;
-accessible method net/minecraft/client/gl/BufferManager setBufferSubData (IILjava/nio/ByteBuffer;I)V
-accessible method net/minecraft/client/gl/BufferManager setBufferData (ILjava/nio/ByteBuffer;I)V
+accessible field net/minecraft/client/Minecraft fontManager Lnet/minecraft/client/gui/font/FontManager;
+accessible field net/minecraft/client/renderer/entity/layers/WolfCollarLayer WOLF_COLLAR_LOCATION Lnet/minecraft/resources/ResourceLocation;
+accessible class net/minecraft/client/renderer/ShaderManager$CompilationCache
+accessible field com/mojang/blaze3d/vertex/ByteBufferBuilder pointer J
+accessible field com/mojang/blaze3d/vertex/BufferBuilder buffer Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;
+accessible method net/minecraft/client/renderer/MultiBufferSource$BufferSource <init> (Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;Ljava/util/SequencedMap;)V
+accessible method net/minecraft/client/renderer/MultiBufferSource$BufferSource endBatch (Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/BufferBuilder;)V
+mutable field net/minecraft/client/renderer/MultiBufferSource$BufferSource sharedBuffer Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;
+accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
+accessible class net/minecraft/client/renderer/RenderType$CompositeState
+accessible field net/minecraft/client/renderer/RenderType$CompositeState textureState Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;
+accessible field net/minecraft/client/renderer/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/RenderType$CompositeState;
+accessible method net/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard cutoutTexture ()Ljava/util/Optional;
+accessible field net/minecraft/client/renderer/RenderStateShard name Ljava/lang/String;
+accessible class net/minecraft/client/resources/MapTextureManager$MapInstance
+accessible field net/minecraft/client/renderer/MultiBufferSource$BufferSource fixedBuffers Ljava/util/SequencedMap;
+accessible field net/minecraft/client/renderer/GameRenderer fogRenderer Lnet/minecraft/client/renderer/fog/FogRenderer;
+accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferSubData (IILjava/nio/ByteBuffer;I)V
+accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferData (ILjava/nio/ByteBuffer;I)V

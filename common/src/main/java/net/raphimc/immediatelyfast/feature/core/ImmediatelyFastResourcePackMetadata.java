@@ -19,7 +19,7 @@ package net.raphimc.immediatelyfast.feature.core;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resource.metadata.ResourceMetadataSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +32,6 @@ public record ImmediatelyFastResourcePackMetadata(List<String> compatibleFeature
                     Codec.STRING.listOf().fieldOf("compatible_features").forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures)
             ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
     );
-    public static final ResourceMetadataSerializer<ImmediatelyFastResourcePackMetadata> SERIALIZER = new ResourceMetadataSerializer<>("immediatelyfast", CODEC);
+    public static final MetadataSectionType<ImmediatelyFastResourcePackMetadata> SERIALIZER = new MetadataSectionType<>("immediatelyfast", CODEC);
 
 }

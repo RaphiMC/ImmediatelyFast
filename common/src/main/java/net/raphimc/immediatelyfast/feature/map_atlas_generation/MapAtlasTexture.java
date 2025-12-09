@@ -17,9 +17,9 @@
  */
 package net.raphimc.immediatelyfast.feature.map_atlas_generation;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
 public class MapAtlasTexture implements AutoCloseable {
@@ -29,15 +29,15 @@ public class MapAtlasTexture implements AutoCloseable {
     public static final int MAPS_PER_ATLAS = (ATLAS_SIZE / MAP_SIZE) * (ATLAS_SIZE / MAP_SIZE);
 
     private final int id;
-    private final Identifier textureId;
-    private final NativeImageBackedTexture texture;
+    private final ResourceLocation textureId;
+    private final DynamicTexture texture;
     private int mapCount;
 
     public MapAtlasTexture(final int id) {
         this.id = id;
-        this.textureId = Identifier.of("immediatelyfast", "map_atlas/" + id);
-        this.texture = new NativeImageBackedTexture("ImmediatelyFast Map Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
-        MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, this.texture);
+        this.textureId = ResourceLocation.fromNamespaceAndPath("immediatelyfast", "map_atlas/" + id);
+        this.texture = new DynamicTexture("ImmediatelyFast Map Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
+        Minecraft.getInstance().getTextureManager().register(this.textureId, this.texture);
     }
 
     public int getNextMapLocation() {
@@ -56,11 +56,11 @@ public class MapAtlasTexture implements AutoCloseable {
         return this.id;
     }
 
-    public Identifier getTextureId() {
+    public ResourceLocation getTextureId() {
         return this.textureId;
     }
 
-    public NativeImageBackedTexture getTexture() {
+    public DynamicTexture getTexture() {
         return this.texture;
     }
 
@@ -70,7 +70,7 @@ public class MapAtlasTexture implements AutoCloseable {
 
     @Override
     public void close() {
-        MinecraftClient.getInstance().getTextureManager().destroyTexture(this.textureId);
+        Minecraft.getInstance().getTextureManager().release(this.textureId);
     }
 
 }

@@ -17,10 +17,10 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
-import net.minecraft.block.entity.SignText;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.SignText;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -40,11 +40,11 @@ public abstract class MixinSignText implements ISignText {
 
     @Shadow
     @Final
-    private Text[] messages;
+    private Component[] messages;
 
     @Shadow
     @Final
-    private Text[] filteredMessages;
+    private Component[] filteredMessages;
 
     @Shadow
     @Final
@@ -52,11 +52,11 @@ public abstract class MixinSignText implements ISignText {
 
     @Shadow
     @Final
-    private boolean glowing;
+    private boolean hasGlowingText;
 
     @Shadow
     @Nullable
-    private OrderedText[] orderedMessages;
+    private FormattedCharSequence[] renderMessages;
 
     @Unique
     private boolean immediatelyFast$shouldCache;
@@ -70,15 +70,15 @@ public abstract class MixinSignText implements ISignText {
     @Unique
     private boolean immediatelyFast$calculatedHashCode;
 
-    @Inject(method = "getOrderedMessages", at = @At("RETURN"))
-    private void checkShouldCache(CallbackInfoReturnable<OrderedText[]> cir) {
+    @Inject(method = "getRenderMessages", at = @At("RETURN"))
+    private void checkShouldCache(CallbackInfoReturnable<FormattedCharSequence[]> cir) {
         if (!this.immediatelyFast$checkedShouldCache) {
             this.immediatelyFast$checkedShouldCache = true;
             this.immediatelyFast$shouldCache = true;
-            for (OrderedText orderedText : this.orderedMessages) {
+            for (FormattedCharSequence line : this.renderMessages) {
                 if (!this.immediatelyFast$shouldCache) break;
 
-                orderedText.accept((index, style, codePoint) -> {
+                line.accept((index, style, codePoint) -> {
                     if (style.isObfuscated()) {
                         this.immediatelyFast$shouldCache = false;
                         return false;
@@ -90,8 +90,8 @@ public abstract class MixinSignText implements ISignText {
         }
     }
 
-    @Inject(method = "getOrderedMessages", at = @At(value = "FIELD", target = "Lnet/minecraft/block/entity/SignText;orderedMessages:[Lnet/minecraft/text/OrderedText;", opcode = Opcodes.PUTFIELD))
-    private void invalidateCache(CallbackInfoReturnable<OrderedText[]> cir) {
+    @Inject(method = "getRenderMessages", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/SignText;renderMessages:[Lnet/minecraft/util/FormattedCharSequence;", opcode = Opcodes.PUTFIELD))
+    private void invalidateCache(CallbackInfoReturnable<FormattedCharSequence[]> cir) {
         this.immediatelyFast$shouldCache = false;
         this.immediatelyFast$checkedShouldCache = false;
         this.immediatelyFast$cachedHashCode = 0;
@@ -113,14 +113,14 @@ public abstract class MixinSignText implements ISignText {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MixinSignText that = (MixinSignText) o;
-        return glowing == that.glowing && color == that.color && Arrays.equals(messages, that.messages) && Arrays.equals(filteredMessages, that.filteredMessages);
+        return hasGlowingText == that.hasGlowingText && color == that.color && Arrays.equals(messages, that.messages) && Arrays.equals(filteredMessages, that.filteredMessages);
     }
 
     @Override
     public int hashCode() {
         if (!this.immediatelyFast$calculatedHashCode) {
             this.immediatelyFast$calculatedHashCode = true;
-            int result = Objects.hash(color, glowing);
+            int result = Objects.hash(color, hasGlowingText);
             result = 31 * result + Arrays.hashCode(messages);
             result = 31 * result + Arrays.hashCode(filteredMessages);
             this.immediatelyFast$cachedHashCode = result;

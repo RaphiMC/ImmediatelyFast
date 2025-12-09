@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
-import net.minecraft.client.render.MapRenderState;
+import net.minecraft.client.renderer.state.MapRenderState;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import org.spongepowered.asm.mixin.Mixin;

@@ -18,43 +18,43 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import it.unimi.dsi.fastutil.objects.ReferenceList;
-import net.minecraft.client.util.BufferAllocator;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
-public class BufferAllocatorPool {
+public class ByteBufferBuilderPool {
 
     private static final ReferenceList<Entry> FREE = new ReferenceArrayList<>();
     private static final ReferenceList<Entry> IN_USE = new ReferenceArrayList<>();
-    private static final Reference2ObjectMap<BufferAllocator, Entry> BUFFER_ALLOCATOR_MAPPING = new Reference2ObjectOpenHashMap<>();
+    private static final Reference2ObjectMap<ByteBufferBuilder, Entry> BUFFER_BUILDER_MAPPING = new Reference2ObjectOpenHashMap<>();
 
-    private BufferAllocatorPool() {
+    private ByteBufferBuilderPool() {
     }
 
-    public static BufferAllocator borrowBufferAllocator() {
+    public static ByteBufferBuilder borrowBufferBuilder() {
         RenderSystem.assertOnRenderThread();
         Entry entry;
         if (FREE.isEmpty()) {
-            entry = new Entry(new BufferAllocator(256));
+            entry = new Entry(new ByteBufferBuilder(256));
         } else {
             entry = FREE.removeFirst();
-            if (entry.bufferAllocator.pointer == 0L) { // If the buffer was closed while in the pool
-                BUFFER_ALLOCATOR_MAPPING.remove(entry.bufferAllocator);
-                entry = new Entry(new BufferAllocator(256));
+            if (entry.bufferBuilder.pointer == 0L) { // If the buffer was closed while in the pool
+                BUFFER_BUILDER_MAPPING.remove(entry.bufferBuilder);
+                entry = new Entry(new ByteBufferBuilder(256));
             }
         }
         IN_USE.add(entry);
-        BUFFER_ALLOCATOR_MAPPING.put(entry.bufferAllocator, entry);
+        BUFFER_BUILDER_MAPPING.put(entry.bufferBuilder, entry);
         entry.onBorrow();
-        return entry.bufferAllocator;
+        return entry.bufferBuilder;
     }
 
-    public static void returnBufferAllocatorSafe(final BufferAllocator bufferAllocator) {
+    public static void returnBufferBuilderSafe(final ByteBufferBuilder bufferBuilder) {
         RenderSystem.assertOnRenderThread();
-        final Entry entry = BUFFER_ALLOCATOR_MAPPING.get(bufferAllocator);
+        final Entry entry = BUFFER_BUILDER_MAPPING.get(bufferBuilder);
         if (!IN_USE.remove(entry)) {
             return;
         }
@@ -68,7 +68,7 @@ public class BufferAllocatorPool {
 
     public static void onEndFrame() {
         if (!IN_USE.isEmpty()) {
-            // Reclaim all buffers that were not returned to the pool this and the last frame
+            // Reclaim all buffer builders that were not returned to the pool this and the last frame
             final boolean leak = IN_USE.removeIf(entry -> {
                 if (entry.inUseOverMultipleFrames) {
                     entry.onReturn();
@@ -78,7 +78,7 @@ public class BufferAllocatorPool {
                 return false;
             });
             if (leak) {
-                ImmediatelyFast.LOGGER.warn("Some BufferAllocators were not returned to the pool. Forcibly reclaiming them to prevent a memory leak.");
+                ImmediatelyFast.LOGGER.warn("Some BufferBuilders were not returned to the pool. Forcibly reclaiming them to prevent a memory leak.");
             }
 
             // Mark all as in use over multiple frames
@@ -89,8 +89,8 @@ public class BufferAllocatorPool {
 
         FREE.removeIf(entry -> {
             if (entry.shouldBeClosed()) {
-                entry.bufferAllocator.close();
-                BUFFER_ALLOCATOR_MAPPING.remove(entry.bufferAllocator);
+                entry.bufferBuilder.close();
+                BUFFER_BUILDER_MAPPING.remove(entry.bufferBuilder);
                 return true;
             }
             return false;
@@ -99,12 +99,12 @@ public class BufferAllocatorPool {
 
     private static class Entry {
 
-        private final BufferAllocator bufferAllocator;
+        private final ByteBufferBuilder bufferBuilder;
         private long lastAccessTime;
         private boolean inUseOverMultipleFrames;
 
-        public Entry(final BufferAllocator bufferAllocator) {
-            this.bufferAllocator = bufferAllocator;
+        public Entry(final ByteBufferBuilder bufferBuilder) {
+            this.bufferBuilder = bufferBuilder;
             this.lastAccessTime = System.currentTimeMillis();
         }
 
@@ -117,7 +117,7 @@ public class BufferAllocatorPool {
         }
 
         public void onReturn() {
-            this.bufferAllocator.reset();
+            this.bufferBuilder.discard();
             this.inUseOverMultipleFrames = false;
         }
 

@@ -17,12 +17,12 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
-import net.minecraft.client.gui.hud.debug.DebugHudEntries;
-import net.minecraft.client.gui.hud.debug.DebugHudEntry;
-import net.minecraft.client.gui.hud.debug.DebugHudEntryVisibility;
-import net.minecraft.client.gui.hud.debug.DebugProfileType;
-import net.minecraft.util.Identifier;
-import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastDebugHudEntry;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
+import net.minecraft.client.gui.components.debug.DebugScreenProfile;
+import net.minecraft.resources.ResourceLocation;
+import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastDebugScreenEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -34,26 +34,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-@Mixin(DebugHudEntries.class)
-public abstract class MixinDebugHudEntries {
+@Mixin(DebugScreenEntries.class)
+public abstract class MixinDebugScreenEntries {
 
     @Shadow
     @Final
     @Mutable
-    public static Map<DebugProfileType, Map<Identifier, DebugHudEntryVisibility>> PROFILES;
+    public static Map<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> PROFILES;
 
     @Shadow
-    private static Identifier register(Identifier id, DebugHudEntry entry) {
+    private static ResourceLocation register(ResourceLocation name, DebugScreenEntry entry) {
         return null;
     }
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void addImmediatelyFastEntry(CallbackInfo ci) {
-        final Identifier entryId = register(ImmediatelyFastDebugHudEntry.ENTRY_ID, new ImmediatelyFastDebugHudEntry());
-        final Map<DebugProfileType, Map<Identifier, DebugHudEntryVisibility>> profiles = new HashMap<>();
-        for (Map.Entry<DebugProfileType, Map<Identifier, DebugHudEntryVisibility>> entry : PROFILES.entrySet()) {
-            final Map<Identifier, DebugHudEntryVisibility> entries = new HashMap<>(entry.getValue());
-            entries.put(entryId, DebugHudEntryVisibility.IN_F3);
+        final ResourceLocation entryId = register(ImmediatelyFastDebugScreenEntry.ENTRY_ID, new ImmediatelyFastDebugScreenEntry());
+        final Map<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> profiles = new HashMap<>();
+        for (Map.Entry<DebugScreenProfile, Map<ResourceLocation, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
+            final Map<ResourceLocation, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
+            entries.put(entryId, DebugScreenEntryStatus.IN_F3);
             profiles.put(entry.getKey(), entries);
         }
         PROFILES = profiles;

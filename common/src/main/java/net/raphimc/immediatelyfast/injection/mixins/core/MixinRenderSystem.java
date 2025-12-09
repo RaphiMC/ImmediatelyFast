@@ -19,7 +19,7 @@ package net.raphimc.immediatelyfast.injection.mixins.core;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.BufferAllocatorPool;
+import net.raphimc.immediatelyfast.feature.core.ByteBufferBuilderPool;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,7 +35,7 @@ public abstract class MixinRenderSystem {
 
     @Inject(method = "flipFrame", at = @At("HEAD"))
     private static void endFrame(CallbackInfo ci) {
-        BufferAllocatorPool.onEndFrame();
+        ByteBufferBuilderPool.onEndFrame();
     }
 
 }

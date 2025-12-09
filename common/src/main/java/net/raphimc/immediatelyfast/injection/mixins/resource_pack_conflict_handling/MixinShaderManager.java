@@ -18,13 +18,13 @@
 package net.raphimc.immediatelyfast.injection.mixins.resource_pack_conflict_handling;
 
 import com.mojang.blaze3d.shaders.ShaderType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderLoader;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ShaderManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
 import net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling.CoreShaderBlacklist;
@@ -38,28 +38,28 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mixin(ShaderLoader.class)
-public abstract class MixinShaderLoader {
+@Mixin(ShaderManager.class)
+public abstract class MixinShaderManager {
 
-    @Inject(method = "apply(Lnet/minecraft/client/gl/ShaderLoader$Definitions;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("RETURN"))
-    private void checkForCoreShaderModifications(ShaderLoader.Definitions definitions, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
-        ResourcePack resourcePackWhichBreaksFontAtlasResizing = null;
+    @Inject(method = "apply(Lnet/minecraft/client/renderer/ShaderManager$Configs;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
+    private void checkForCoreShaderModifications(ShaderManager.Configs configs, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
+        PackResources resourcePackWhichBreaksFontAtlasResizing = null;
         try {
-            final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
-            for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
-                final Identifier vertexShaderIdentifier = ShaderType.VERTEX.idConverter().toResourcePath(shaderIdentifier);
-                final ResourcePack vertexShaderResourcePack = resourceManager.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
-                if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+            final Set<PackResources> breakingResourcePacks = new HashSet<>();
+            for (ResourceLocation shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
+                final ResourceLocation vertexShaderIdentifier = ShaderType.VERTEX.idConverter().idToFile(shaderIdentifier);
+                final PackResources vertexShaderResourcePack = resourceManager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
+                if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
                     breakingResourcePacks.add(vertexShaderResourcePack);
                 }
-                final Identifier fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().toResourcePath(shaderIdentifier);
-                final ResourcePack fragmentShaderResourcePack = resourceManager.getResource(fragmentShaderIdentifier).map(Resource::getPack).orElse(null);
-                if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
+                final ResourceLocation fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().idToFile(shaderIdentifier);
+                final PackResources fragmentShaderResourcePack = resourceManager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
+                if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
                     breakingResourcePacks.add(fragmentShaderResourcePack);
                 }
             }
-            for (ResourcePack resourcePack : breakingResourcePacks) {
-                ImmediatelyFastResourcePackMetadata metadata = resourcePack.parseMetadata(ImmediatelyFastResourcePackMetadata.SERIALIZER);
+            for (PackResources resourcePack : breakingResourcePacks) {
+                ImmediatelyFastResourcePackMetadata metadata = resourcePack.getMetadataSection(ImmediatelyFastResourcePackMetadata.SERIALIZER);
                 if (metadata == null) {
                     metadata = ImmediatelyFastResourcePackMetadata.DEFAULT;
                 }
@@ -72,7 +72,7 @@ public abstract class MixinShaderLoader {
         }
 
         if (ImmediatelyFast.runtimeConfig.font_atlas_resizing && resourcePackWhichBreaksFontAtlasResizing != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
+            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.packId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
             ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
             this.immediatelyFast$reloadFontStorages();
         } else {
@@ -85,8 +85,8 @@ public abstract class MixinShaderLoader {
 
     @Unique
     private void immediatelyFast$reloadFontStorages() {
-        // Force reload the font storages to rebuild the font atlas textures
-        MinecraftClient.getInstance().fontManager.setActiveFilters(MinecraftClient.getInstance().options);
+        // Force reload the font manager to rebuild the font atlas textures
+        Minecraft.getInstance().fontManager.updateOptions(Minecraft.getInstance().options);
     }
 
 }

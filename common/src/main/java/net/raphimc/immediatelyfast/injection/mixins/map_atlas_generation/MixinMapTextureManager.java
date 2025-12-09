@@ -21,9 +21,9 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.client.texture.MapTextureManager;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.item.map.MapState;
+import net.minecraft.client.resources.MapTextureManager;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,7 +44,7 @@ public abstract class MixinMapTextureManager implements IMapTextureManager {
     @Unique
     private final Int2IntMap immediatelyFast$mapIdToAtlasMapping = new Int2IntOpenHashMap();
 
-    @Inject(method = "clear", at = @At("RETURN"))
+    @Inject(method = "resetData", at = @At("RETURN"))
     private void clearMapAtlas(final CallbackInfo ci) {
         for (MapAtlasTexture texture : this.immediatelyFast$mapAtlasTextures.values()) {
             texture.close();
@@ -54,8 +54,8 @@ public abstract class MixinMapTextureManager implements IMapTextureManager {
         this.immediatelyFast$mapIdToAtlasMapping.clear();
     }
 
-    @Inject(method = "getMapTexture", at = @At("HEAD"))
-    private void createMapAtlasTexture(MapIdComponent mapId, MapState state, CallbackInfoReturnable<MapTextureManager.MapTexture> cir) {
+    @Inject(method = "getOrCreateMapInstance", at = @At("HEAD"))
+    private void createMapAtlasTexture(MapId mapId, MapItemSavedData data, CallbackInfoReturnable<MapTextureManager.MapInstance> cir) {
         this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(mapId.id(), k -> {
             for (MapAtlasTexture atlasTexture : this.immediatelyFast$mapAtlasTextures.values()) {
                 final int location = atlasTexture.getNextMapLocation();

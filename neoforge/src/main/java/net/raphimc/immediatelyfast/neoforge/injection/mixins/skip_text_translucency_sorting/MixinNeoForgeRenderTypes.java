@@ -31,7 +31,7 @@ public abstract class MixinNeoForgeRenderTypes {
             "getTextIntensityPolygonOffsetFiltered",
             "getTextSeeThroughFiltered",
             "getTextIntensitySeeThroughFiltered"
-    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 3)
+    }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderType;create(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;"), index = 3)
     private static boolean changeTranslucency(boolean value) {
         return false;
     }

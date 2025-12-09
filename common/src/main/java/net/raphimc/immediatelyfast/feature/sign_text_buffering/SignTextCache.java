@@ -21,41 +21,41 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.client.render.ProjectionMatrix2;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloader;
+import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.level.block.entity.SignText;
 
 import java.util.concurrent.TimeUnit;
 
-public class SignTextCache implements SynchronousResourceReloader {
+public class SignTextCache implements ResourceManagerReloadListener {
 
-    public final SignAtlasFramebuffer signAtlasFramebuffer = new SignAtlasFramebuffer(0);
-    public final ProjectionMatrix2 signProjectionMatrix = new ProjectionMatrix2("immediatelyfast:sign_atlas_text", -1000F, 1000F, true);
-    public final GpuBufferSlice signProjectionMatrixBuffer = this.signProjectionMatrix.set(SignAtlasFramebuffer.ATLAS_SIZE, SignAtlasFramebuffer.ATLAS_SIZE);
-    public final Cache<SignText, SignAtlasFramebuffer.Slot> slotCache = CacheBuilder.newBuilder()
+    public final SignAtlasRenderTarget signAtlasRenderTarget = new SignAtlasRenderTarget(0);
+    public final CachedOrthoProjectionMatrixBuffer signProjectionMatrix = new CachedOrthoProjectionMatrixBuffer("immediatelyfast:sign_atlas_text", -1000F, 1000F, true);
+    public final GpuBufferSlice signProjectionMatrixBuffer = this.signProjectionMatrix.getBuffer(SignAtlasRenderTarget.ATLAS_SIZE, SignAtlasRenderTarget.ATLAS_SIZE);
+    public final Cache<SignText, SignAtlasRenderTarget.Slot> slotCache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .removalListener(notification -> {
                 if (notification.getCause().equals(RemovalCause.EXPLICIT)) return;
 
-                final SignAtlasFramebuffer.Slot slot = (SignAtlasFramebuffer.Slot) notification.getValue();
+                final SignAtlasRenderTarget.Slot slot = (SignAtlasRenderTarget.Slot) notification.getValue();
                 if (slot != null) {
                     slot.markFree();
                 }
             })
             .build();
-    public final RenderLayer renderLayer = RenderLayer.getText(this.signAtlasFramebuffer.getTextureId());
+    public final RenderType renderType = RenderType.text(this.signAtlasRenderTarget.getTextureId());
     public boolean lockFramebuffer = false;
     public boolean lockViewport = false;
 
     public void clearCache() {
         this.slotCache.invalidateAll();
-        this.signAtlasFramebuffer.clear();
+        this.signAtlasRenderTarget.clear();
     }
 
     @Override
-    public void reload(final ResourceManager manager) {
+    public void onResourceManagerReload(final ResourceManager manager) {
         this.clearCache();
     }
 

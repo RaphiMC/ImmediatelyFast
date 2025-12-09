@@ -17,12 +17,12 @@
  */
 package net.raphimc.immediatelyfast.feature.core;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.debug.DebugHudEntry;
-import net.minecraft.client.gui.hud.debug.DebugHudLines;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
+import net.minecraft.client.gui.components.debug.DebugScreenEntry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
@@ -31,17 +31,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ImmediatelyFastDebugHudEntry implements DebugHudEntry {
+public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
 
-    public static final Identifier ENTRY_ID = Identifier.of("immediatelyfast", "immediatelyfast");
-    private static final Identifier SECTION_ID = ENTRY_ID;
+    public static final ResourceLocation ENTRY_ID = ResourceLocation.fromNamespaceAndPath("immediatelyfast", "immediatelyfast");
+    private static final ResourceLocation SECTION_ID = ENTRY_ID;
 
     @Override
-    public void render(final DebugHudLines debugHudLines, final World world, final WorldChunk clientChunk, final WorldChunk chunk) {
+    public void display(final DebugScreenDisplayer displayer, final Level level, final LevelChunk clientChunk, final LevelChunk serverChunk) {
         final List<String> lines = new ArrayList<>();
         lines.add("ImmediatelyFast " + ImmediatelyFast.VERSION);
-        lines.add("Buffer Pool: " + BufferAllocatorPool.getSize());
-        if (MinecraftClient.getInstance().getMapTextureManager() instanceof IMapTextureManager mapTextureManager) {
+        lines.add("Buffer Pool: " + ByteBufferBuilderPool.getSize());
+        if (Minecraft.getInstance().getMapTextureManager() instanceof IMapTextureManager mapTextureManager) {
             final Collection<MapAtlasTexture> atlasTextures = mapTextureManager.immediatelyFast$getAllMapAtlasTextures();
             final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlasTexture::getMapCount).sum();
             lines.add("Map Atlas: " + atlasTextures.size() + "x" + MapAtlasTexture.ATLAS_SIZE + "x" + MapAtlasTexture.ATLAS_SIZE + " (" + totalMapCount + " maps)");
@@ -49,11 +49,11 @@ public class ImmediatelyFastDebugHudEntry implements DebugHudEntry {
         if (ImmediatelyFast.signTextCache != null) {
             lines.add("Sign Text Cache: " + ImmediatelyFast.signTextCache.slotCache.size() + " entries");
         }
-        debugHudLines.addLinesToSection(SECTION_ID, lines);
+        displayer.addToGroup(SECTION_ID, lines);
     }
 
     @Override
-    public boolean canShow(final boolean reducedDebugInfo) {
+    public boolean isAllowed(final boolean reducedDebugInfo) {
         return true;
     }
 

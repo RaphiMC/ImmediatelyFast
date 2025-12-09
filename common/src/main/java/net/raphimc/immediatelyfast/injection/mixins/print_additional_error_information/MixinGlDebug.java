@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.print_additional_error_information;
 
-import net.minecraft.client.gl.GlDebug;
+import com.mojang.blaze3d.opengl.GlDebug;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,12 +31,12 @@ public abstract class MixinGlDebug {
     @Unique
     private static long immediatelyFast$lastTime;
 
-    @ModifyVariable(method = "enableDebug", at = @At("HEAD"), index = 1, argsOnly = true)
+    @ModifyVariable(method = "enableDebugCallback", at = @At("HEAD"), index = 1, argsOnly = true)
     private static boolean enableSyncDebug(boolean sync) {
         return true;
     }
 
-    @Redirect(method = "onDebugMessage", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    @Redirect(method = "printDebugLog", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
     private void appendStackTrace(Logger instance, String message, Object argument) {
         if (System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
             immediatelyFast$lastTime = System.currentTimeMillis();

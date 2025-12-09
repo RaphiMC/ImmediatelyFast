@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-public class NoTextTransformMatrixStack extends MatrixStack {
+public class NoTextTransformPoseStack extends PoseStack {
 }

@@ -27,14 +27,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GlStateManager.class)
 public abstract class MixinGlStateManager {
 
-    @Inject(method = {"_glBindFramebuffer"}, at = @At("HEAD"), cancellable = true)
+    @Inject(method = "_glBindFramebuffer", at = @At("HEAD"), cancellable = true)
     private static void lockFramebuffer(CallbackInfo ci) {
         if (ImmediatelyFast.signTextCache != null && ImmediatelyFast.signTextCache.lockFramebuffer) {
             ci.cancel();
         }
     }
 
-    @Inject(method = {"_viewport"}, at = @At("HEAD"), cancellable = true)
+    @Inject(method = "_viewport", at = @At("HEAD"), cancellable = true)
     private static void lockViewport(CallbackInfo ci) {
         if (ImmediatelyFast.signTextCache != null && ImmediatelyFast.signTextCache.lockViewport) {
             ci.cancel();

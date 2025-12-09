@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.font_atlas_resizing;
 
-import net.minecraft.client.font.GlyphAtlasTexture;
+import net.minecraft.client.gui.font.FontTexture;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,13 +28,13 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Modifies the size of the glyph atlas texture.
+ * Modifies the size of the font atlas texture.
  * <p>
  * Vanilla uses a 256x256 texture, which is too small for high resolution fonts.
  * If the texture is too small, there may only be under ten glyphs per texture which causes a lot of texture switching when rendering text.
  */
-@Mixin(GlyphAtlasTexture.class)
-public abstract class MixinGlyphAtlasTexture {
+@Mixin(FontTexture.class)
+public abstract class MixinFontTexture {
 
     @Unique
     private boolean immediatelyFast$shouldResizeFontAtlas;
@@ -49,13 +49,13 @@ public abstract class MixinGlyphAtlasTexture {
     }
 
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
-    private int modifyGlyphAtlasTextureSize(int original) {
+    private int modifyTextureSize(int original) {
         return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256;
     }
 
     @SuppressWarnings("MixinAnnotationTarget")
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
-    private float modifyGlyphAtlasTextureSize(float original) {
+    private float modifyTextureSize(float original) {
         return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256F;
     }
 

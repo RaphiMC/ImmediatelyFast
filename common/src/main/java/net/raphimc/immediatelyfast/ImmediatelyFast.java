@@ -20,8 +20,8 @@ package net.raphimc.immediatelyfast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
@@ -106,12 +106,12 @@ public class ImmediatelyFast {
         if (ImmediatelyFast.config.experimental_sign_text_buffering) {
             ImmediatelyFast.signTextCache = new SignTextCache();
             if (PlatformCode.getModVersion("neoforge").isEmpty()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
-                ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(ImmediatelyFast.signTextCache);
+                ((ReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(ImmediatelyFast.signTextCache);
             }
         }
     }
 
-    public static void onWorldJoin() {
+    public static void onLevelChange() {
         if (ImmediatelyFast.signTextCache != null) {
             ImmediatelyFast.signTextCache.clearCache();
         }

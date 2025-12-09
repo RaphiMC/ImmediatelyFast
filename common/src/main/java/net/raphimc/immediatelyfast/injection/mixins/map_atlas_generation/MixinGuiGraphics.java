@@ -22,8 +22,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.MapRenderState;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.state.MapRenderState;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,11 +31,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
 import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
 
-@Mixin(DrawContext.class)
-public abstract class MixinDrawContext {
+@Mixin(GuiGraphics.class)
+public abstract class MixinGuiGraphics {
 
-    @WrapOperation(method = "drawMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexturedQuad(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;IIIIFFFFI)V", ordinal = 0))
-    private void drawAtlasTexture(DrawContext instance, RenderPipeline pipeline, GpuTextureView texture, int x1, int y1, int x2, int y2, float u1, float u2, float v1, float v2, int color, Operation<Void> original, @Local(argsOnly = true) MapRenderState renderState) {
+    @WrapOperation(method = "submitMapRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBlit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;IIIIFFFFI)V", ordinal = 0))
+    private void modifyTextureCoordinates(GuiGraphics instance, RenderPipeline pipeline, GpuTextureView textureView, int x1, int y1, int x2, int y2, float u1, float u2, float v1, float v2, int color, Operation<Void> original, @Local(argsOnly = true) MapRenderState renderState) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
         if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {
             u1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
@@ -43,7 +43,7 @@ public abstract class MixinDrawContext {
             v1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
             v2 = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasY() + MAP_SIZE) / ATLAS_SIZE;
         }
-        original.call(instance, pipeline, texture, x1, y1, x2, y2, u1, u2, v1, v2, color);
+        original.call(instance, pipeline, textureView, x1, y1, x2, y2, u1, u2, v1, v2, color);
     }
 
 }

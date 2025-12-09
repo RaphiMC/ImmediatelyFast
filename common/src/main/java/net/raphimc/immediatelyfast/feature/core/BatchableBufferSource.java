@@ -17,46 +17,50 @@
  */
 package net.raphimc.immediatelyfast.feature.core;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
-import net.minecraft.client.util.BufferAllocator;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.entity.layers.WolfCollarLayer;
+import net.minecraft.resources.ResourceLocation;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.IrisCompat;
 
 import java.util.*;
 
-public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
+public class BatchableBufferSource extends MultiBufferSource.BufferSource implements AutoCloseable {
 
     /**
      * A fallback buffer has to be defined because Iris tries to release that buffer, so it can't be null. It should be fine
      * to reuse/release the buffer multiple times, as it won't ever be written into by minecraft or Iris.
      */
-    private final static BufferAllocator FALLBACK_BUFFER = new BufferAllocator(0);
+    private final static ByteBufferBuilder FALLBACK_BUFFER = new ByteBufferBuilder(0);
 
-    protected final Map<RenderLayer, ReferenceSet<BufferBuilder>> pendingBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
-    protected final Set<RenderLayer> activeLayers = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
+    protected final Map<RenderType, ReferenceSet<BufferBuilder>> dynamicBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
+    protected final Set<RenderType> activeRenderTypes = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
 
-    protected boolean drawFallbackLayersFirst = false;
+    protected boolean drawDynamicBuffersFirst = false;
 
     public BatchableBufferSource() {
         this(Object2ObjectSortedMaps.emptyMap());
     }
 
-    public BatchableBufferSource(final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
-        this(FALLBACK_BUFFER, layerBuffers);
+    public BatchableBufferSource(final SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers) {
+        this(FALLBACK_BUFFER, fixedBuffers);
     }
 
-    public BatchableBufferSource(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
-        super(fallbackBuffer, layerBuffers);
+    public BatchableBufferSource(final ByteBufferBuilder sharedBuffer, final SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers) {
+        super(sharedBuffer, fixedBuffers);
     }
 
     @Override
-    public VertexConsumer getBuffer(final RenderLayer layer) {
-        if (!this.drawFallbackLayersFirst) {
-            if (this.currentLayer != null && this.currentLayer != layer && !this.layerBuffers.containsKey(this.currentLayer)) {
-                this.drawFallbackLayersFirst = true;
+    public VertexConsumer getBuffer(final RenderType renderType) {
+        if (!this.drawDynamicBuffersFirst) {
+            if (this.lastSharedType != null && this.lastSharedType != renderType && !this.fixedBuffers.containsKey(this.lastSharedType)) {
+                this.drawDynamicBuffersFirst = true;
             }
         }
 
@@ -65,115 +69,115 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         final BufferBuilder bufferBuilder;
-        boolean hasBufferForRenderLayer = layer.areVerticesNotShared() && this.pendingBuffers.containsKey(layer);
-        if (!layer.areVerticesNotShared()) {
-            bufferBuilder = new BufferBuilder(this.getNextBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
-            this.currentLayer = layer;
-        } else if (hasBufferForRenderLayer) {
-            bufferBuilder = this.pendingBuffers.get(layer).iterator().next();
-        } else if (this.layerBuffers.containsKey(layer)) {
-            bufferBuilder = new BufferBuilder(this.layerBuffers.get(layer), layer.getDrawMode(), layer.getVertexFormat());
+        boolean hasBufferForRenderType = renderType.canConsolidateConsecutiveGeometry() && this.dynamicBuffers.containsKey(renderType);
+        if (!renderType.canConsolidateConsecutiveGeometry()) {
+            bufferBuilder = new BufferBuilder(this.getNextByteBufferBuilder(), renderType.mode(), renderType.format());
+            this.lastSharedType = renderType;
+        } else if (hasBufferForRenderType) {
+            bufferBuilder = this.dynamicBuffers.get(renderType).iterator().next();
+        } else if (this.fixedBuffers.containsKey(renderType)) {
+            bufferBuilder = new BufferBuilder(this.fixedBuffers.get(renderType), renderType.mode(), renderType.format());
         } else {
-            bufferBuilder = new BufferBuilder(this.getNextBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
-            this.currentLayer = layer;
+            bufferBuilder = new BufferBuilder(this.getNextByteBufferBuilder(), renderType.mode(), renderType.format());
+            this.lastSharedType = renderType;
         }
 
         if (IrisCompat.IRIS_LOADED) {
             IrisCompat.skipExtension.set(false);
         }
 
-        if (!hasBufferForRenderLayer) {
-            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
+        if (!hasBufferForRenderType) {
+            this.dynamicBuffers.computeIfAbsent(renderType, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
         }
 
-        if (hasBufferForRenderLayer) {
-            if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
-                this.activeLayers.remove(layer);
-                this.activeLayers.add(layer);
+        if (hasBufferForRenderType) {
+            if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || renderType.name.contains("immediatelyfast:renderlast")) && this.activeRenderTypes.contains(renderType)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
+                this.activeRenderTypes.remove(renderType);
+                this.activeRenderTypes.add(renderType);
             }
         } else {
-            this.activeLayers.add(layer);
+            this.activeRenderTypes.add(renderType);
         }
 
         return bufferBuilder;
     }
 
     @Override
-    public void drawCurrentLayer() {
-        this.currentLayer = null;
-        this.drawFallbackLayersFirst = false;
+    public void endLastBatch() {
+        this.lastSharedType = null;
+        this.drawDynamicBuffersFirst = false;
 
-        int sortedLayersLength = 0;
-        final RenderLayer[] sortedLayers = new RenderLayer[this.activeLayers.size()];
-        for (RenderLayer layer : this.activeLayers) {
-            if (!this.layerBuffers.containsKey(layer)) {
-                sortedLayers[sortedLayersLength++] = layer;
+        int sortedRenderTypesLength = 0;
+        final RenderType[] sortedRenderTypes = new RenderType[this.activeRenderTypes.size()];
+        for (RenderType renderType : this.activeRenderTypes) {
+            if (!this.fixedBuffers.containsKey(renderType)) {
+                sortedRenderTypes[sortedRenderTypesLength++] = renderType;
             }
         }
-        if (sortedLayersLength == 0) {
+        if (sortedRenderTypesLength == 0) {
             return;
         }
 
-        Arrays.sort(sortedLayers, (l1, l2) -> Integer.compare(this.getLayerOrder(l1), this.getLayerOrder(l2)));
-        for (int i = 0; i < sortedLayersLength; i++) {
-            this.draw(sortedLayers[i]);
+        Arrays.sort(sortedRenderTypes, (t1, t2) -> Integer.compare(this.getRenderTypeOrder(t1), this.getRenderTypeOrder(t2)));
+        for (int i = 0; i < sortedRenderTypesLength; i++) {
+            this.endBatch(sortedRenderTypes[i]);
         }
     }
 
     @Override
-    public void draw() {
-        if (this.activeLayers.isEmpty()) {
+    public void endBatch() {
+        if (this.activeRenderTypes.isEmpty()) {
             this.close();
             return;
         }
 
-        this.drawCurrentLayer();
-        for (RenderLayer layer : this.layerBuffers.keySet()) {
-            this.draw(layer);
+        this.endLastBatch();
+        for (RenderType renderType : this.fixedBuffers.keySet()) {
+            this.endBatch(renderType);
         }
     }
 
     @Override
-    public void draw(final RenderLayer layer) {
-        if (this.drawFallbackLayersFirst) {
-            this.drawCurrentLayer();
+    public void endBatch(final RenderType renderType) {
+        if (this.drawDynamicBuffersFirst) {
+            this.endLastBatch();
         }
 
-        this.drawDirect(layer);
+        this.drawDirect(renderType);
     }
 
     @Override
     public void close() {
-        this.currentLayer = null;
-        this.drawFallbackLayersFirst = false;
+        this.lastSharedType = null;
+        this.drawDynamicBuffersFirst = false;
 
-        for (RenderLayer layer : this.activeLayers) {
-            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.endNullable();
-                BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
+        for (RenderType renderType : this.activeRenderTypes) {
+            for (BufferBuilder bufferBuilder : this.getBufferBuilder(renderType)) {
+                bufferBuilder.build();
+                ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
             }
         }
 
-        this.activeLayers.clear();
-        this.pendingBuffers.clear();
+        this.activeRenderTypes.clear();
+        this.dynamicBuffers.clear();
     }
 
-    public void drawDirect(final RenderLayer layer) {
+    public void drawDirect(final RenderType renderType) {
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(false);
         }
 
-        this.activeLayers.remove(layer);
-        for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-            final BufferAllocator prevBufferAllocator = this.allocator;
-            this.allocator = bufferBuilder.allocator;
-            this.draw(layer, bufferBuilder);
-            this.allocator = prevBufferAllocator;
-            BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
+        this.activeRenderTypes.remove(renderType);
+        for (BufferBuilder bufferBuilder : this.getBufferBuilder(renderType)) {
+            final ByteBufferBuilder prevBufferBuilder = this.sharedBuffer;
+            this.sharedBuffer = bufferBuilder.buffer;
+            this.endBatch(renderType, bufferBuilder);
+            this.sharedBuffer = prevBufferBuilder;
+            ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
         }
-        this.pendingBuffers.remove(layer);
-        if (this.currentLayer == layer) {
-            this.currentLayer = null;
+        this.dynamicBuffers.remove(renderType);
+        if (this.lastSharedType == renderType) {
+            this.lastSharedType = null;
         }
 
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
@@ -181,37 +185,37 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
     }
 
-    public boolean hasActiveLayers() {
-        return !this.activeLayers.isEmpty();
+    public boolean hasActiveRenderTypes() {
+        return !this.activeRenderTypes.isEmpty();
     }
 
-    protected Set<BufferBuilder> getBufferBuilder(final RenderLayer layer) {
-        if (this.pendingBuffers.containsKey(layer)) {
-            return this.pendingBuffers.get(layer);
+    protected Set<BufferBuilder> getBufferBuilder(final RenderType renderType) {
+        if (this.dynamicBuffers.containsKey(renderType)) {
+            return this.dynamicBuffers.get(renderType);
         } else {
             return Collections.emptySet();
         }
     }
 
-    protected int getLayerOrder(final RenderLayer layer) {
-        if (layer == null) return Integer.MAX_VALUE;
+    protected int getRenderTypeOrder(final RenderType renderType) {
+        if (renderType == null) return Integer.MAX_VALUE;
 
         int order = 0;
-        if (layer instanceof RenderLayer.MultiPhase multiPhase) {
-            final Identifier textureId = multiPhase.phases.texture.getId().orElse(null);
+        if (renderType instanceof RenderType.CompositeRenderType compositeRenderType) {
+            final ResourceLocation textureId = compositeRenderType.state.textureState.cutoutTexture().orElse(null);
             if (textureId != null) {
                 if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
-                    if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
+                    if (textureId.equals(WolfCollarLayer.WOLF_COLLAR_LOCATION)) {
                         order = 2;
                     } else {
                         order = 1;
                     }
-                } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
+                } else if (textureId.equals(Sheets.ARMOR_TRIMS_SHEET)) {
                     order = 1;
-                } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text")) {
-                    // Draws vanilla text over custom font layers
+                } else if (renderType.name.startsWith("text") || renderType.name.startsWith("neoforge_text")) {
+                    // Draws vanilla text over custom font text
                     // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
-                    if (textureId.getNamespace().equals("minecraft")) {
+                    if (textureId.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
                         order = 2;
                     } else {
                         order = 1;
@@ -220,18 +224,18 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             }
         }
 
-        if (!layer.isTranslucent()) {
+        if (!renderType.sortOnUpload()) {
             return order;
         } else {
             return 100_000_000 + order;
         }
     }
 
-    private BufferAllocator getNextBufferAllocator() {
-        if (this.allocator != FALLBACK_BUFFER && this.currentLayer == null && this.allocator.pointer != 0L) {
-            return this.allocator;
+    private ByteBufferBuilder getNextByteBufferBuilder() {
+        if (this.sharedBuffer != FALLBACK_BUFFER && this.lastSharedType == null && this.sharedBuffer.pointer != 0L) {
+            return this.sharedBuffer;
         } else {
-            return BufferAllocatorPool.borrowBufferAllocator();
+            return ByteBufferBuilderPool.borrowBufferBuilder();
         }
     }
 
