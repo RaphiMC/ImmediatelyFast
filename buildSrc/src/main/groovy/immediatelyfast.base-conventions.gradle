@@ -12,6 +12,17 @@ loom {
     }
 }
 
+repositories {
+    maven {
+        name = "Lenni0451"
+        url = "https://maven.lenni0451.net/releases"
+
+        content {
+            includeGroup "net.lenni0451"
+        }
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     //mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
