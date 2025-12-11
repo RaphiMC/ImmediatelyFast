@@ -48,7 +48,7 @@ public abstract class MixinMapRenderer {
     @ModifyArg(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitCustom(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue$Custom;)V", ordinal = 0))
     private OrderedRenderCommandQueue.Custom drawAtlasTexture(OrderedRenderCommandQueue.Custom customRenderer, @Local(argsOnly = true) MapRenderState renderState, @Local(argsOnly = true) int light) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
-        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {
+        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null && immediatelyFast$renderState.immediatelyFast$getAtlasTexture().getTextureId().equals(renderState.texture)) {
             final float u1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
             final float u2 = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
             final float v1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;

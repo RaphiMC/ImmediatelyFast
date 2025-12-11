@@ -37,7 +37,7 @@ public abstract class MixinDrawContext {
     @WrapOperation(method = "drawMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexturedQuad(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;IIIIFFFFI)V", ordinal = 0))
     private void drawAtlasTexture(DrawContext instance, RenderPipeline pipeline, GpuTextureView texture, int x1, int y1, int x2, int y2, float u1, float u2, float v1, float v2, int color, Operation<Void> original, @Local(argsOnly = true) MapRenderState renderState) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
-        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {
+        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null && immediatelyFast$renderState.immediatelyFast$getAtlasTexture().getTextureId().equals(renderState.texture)) {
             u1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
             u2 = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
             v1 = (float) immediatelyFast$renderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
