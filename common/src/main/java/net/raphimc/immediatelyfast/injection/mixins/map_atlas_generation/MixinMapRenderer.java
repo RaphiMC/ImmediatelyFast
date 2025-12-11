@@ -49,7 +49,7 @@ public abstract class MixinMapRenderer {
     @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;texture(FF)Lnet/minecraft/client/render/VertexConsumer;"), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;vertex(Lorg/joml/Matrix4f;FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 0), to = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;light(I)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 3)))
     private VertexConsumer drawAtlasTexture(VertexConsumer instance, float u, float v, @Local(argsOnly = true) MapRenderState renderState) {
         final IMapRenderState immediatelyFast$renderState = (IMapRenderState) renderState;
-        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null) {
+        if (immediatelyFast$renderState.immediatelyFast$getAtlasTexture() != null && immediatelyFast$renderState.immediatelyFast$getAtlasTexture().getIdentifier().equals(renderState.texture)) {
             if (u == 0 && v == 1) {
                 u = (float) immediatelyFast$renderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
                 v = (float) (immediatelyFast$renderState.immediatelyFast$getAtlasY() + MAP_SIZE) / ATLAS_SIZE;
