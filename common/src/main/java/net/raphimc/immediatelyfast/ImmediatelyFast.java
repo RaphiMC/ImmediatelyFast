@@ -93,8 +93,8 @@ public class ImmediatelyFast {
         }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {
-                ImmediatelyFast.LOGGER.info("Found Iris/Oculus " + version + ". Enabling compatibility.");
+            PlatformCode.getModVersion("iris").ifPresent(version -> {
+                ImmediatelyFast.LOGGER.info("Found Iris " + version + ". Enabling compatibility.");
                 IrisCompat.init();
             });
         }
