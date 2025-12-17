@@ -16,6 +16,7 @@
     "core.compat.MixinShaderLoader",
     "core.compat.MixinShaderProgram",
     "core.compat.MixinTextDisplayEntityRenderer",
+    "core.compat.iris.MixinIris_ShadowRenderer",
     "disable_error_checking.MixinGL11",
     "fast_buffer_upload.MixinVertexBuffer",
     "fast_text_lookup.MixinTextRenderer_Drawer",
