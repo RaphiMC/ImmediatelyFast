@@ -1,2 +1,2 @@
-* Allow ImmediatelyFast to run with VulkanMod (It mostly works with VulkanMod, except for the experimental sign buffering optimization)
-* Fixed experimental sign buffering sometimes not rendering text glow effect
+* Made ImmediatelyFast compatible with Java 25
+* Only apply map atlas texture coords when the map texture is set correctly (Fixes map rendering issues with ImageFrameClient mod)
