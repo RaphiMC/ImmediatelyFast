@@ -66,6 +66,17 @@ public class ByteBufferBuilderPool {
         return FREE.size() + IN_USE.size();
     }
 
+    public static long getAllocatedBytes() {
+        long total = 0;
+        for (Entry entry : FREE) {
+            total += entry.bufferBuilder.capacity;
+        }
+        for (Entry entry : IN_USE) {
+            total += entry.bufferBuilder.capacity;
+        }
+        return total;
+    }
+
     public static void onEndFrame() {
         if (!IN_USE.isEmpty()) {
             // Reclaim all buffer builders that were not returned to the pool this and the last frame
