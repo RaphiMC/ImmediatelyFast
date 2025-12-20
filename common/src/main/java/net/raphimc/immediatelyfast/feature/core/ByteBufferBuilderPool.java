@@ -69,17 +69,21 @@ public class ByteBufferBuilderPool {
     public static void onEndFrame() {
         if (!IN_USE.isEmpty()) {
             // Reclaim all buffer builders that were not returned to the pool this and the last frame
-            final boolean leak = IN_USE.removeIf(entry -> {
+            IN_USE.removeIf(entry -> {
                 if (entry.inUseOverMultipleFrames) {
-                    entry.onReturn();
-                    FREE.addFirst(entry);
+                    ImmediatelyFast.LOGGER.warn("!!! Possible memory leak detected!!! A BufferBuilder was not returned to the pool. This is not a bug in ImmediatelyFast.");
+                    ImmediatelyFast.LOGGER.warn("Allocation stack trace:");
+                    if (entry.allocationStackTrace != null) {
+                        for (StackTraceElement element : entry.allocationStackTrace) {
+                            ImmediatelyFast.LOGGER.warn("\tat {}", element.toString());
+                        }
+                    } else {
+                        ImmediatelyFast.LOGGER.warn("\t<No stack trace available. Enable debug_only_detailed_memory_leak_detection in the config to get stack traces>");
+                    }
                     return true;
                 }
                 return false;
             });
-            if (leak) {
-                ImmediatelyFast.LOGGER.warn("Some BufferBuilders were not returned to the pool. Forcibly reclaiming them to prevent a memory leak.");
-            }
 
             // Mark all as in use over multiple frames
             for (Entry entry : IN_USE) {
@@ -102,6 +106,7 @@ public class ByteBufferBuilderPool {
         private final ByteBufferBuilder bufferBuilder;
         private long lastAccessTime;
         private boolean inUseOverMultipleFrames;
+        private StackTraceElement[] allocationStackTrace;
 
         public Entry(final ByteBufferBuilder bufferBuilder) {
             this.bufferBuilder = bufferBuilder;
@@ -114,11 +119,15 @@ public class ByteBufferBuilderPool {
 
         public void onBorrow() {
             this.lastAccessTime = System.currentTimeMillis();
+            if (ImmediatelyFast.config.debug_only_detailed_memory_leak_detection) {
+                this.allocationStackTrace = Thread.currentThread().getStackTrace();
+            }
         }
 
         public void onReturn() {
             this.bufferBuilder.discard();
             this.inUseOverMultipleFrames = false;
+            this.allocationStackTrace = null;
         }
 
     }
