@@ -40,6 +40,7 @@ public class ConfigAccessImpl implements ConfigAccess {
             case "debug_only_and_not_recommended_disable_hardware_conflict_handling" -> ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling;
             case "debug_only_print_additional_error_information" -> ImmediatelyFast.config.debug_only_print_additional_error_information;
             case "debug_only_use_last_usage_for_batch_ordering" -> ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering;
+            case "debug_only_detailed_memory_leak_detection" -> ImmediatelyFast.config.debug_only_detailed_memory_leak_detection;
             default -> defaultValue;
         };
     }
