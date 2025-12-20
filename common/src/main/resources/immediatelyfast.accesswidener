@@ -5,6 +5,7 @@ accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft
 accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
 accessible class net/minecraft/client/gl/ShaderLoader$Cache
 accessible field net/minecraft/client/util/BufferAllocator pointer J
+accessible field net/minecraft/client/util/BufferAllocator size J
 accessible field net/minecraft/client/render/BufferBuilder allocator Lnet/minecraft/client/util/BufferAllocator;
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate <init> (Lnet/minecraft/client/util/BufferAllocator;Ljava/util/SequencedMap;)V
 accessible method net/minecraft/client/render/VertexConsumerProvider$Immediate draw (Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/BufferBuilder;)V

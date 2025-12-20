@@ -66,6 +66,17 @@ public class BufferAllocatorPool {
         return FREE.size() + IN_USE.size();
     }
 
+    public static long getAllocatedBytes() {
+        long total = 0;
+        for (Entry entry : FREE) {
+            total += entry.bufferAllocator.size;
+        }
+        for (Entry entry : IN_USE) {
+            total += entry.bufferAllocator.size;
+        }
+        return total;
+    }
+
     public static void onEndFrame() {
         if (!IN_USE.isEmpty()) {
             // Reclaim all buffers that were not returned to the pool this and the last frame

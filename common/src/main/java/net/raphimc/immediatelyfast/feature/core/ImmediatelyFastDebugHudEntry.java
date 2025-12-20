@@ -26,6 +26,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
+import net.raphimc.immediatelyfast.util.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,7 @@ public class ImmediatelyFastDebugHudEntry implements DebugHudEntry {
     public void render(final DebugHudLines debugHudLines, final World world, final WorldChunk clientChunk, final WorldChunk chunk) {
         final List<String> lines = new ArrayList<>();
         lines.add("ImmediatelyFast " + ImmediatelyFast.VERSION);
-        lines.add("Buffer Pool: " + BufferAllocatorPool.getSize());
+        lines.add("Buffer Pool: " + BufferAllocatorPool.getSize() + " buffers (" + MathUtil.formatBytes(BufferAllocatorPool.getAllocatedBytes()) + ")");
         if (MinecraftClient.getInstance().getMapTextureManager() instanceof IMapTextureManager mapTextureManager) {
             final Collection<MapAtlasTexture> atlasTextures = mapTextureManager.immediatelyFast$getAllMapAtlasTextures();
             final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlasTexture::getMapCount).sum();
