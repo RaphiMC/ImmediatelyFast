@@ -195,6 +195,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
     protected int getLayerOrder(final RenderLayer layer) {
         if (layer == null) return Integer.MAX_VALUE;
+
+        int order = 0;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
             if (textureId != null) {
@@ -213,17 +215,27 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                     } else {
                         return 1;
                     }
+                } else if (textureId.getPath().startsWith("textures/entity/villager/")) {
+                    final String villagerTexturePath = textureId.getPath().substring("textures/entity/villager/".length());
+                    if (villagerTexturePath.startsWith("type/")) {
+                        return 2;
+                    } else if (villagerTexturePath.startsWith("profession/")) {
+                        return 3;
+                    } else {
+                        return 1;
+                    }
                 } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
-                    return 1;
+                    order = 1;
                 } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text") || layer.name.startsWith("forge_text")) {
                     // Draws vanilla text over custom font layers
                     // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
                     if (textureId.getNamespace().equals("minecraft")) {
-                        return 2;
+                        order = 2;
                     } else {
-                        return 1;
+                        order = 1;
                     }
                 } else if (textureId.getNamespace().equals("cataclysm")) { // https://github.com/RaphiMC/ImmediatelyFast/issues/371
+                    // Appears to be fixed in 3.00+
                     if (textureId.getPath().equals("textures/entity/maledictus/phantom_halberd.png")) {
                         return 2;
                     } else if (textureId.getPath().equals("textures/entity/maledictus/phantom_halberd_discard.png")) {
@@ -234,9 +246,9 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         if (!layer.isTranslucent()) {
-            return Integer.MIN_VALUE;
+            return order;
         } else {
-            return Integer.MAX_VALUE - 1;
+            return 100_000_000 + order;
         }
     }
 
