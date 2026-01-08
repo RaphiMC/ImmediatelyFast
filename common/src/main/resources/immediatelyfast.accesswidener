@@ -2,7 +2,6 @@ accessWidener v1 named
 #https://fabricmc.net/wiki/tutorial:accesswideners
 
 accessible field net/minecraft/client/MinecraftClient fontManager Lnet/minecraft/client/font/FontManager;
-accessible field net/minecraft/client/render/entity/feature/WolfCollarFeatureRenderer SKIN Lnet/minecraft/util/Identifier;
 accessible class net/minecraft/client/gl/ShaderLoader$Cache
 accessible field net/minecraft/client/util/BufferAllocator pointer J
 accessible field net/minecraft/client/util/BufferAllocator size J

@@ -18,8 +18,10 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -200,15 +202,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {
             final Identifier textureId = multiPhase.phases.texture.getId().orElse(null);
             if (textureId != null) {
-                if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
-                    if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
-                        order = 2;
-                    } else {
-                        order = 1;
-                    }
-                } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
-                    order = 1;
-                } else if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text")) {
+                if (layer.name.startsWith("text") || layer.name.startsWith("neoforge_text")) {
                     // Draws vanilla text over custom font layers
                     // Fixes https://github.com/RaphiMC/ImmediatelyFast/issues/81, https://github.com/RaphiMC/ImmediatelyFast/issues/287, https://github.com/RaphiMC/ImmediatelyFast/issues/288
                     if (textureId.getNamespace().equals("minecraft")) {
