@@ -202,9 +202,18 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             if (textureId != null) {
                 if (textureId.toString().startsWith("minecraft:textures/entity/wolf/")) {
                     if (textureId.equals(WolfCollarFeatureRenderer.SKIN)) {
-                        order = 2;
+                        return 2;
                     } else {
-                        order = 1;
+                        return 1;
+                    }
+                } else if (textureId.getPath().startsWith("textures/entity/villager/")) {
+                    final String villagerTexturePath = textureId.getPath().substring("textures/entity/villager/".length());
+                    if (villagerTexturePath.startsWith("type/")) {
+                        return 2;
+                    } else if (villagerTexturePath.startsWith("profession/")) {
+                        return 3;
+                    } else {
+                        return 1;
                     }
                 } else if (textureId.equals(TexturedRenderLayers.ARMOR_TRIMS_ATLAS_TEXTURE)) {
                     order = 1;
