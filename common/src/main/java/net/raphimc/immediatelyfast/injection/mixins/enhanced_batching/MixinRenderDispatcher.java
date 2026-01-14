@@ -33,7 +33,10 @@ public abstract class MixinRenderDispatcher {
     @Final
     private VertexConsumerProvider.Immediate vertexConsumers;
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/LayeredCustomCommandRenderer;render(Lnet/minecraft/client/render/command/BatchingRenderCommandQueue;)V"))
+    @Inject(method = "render", at = {
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/LabelCommandRenderer;render(Lnet/minecraft/client/render/command/BatchingRenderCommandQueue;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/font/TextRenderer;)V"), // https://github.com/RaphiMC/ImmediatelyFast/issues/452
+            @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/LayeredCustomCommandRenderer;render(Lnet/minecraft/client/render/command/BatchingRenderCommandQueue;)V"),
+    })
     private void drawBatch(CallbackInfo ci) {
         this.vertexConsumers.drawCurrentLayer();
     }
