@@ -71,12 +71,15 @@ public abstract class MixinShaderLoader {
             ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
         }
 
-        if (ImmediatelyFast.runtimeConfig.font_atlas_resizing && resourcePackWhichBreaksFontAtlasResizing != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
-            ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
-            this.immediatelyFast$reloadFontStorages();
-        } else {
-            if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing && ImmediatelyFast.config.font_atlas_resizing) {
+        if (ImmediatelyFast.config.font_atlas_resizing) {
+            if (resourcePackWhichBreaksFontAtlasResizing != null) {
+                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
+                if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
+                    ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
+                    this.immediatelyFast$reloadFontStorages();
+                }
+            } else if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
+                ImmediatelyFast.LOGGER.info("Re-enabling font atlas resizing because no incompatible resource packs are loaded.");
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
                 this.immediatelyFast$reloadFontStorages();
             }
