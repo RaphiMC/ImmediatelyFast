@@ -87,21 +87,27 @@ public abstract class MixinGameRenderer {
             ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
         }
 
-        if (ImmediatelyFast.runtimeConfig.font_atlas_resizing && resourcePackWhichBreaksFontAtlasResizing != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getName() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
-            ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
-            this.immediatelyFast$reloadFontStorages();
-        } else {
-            if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing && ImmediatelyFast.config.font_atlas_resizing) {
+        if (ImmediatelyFast.config.font_atlas_resizing) {
+            if (resourcePackWhichBreaksFontAtlasResizing != null) {
+                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.getName() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
+                if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
+                    ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
+                    this.immediatelyFast$reloadFontStorages();
+                }
+            } else if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
+                ImmediatelyFast.LOGGER.info("Re-enabling font atlas resizing because no incompatible resource packs are loaded.");
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
                 this.immediatelyFast$reloadFontStorages();
             }
         }
-        if (ImmediatelyFast.runtimeConfig.hud_batching && resourcePackWhichBreaksHudBatching != null) {
-            ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksHudBatching.getName() + " is not compatible with HUD batching. Temporarily disabling HUD batching.");
-            ImmediatelyFast.runtimeConfig.hud_batching = false;
-        } else {
-            ImmediatelyFast.runtimeConfig.hud_batching = ImmediatelyFast.config.hud_batching;
+        if (ImmediatelyFast.config.hud_batching) {
+            if (resourcePackWhichBreaksHudBatching != null) {
+                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksHudBatching.getName() + " is not compatible with HUD batching. Temporarily disabling HUD batching.");
+                ImmediatelyFast.runtimeConfig.hud_batching = false;
+            } else if (!ImmediatelyFast.runtimeConfig.hud_batching) {
+                ImmediatelyFast.LOGGER.info("Re-enabling HUD batching because no incompatible resource packs are loaded.");
+                ImmediatelyFast.runtimeConfig.hud_batching = true;
+            }
         }
     }
 
