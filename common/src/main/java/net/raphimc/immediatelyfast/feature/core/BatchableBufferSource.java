@@ -25,7 +25,10 @@ import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.SequencedMap;
+import java.util.Set;
 
 public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
@@ -147,9 +150,9 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         this.currentLayer = null;
         this.drawFallbackLayersFirst = false;
 
-        for (RenderLayer layer : this.activeLayers) {
-            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.endNullable();
+        for (Set<BufferBuilder> buffers : this.pendingBuffers.values()) {
+            for (BufferBuilder bufferBuilder : buffers) {
+                bufferBuilder.endNullable().close();
                 BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
             }
         }
@@ -164,14 +167,16 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         this.activeLayers.remove(layer);
-        for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-            final BufferAllocator prevBufferAllocator = this.allocator;
-            this.allocator = bufferBuilder.allocator;
-            this.draw(layer, bufferBuilder);
-            this.allocator = prevBufferAllocator;
-            BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
+        final Set<BufferBuilder> buffers = this.pendingBuffers.remove(layer);
+        if (buffers != null) {
+            for (BufferBuilder bufferBuilder : buffers) {
+                final BufferAllocator prevBufferAllocator = this.allocator;
+                this.allocator = bufferBuilder.allocator;
+                this.draw(layer, bufferBuilder);
+                this.allocator = prevBufferAllocator;
+                BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
+            }
         }
-        this.pendingBuffers.remove(layer);
         if (this.currentLayer == layer) {
             this.currentLayer = null;
         }
@@ -183,14 +188,6 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
     public boolean hasActiveLayers() {
         return !this.activeLayers.isEmpty();
-    }
-
-    protected Set<BufferBuilder> getBufferBuilder(final RenderLayer layer) {
-        if (this.pendingBuffers.containsKey(layer)) {
-            return this.pendingBuffers.get(layer);
-        } else {
-            return Collections.emptySet();
-        }
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
