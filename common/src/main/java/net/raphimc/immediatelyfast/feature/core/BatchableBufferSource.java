@@ -28,7 +28,10 @@ import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.IrisCompat;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.SequencedMap;
+import java.util.Set;
 
 public class BatchableBufferSource extends MultiBufferSource.BufferSource implements AutoCloseable {
 
@@ -150,9 +153,9 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
         this.lastSharedType = null;
         this.drawDynamicBuffersFirst = false;
 
-        for (RenderType renderType : this.activeRenderTypes) {
-            for (BufferBuilder bufferBuilder : this.getBufferBuilder(renderType)) {
-                bufferBuilder.build();
+        for (Set<BufferBuilder> buffers : this.dynamicBuffers.values()) {
+            for (BufferBuilder bufferBuilder : buffers) {
+                bufferBuilder.build().close();
                 ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
             }
         }
@@ -167,14 +170,16 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
         }
 
         this.activeRenderTypes.remove(renderType);
-        for (BufferBuilder bufferBuilder : this.getBufferBuilder(renderType)) {
-            final ByteBufferBuilder prevBufferBuilder = this.sharedBuffer;
-            this.sharedBuffer = bufferBuilder.buffer;
-            this.endBatch(renderType, bufferBuilder);
-            this.sharedBuffer = prevBufferBuilder;
-            ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
+        final Set<BufferBuilder> buffers = this.dynamicBuffers.remove(renderType);
+        if (buffers != null) {
+            for (BufferBuilder bufferBuilder : buffers) {
+                final ByteBufferBuilder prevBufferBuilder = this.sharedBuffer;
+                this.sharedBuffer = bufferBuilder.buffer;
+                this.endBatch(renderType, bufferBuilder);
+                this.sharedBuffer = prevBufferBuilder;
+                ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
+            }
         }
-        this.dynamicBuffers.remove(renderType);
         if (this.lastSharedType == renderType) {
             this.lastSharedType = null;
         }
@@ -186,14 +191,6 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
 
     public boolean hasActiveRenderTypes() {
         return !this.activeRenderTypes.isEmpty();
-    }
-
-    protected Set<BufferBuilder> getBufferBuilder(final RenderType renderType) {
-        if (this.dynamicBuffers.containsKey(renderType)) {
-            return this.dynamicBuffers.get(renderType);
-        } else {
-            return Collections.emptySet();
-        }
     }
 
     protected int getRenderTypeOrder(final RenderType renderType) {
