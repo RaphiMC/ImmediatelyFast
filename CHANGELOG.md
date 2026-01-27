@@ -1,4 +1,2 @@
-* Fixed Alex's Caves Hullbreaker glow render order
-* Fixed Alex's Caves Tremorzilla glow render order
-* Fixed WebDisplays MinePad render issue
-* Fixed potential performance issue with Iris
+* Fixed villager type and profession layer render order
+* Fixed core shader incompatibility detection logic bug
