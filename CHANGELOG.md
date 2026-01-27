@@ -1,2 +1,5 @@
-* Made ImmediatelyFast compatible with Java 25
-* Only apply map atlas texture coords when the map texture is set correctly (Fixes map rendering issues with ImageFrameClient mod)
+* Fixed player nametag render order
+* Fixed core shader incompatibility detection logic bug
+* Added allocated bytes of Buffer Pool to the debug hud
+* Added advanced memory leak detector
+* Fixed batching buffer clearing
