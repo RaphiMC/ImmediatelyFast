@@ -41,6 +41,8 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
      */
     private final static ByteBufferBuilder FALLBACK_BUFFER = new ByteBufferBuilder(0);
 
+    private RenderType[] renderTypeSortBuffer = new RenderType[8];
+
     protected final Map<RenderType, ReferenceSet<BufferBuilder>> dynamicBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
     protected final Set<RenderType> activeRenderTypes = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
 
@@ -110,7 +112,10 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
         this.drawDynamicBuffersFirst = false;
 
         int sortedRenderTypesLength = 0;
-        final RenderType[] sortedRenderTypes = new RenderType[this.activeRenderTypes.size()];
+        if (this.renderTypeSortBuffer.length < this.activeRenderTypes.size()) {
+            this.renderTypeSortBuffer = new RenderType[this.activeRenderTypes.size()];
+        }
+        final RenderType[] sortedRenderTypes = this.renderTypeSortBuffer;
         for (RenderType renderType : this.activeRenderTypes) {
             if (!this.fixedBuffers.containsKey(renderType)) {
                 sortedRenderTypes[sortedRenderTypesLength++] = renderType;
