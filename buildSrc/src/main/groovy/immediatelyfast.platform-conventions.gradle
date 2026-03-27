@@ -29,3 +29,7 @@ dependencies {
         transitive = false
     }
 }
+
+jar {
+    exclude("assets/immediatelyfast/icon-full.png")
+}
