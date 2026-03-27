@@ -13,7 +13,6 @@ loom {
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
     implementation("net.lenni0451:Reflect:${project.reflect_version}")
 }
