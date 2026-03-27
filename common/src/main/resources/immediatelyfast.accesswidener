@@ -1,4 +1,4 @@
-accessWidener v1 named
+accessWidener v1 official
 
 accessible field net/minecraft/client/Minecraft fontManager Lnet/minecraft/client/gui/font/FontManager;
 accessible field com/mojang/blaze3d/vertex/ByteBufferBuilder pointer J
@@ -14,5 +14,8 @@ accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBin
 accessible class net/minecraft/client/resources/MapTextureManager$MapInstance
 accessible field net/minecraft/client/renderer/MultiBufferSource$BufferSource fixedBuffers Ljava/util/SequencedMap;
 accessible field net/minecraft/client/renderer/GameRenderer fogRenderer Lnet/minecraft/client/renderer/fog/FogRenderer;
+accessible class com/mojang/blaze3d/opengl/GlCommandEncoder
+accessible field com/mojang/blaze3d/systems/GpuDevice backend Lcom/mojang/blaze3d/systems/GpuDeviceBackend;
+accessible class com/mojang/blaze3d/opengl/GlDevice
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferSubData (IJLjava/nio/ByteBuffer;I)V
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferData (ILjava/nio/ByteBuffer;I)V

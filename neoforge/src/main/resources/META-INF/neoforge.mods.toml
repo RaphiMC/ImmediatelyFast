@@ -21,13 +21,13 @@ config = "immediatelyfast-common.mixins.json"
 [[dependencies.immediatelyfast]]
 modId = "neoforge"
 required = true
-versionRange = "[21.11.0,)"
+versionRange = "[26.1.0,)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies.immediatelyfast]]
 modId = "minecraft"
 required = true
-versionRange = "[1.21.11]"
+versionRange = "[26.1]"
 ordering = "NONE"
 side = "CLIENT"

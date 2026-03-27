@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.raphimc.immediatelyfast.injection.mixins",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "avoid_redundant_framebuffer_switching.MixinGlCommandEncoder",
@@ -15,7 +15,7 @@
     "fast_text_lookup.MixinFont_GlyphVisitor",
     "fix_slow_buffer_upload_on_apple_gpu.MixinGlCommandEncoder",
     "font_atlas_resizing.MixinFontTexture",
-    "map_atlas_generation.MixinGuiGraphics",
+    "map_atlas_generation.MixinGuiGraphicsExtractor",
     "map_atlas_generation.MixinMapRenderer",
     "map_atlas_generation.MixinMapRenderState",
     "map_atlas_generation.MixinMapTextureManager",

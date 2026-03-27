@@ -36,7 +36,7 @@ public abstract class MixinGlDebug {
         return true;
     }
 
-    @Redirect(method = "printDebugLog", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V", remap = false))
+    @Redirect(method = "printDebugLog", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V"))
     private void appendStackTrace(Logger instance, String message, Object argument) {
         if (System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
             immediatelyFast$lastTime = System.currentTimeMillis();

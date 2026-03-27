@@ -2,7 +2,7 @@ plugins {
     id "java-library"
     id "base.base-conventions"
     id "architectury-plugin"
-    id "dev.architectury.loom"
+    id "dev.architectury.loom-no-remap"
     id "me.modmuss50.mod-publish-plugin"
 }
 
@@ -12,31 +12,8 @@ loom {
     }
 }
 
-repositories {
-    maven {
-        name = "ParchmentMC"
-        url = "https://maven.parchmentmc.org"
-
-        content {
-            includeGroup "org.parchmentmc.data"
-        }
-    }
-    maven {
-        name = "Lenni0451"
-        url = "https://maven.lenni0451.net/releases"
-
-        content {
-            includeGroup "net.lenni0451"
-        }
-    }
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered() {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${project.parchment_mappings}@zip")
-    }
 }
 
 publishMods {

@@ -11,17 +11,11 @@ configurations {
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-
+    implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     implementation(include("net.lenni0451:Reflect:${project.reflect_version}"))
-
     includeInJar(project(path: ":common", configuration: "transformProductionFabric")) {
         transitive = false
     }
-}
-
-remapJar {
-    injectAccessWidener = true
 }
 
 processResources {

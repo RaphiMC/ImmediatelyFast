@@ -25,7 +25,11 @@ configurations {
 }
 
 dependencies {
-    common(project(path: ":common", configuration: "namedElements")) {
+    common(project(":common")) {
         transitive = false
     }
+}
+
+jar {
+    exclude("assets/immediatelyfast/icon-full.png")
 }

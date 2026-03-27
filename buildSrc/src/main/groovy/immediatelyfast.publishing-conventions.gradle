@@ -3,7 +3,7 @@ plugins {
 }
 
 publishMods {
-    file = remapJar.archiveFile
+    file = jar.archiveFile
     version = project.version + '-' + project.loom.platform.get().id()
     modLoaders.add(project.loom.platform.get().id())
     if (project.name == "fabric") {

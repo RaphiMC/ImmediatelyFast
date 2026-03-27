@@ -19,17 +19,15 @@ repositories {
 
 dependencies {
     neoForge("net.neoforged:neoforge:${project.neoforge_version}")
-
     forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${project.reflect_version}")))
-
     includeInJar(project(path: ":common", configuration: "transformProductionNeoForge")) {
         transitive = false
     }
 }
 
-remapJar {
+/*remapJar {
     atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
-}
+}*/
 
 processResources {
     inputs.property("version", project.version)

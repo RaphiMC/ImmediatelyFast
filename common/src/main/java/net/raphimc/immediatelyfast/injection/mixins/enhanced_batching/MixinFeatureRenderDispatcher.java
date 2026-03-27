@@ -33,11 +33,14 @@ public abstract class MixinFeatureRenderDispatcher {
     @Final
     private MultiBufferSource.BufferSource bufferSource;
 
-    @Inject(method = "renderAllFeatures", at = {
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/NameTagFeatureRenderer;render(Lnet/minecraft/client/renderer/SubmitNodeCollection;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;)V"), // https://github.com/RaphiMC/ImmediatelyFast/issues/452
-            @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/ParticleFeatureRenderer;render(Lnet/minecraft/client/renderer/SubmitNodeCollection;)V"),
-    })
-    private void drawBatch(CallbackInfo ci) {
+    // https://github.com/RaphiMC/ImmediatelyFast/issues/452
+    @Inject(method = "renderTranslucentFeatures", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/NameTagFeatureRenderer;renderTranslucent(Lnet/minecraft/client/renderer/SubmitNodeCollection;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/gui/Font;)V"))
+    private void drawBatch1(CallbackInfo ci) {
+        this.bufferSource.endLastBatch();
+    }
+
+    @Inject(method = "renderSolidFeatures", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/ParticleFeatureRenderer;renderSolid(Lnet/minecraft/client/renderer/SubmitNodeCollection;)V"))
+    private void drawBatch2(CallbackInfo ci) {
         this.bufferSource.endLastBatch();
     }
 

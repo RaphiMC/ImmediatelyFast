@@ -47,7 +47,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
 
     public int bind(final boolean setViewport) {
         final int previousFramebuffer = GL11C.glGetInteger(GL30C.GL_FRAMEBUFFER_BINDING);
-        final int fbo = ((GlTexture) SignAtlasRenderTarget.this.colorTexture).getFbo(((GlDevice) RenderSystem.getDevice()).directStateAccess(), null);
+        final int fbo = ((GlTexture) this.colorTexture).getFbo(((GlDevice) RenderSystem.getDevice().backend).directStateAccess(), null);
         GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, fbo);
         if (setViewport) {
             GL11C.glViewport(0, 0, ATLAS_SIZE, ATLAS_SIZE);
