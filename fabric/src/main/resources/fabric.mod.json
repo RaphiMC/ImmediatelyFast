@@ -21,7 +21,7 @@
   ],
   "accessWidener": "immediatelyfast.accesswidener",
   "depends": {
-    "fabricloader": ">=0.18.5",
+    "fabricloader": ">=0.16.14",
     "minecraft": "26.1",
     "java": ">=25"
   },
