@@ -22,7 +22,7 @@
   "accessWidener": "immediatelyfast.accesswidener",
   "depends": {
     "fabricloader": ">=0.18.5",
-    "minecraft": ">=26.1 <=26.1.1",
+    "minecraft": ">=26.1 <=26.1.2",
     "java": ">=25"
   },
   "recommends": {
