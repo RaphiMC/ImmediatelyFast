@@ -1,1 +1,1 @@
-* Updated to Minecraft 26.1.1
+* Added support for Minecraft 26.1.2
