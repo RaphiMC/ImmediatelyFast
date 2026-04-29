@@ -15,5 +15,6 @@ accessible class net/minecraft/client/resources/MapTextureManager$MapInstance
 accessible field net/minecraft/client/renderer/MultiBufferSource$BufferSource fixedBuffers Ljava/util/SequencedMap;
 accessible field net/minecraft/client/renderer/GameRenderer fogRenderer Lnet/minecraft/client/renderer/fog/FogRenderer;
 accessible class com/mojang/blaze3d/opengl/GlCommandEncoder
+accessible class com/mojang/blaze3d/opengl/GlDevice
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferSubData (IJLjava/nio/ByteBuffer;I)V
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferData (ILjava/nio/ByteBuffer;I)V

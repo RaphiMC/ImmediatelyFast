@@ -6,7 +6,7 @@
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
     "avoid_redundant_framebuffer_switching.MixinGlCommandEncoder",
-    "avoid_redundant_framebuffer_switching.MixinRenderSystem",
+    "avoid_redundant_framebuffer_switching.MixinGlDevice",
     "core.MixinDebugScreenEntries",
     "core.MixinMinecraft",
     "core.MixinRenderSystem",
