@@ -48,14 +48,12 @@ public class SignTextCache implements ResourceManagerReloadListener {
                 }
             })
             .build();
-    public boolean lockFramebuffer = false;
-    public boolean lockViewport = false;
 
     public SignTextCache() {
         RenderSystem.assertOnRenderThread();
         this.signAtlasRenderTarget = new SignAtlasRenderTarget(0);
         this.renderType = RenderTypes.text(this.signAtlasRenderTarget.getTextureId());
-        final ProjectionMatrixBuffer projectionMatrixBuffer = new ProjectionMatrixBuffer("immediatelyfast:sign_atlas_text");
+        final ProjectionMatrixBuffer projectionMatrixBuffer = new ProjectionMatrixBuffer("ImmediatelyFast Sign Atlas");
         this.signProjectionMatrix = projectionMatrixBuffer.getBuffer(new Matrix4f().setOrtho(0F, SignAtlasRenderTarget.ATLAS_SIZE, SignAtlasRenderTarget.ATLAS_SIZE, 0F, -1000F, 1000F));
     }
 

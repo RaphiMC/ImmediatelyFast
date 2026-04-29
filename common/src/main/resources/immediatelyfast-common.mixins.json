@@ -23,7 +23,6 @@
     "print_additional_error_information.MixinGlDebug",
     "resource_pack_conflict_handling.MixinShaderManager",
     "sign_text_buffering.MixinAbstractSignRenderer",
-    "sign_text_buffering.MixinGlStateManager",
     "sign_text_buffering.MixinSignText",
     "skip_text_translucency_sorting.MixinRenderTypes"
   ],

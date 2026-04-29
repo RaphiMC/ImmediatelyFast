@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -79,14 +80,14 @@ public abstract class MixinAbstractSignRenderer {
                 RenderSystem.backupProjectionMatrix();
                 RenderSystem.setProjectionMatrix(ImmediatelyFast.signTextCache.signProjectionMatrix, ProjectionType.ORTHOGRAPHIC);
                 final Matrix4fStack modelViewMatrix = RenderSystem.getModelViewStack();
-                modelViewMatrix.pushMatrix();
-                modelViewMatrix.identity();
+                modelViewMatrix.pushMatrix().identity();
                 final GpuBufferSlice fog = RenderSystem.getShaderFog();
                 RenderSystem.setShaderFog(Minecraft.getInstance().gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
+                final GpuTextureView previousColorTextureOverride = RenderSystem.outputColorTextureOverride;
+                final GpuTextureView previousDepthTextureOverride = RenderSystem.outputDepthTextureOverride;
+                RenderSystem.outputColorTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getColorTextureView();
+                RenderSystem.outputDepthTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getDepthTextureView();
                 final ByteBufferBuilder bufferBuilder = ByteBufferBuilderPool.borrowBufferBuilder();
-                final int previousFbo = ImmediatelyFast.signTextCache.signAtlasRenderTarget.bind(true);
-                ImmediatelyFast.signTextCache.lockFramebuffer = true;
-                ImmediatelyFast.signTextCache.lockViewport = true;
                 mixinSignText.immediatelyFast$setShouldCache(false);
 
                 try {
@@ -103,10 +104,9 @@ public abstract class MixinAbstractSignRenderer {
                     renderDispatcher.close();
                 } finally {
                     mixinSignText.immediatelyFast$setShouldCache(true);
-                    ImmediatelyFast.signTextCache.lockViewport = false;
-                    ImmediatelyFast.signTextCache.lockFramebuffer = false;
-                    ImmediatelyFast.signTextCache.signAtlasRenderTarget.unbind(previousFbo);
                     ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder);
+                    RenderSystem.outputColorTextureOverride = previousColorTextureOverride;
+                    RenderSystem.outputDepthTextureOverride = previousDepthTextureOverride;
                     RenderSystem.setShaderFog(fog);
                     modelViewMatrix.popMatrix();
                     RenderSystem.restoreProjectionMatrix();

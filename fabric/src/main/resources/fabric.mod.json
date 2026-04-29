@@ -28,9 +28,6 @@
   "recommends": {
     "sodium": "*"
   },
-  "conflicts": {
-    "vulkanmod": "*"
-  },
   "custom": {
     "modmenu": {
       "links": {

@@ -17,47 +17,27 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import com.mojang.blaze3d.opengl.GlDevice;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.AddressMode;
-import com.mojang.blaze3d.textures.FilterMode;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.opengl.GL11C;
-import org.lwjgl.opengl.GL30C;
+import net.raphimc.immediatelyfast.util.RenderTargetTexture;
 
 public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable {
 
     public static final int ATLAS_SIZE = 4096;
 
+    private final int id;
     private final Identifier textureId;
     private final Slot rootSlot;
 
     public SignAtlasRenderTarget(final int id) {
-        super("ImmediatelyFast Sign Atlas FBO", false);
+        super("ImmediatelyFast Sign Atlas", true);
         this.resize(ATLAS_SIZE, ATLAS_SIZE);
+        this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
-        Minecraft.getInstance().getTextureManager().register(this.textureId, new FboTexture());
+        Minecraft.getInstance().getTextureManager().register(this.textureId, new RenderTargetTexture(this));
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
-    }
-
-    public int bind(final boolean setViewport) {
-        final int previousFramebuffer = GL11C.glGetInteger(GL30C.GL_FRAMEBUFFER_BINDING);
-        final int fbo = ((GlTexture) this.colorTexture).getFbo(((GlDevice) RenderSystem.getDevice().backend).directStateAccess(), null);
-        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, fbo);
-        if (setViewport) {
-            GL11C.glViewport(0, 0, ATLAS_SIZE, ATLAS_SIZE);
-        }
-        return previousFramebuffer;
-    }
-
-    public void unbind(final int previousFbo) {
-        GL30C.glBindFramebuffer(GL30C.GL_FRAMEBUFFER, previousFbo);
-        GL11C.glViewport(0, 0, Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight());
     }
 
     public Slot findSlot(final int width, final int height) {
@@ -65,10 +45,13 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
     }
 
     public void clear() {
-        RenderSystem.getDevice().createCommandEncoder().clearColorTexture(this.getColorTexture(), 0);
-
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.getColorTexture(), 0, this.getDepthTexture(), 1F);
         this.rootSlot.subSlot1 = null;
         this.rootSlot.subSlot2 = null;
+    }
+
+    public int getId() {
+        return this.id;
     }
 
     public Identifier getTextureId() {
@@ -77,6 +60,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
 
     @Override
     public void close() {
+        Minecraft.getInstance().getTextureManager().release(this.textureId);
         this.destroyBuffers();
     }
 
@@ -108,13 +92,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
             }
             this.occupied = false;
             removeUnoccupiedSubSlots(this);
-
-            GlStateManager._scissorBox(this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
-            GlStateManager._enableScissorTest();
-            final int previousFbo = SignAtlasRenderTarget.this.bind(false);
-            GL11C.glClear(GL11C.GL_COLOR_BUFFER_BIT);
-            SignAtlasRenderTarget.this.unbind(previousFbo);
-            GlStateManager._disableScissorTest();
+            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), 0, SignAtlasRenderTarget.this.getDepthTexture(), 1F, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
         }
 
         public Slot findSlot(final int width, final int height) {
@@ -165,20 +143,6 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
             if (slot == null) return false;
             if (slot.occupied) return true;
             return hasOccupiedSlot(slot.subSlot1) || hasOccupiedSlot(slot.subSlot2);
-        }
-
-    }
-
-    private class FboTexture extends AbstractTexture {
-
-        private FboTexture() {
-            this.texture = SignAtlasRenderTarget.this.colorTexture;
-            this.textureView = RenderSystem.getDevice().createTextureView(this.texture);
-            this.sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false);
-        }
-
-        @Override
-        public void close() {
         }
 
     }
