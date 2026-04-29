@@ -47,16 +47,6 @@ public class ImmediatelyFast {
     public static void earlyInit() {
         if (ImmediatelyFast.config != null) return;
         ImmediatelyFast.loadConfig();
-
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            if (ImmediatelyFast.config.experimental_sign_text_buffering) {
-                if (PlatformCode.getModVersion("vulkanmod").isPresent()) {
-                    LOGGER.warn("VulkanMod detected. Force disabling sign text buffering optimization.");
-                    ImmediatelyFast.config.experimental_sign_text_buffering = false;
-                }
-            }
-        }
-
         ImmediatelyFast.createRuntimeConfig();
         VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
         PlatformCode.checkModCompatibility();

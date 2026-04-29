@@ -21,6 +21,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -32,9 +33,9 @@ import java.util.concurrent.TimeUnit;
 
 public class SignTextCache implements ResourceManagerReloadListener {
 
-    public final SignAtlasRenderTarget signAtlasRenderTarget = new SignAtlasRenderTarget(0);
-    public final CachedOrthoProjectionMatrixBuffer signProjectionMatrix = new CachedOrthoProjectionMatrixBuffer("immediatelyfast:sign_atlas_text", -1000F, 1000F, true);
-    public final GpuBufferSlice signProjectionMatrixBuffer = this.signProjectionMatrix.getBuffer(SignAtlasRenderTarget.ATLAS_SIZE, SignAtlasRenderTarget.ATLAS_SIZE);
+    public final SignAtlasRenderTarget signAtlasRenderTarget;
+    public final RenderType renderType;
+    public final GpuBufferSlice signProjectionMatrix;
     public final Cache<SignText, SignAtlasRenderTarget.Slot> slotCache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.SECONDS)
             .removalListener(notification -> {
@@ -46,9 +47,14 @@ public class SignTextCache implements ResourceManagerReloadListener {
                 }
             })
             .build();
-    public final RenderType renderType = RenderTypes.text(this.signAtlasRenderTarget.getTextureId());
-    public boolean lockFramebuffer = false;
-    public boolean lockViewport = false;
+
+    public SignTextCache() {
+        RenderSystem.assertOnRenderThread();
+        this.signAtlasRenderTarget = new SignAtlasRenderTarget(0);
+        this.renderType = RenderTypes.text(this.signAtlasRenderTarget.getTextureId());
+        final CachedOrthoProjectionMatrixBuffer projectionMatrixBuffer = new CachedOrthoProjectionMatrixBuffer("ImmediatelyFast Sign Atlas", -1000F, 1000F, true);
+        this.signProjectionMatrix = projectionMatrixBuffer.getBuffer(SignAtlasRenderTarget.ATLAS_SIZE, SignAtlasRenderTarget.ATLAS_SIZE);
+    }
 
     public void clearCache() {
         this.slotCache.invalidateAll();
