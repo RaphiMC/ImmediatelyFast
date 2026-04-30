@@ -25,12 +25,13 @@ import net.minecraft.client.gl.GlBackend;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.GlTexture;
 import net.minecraft.util.Identifier;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL30C;
 
 public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
 
-    public static final int ATLAS_SIZE = 4096;
+    public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
     private final Identifier textureId;
     private final Slot rootSlot;

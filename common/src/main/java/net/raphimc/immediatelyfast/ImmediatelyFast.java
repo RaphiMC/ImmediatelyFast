@@ -126,11 +126,6 @@ public class ImmediatelyFast {
         if (ImmediatelyFast.config == null) {
             ImmediatelyFast.config = new ImmediatelyFastConfig();
         }
-        try {
-            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
-        } catch (Throwable e) {
-            LOGGER.error("Failed to save ImmediatelyFast config.", e);
-        }
 
         if (!MathUtil.mathIsPoT(ImmediatelyFast.config.font_atlas_size)) {
             LOGGER.warn("Font atlas size " + ImmediatelyFast.config.font_atlas_size + " is not a power of two! Rounding up to the next power of two.");
@@ -139,6 +134,16 @@ public class ImmediatelyFast {
         if (!MathUtil.mathIsPoT(ImmediatelyFast.config.map_atlas_size)) {
             LOGGER.warn("Map atlas size " + ImmediatelyFast.config.map_atlas_size + " is not a power of two! Rounding up to the next power of two.");
             ImmediatelyFast.config.map_atlas_size = MathUtil.mathRoundPoT(ImmediatelyFast.config.map_atlas_size);
+        }
+        if (!MathUtil.mathIsPoT(ImmediatelyFast.config.experimental_sign_atlas_size)) {
+            LOGGER.warn("Sign atlas size " + ImmediatelyFast.config.experimental_sign_atlas_size + " is not a power of two! Rounding up to the next power of two.");
+            ImmediatelyFast.config.experimental_sign_atlas_size = MathUtil.mathRoundPoT(ImmediatelyFast.config.experimental_sign_atlas_size);
+        }
+
+        try {
+            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
+        } catch (Throwable e) {
+            LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
     }
 
