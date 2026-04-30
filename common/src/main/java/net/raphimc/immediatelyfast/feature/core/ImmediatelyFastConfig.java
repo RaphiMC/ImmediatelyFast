@@ -35,6 +35,7 @@ public class ImmediatelyFastConfig {
     private String EXPERIMENTAL_INFO = "----- Experimental config values below (Rendering glitches may occur) -----";
     public boolean experimental_disable_resource_pack_conflict_handling = false;
     public boolean experimental_sign_text_buffering = false;
+    public int experimental_sign_atlas_size = 4096;
 
     // Debug config values
     private String DEBUG_INFO = "----- Debug only config values below (Do not touch) -----";
@@ -68,6 +69,7 @@ public class ImmediatelyFastConfig {
         return switch (key) {
             case "font_atlas_size" -> this.font_atlas_size;
             case "map_atlas_size" -> this.map_atlas_size;
+            case "experimental_sign_atlas_size" -> this.experimental_sign_atlas_size;
             default -> defaultValue;
         };
     }

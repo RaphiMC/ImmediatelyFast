@@ -21,11 +21,12 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.RenderTargetTexture;
 
 public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable {
 
-    public static final int ATLAS_SIZE = 4096;
+    public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
     private final int id;
     private final Identifier textureId;
