@@ -1,0 +1,5 @@
+# Linux scripts use lf
+/gradlew text eol=lf
+
+# Windows scripts use crlf
+*.bat text eol=crlf
