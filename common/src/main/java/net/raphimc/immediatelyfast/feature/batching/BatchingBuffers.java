@@ -167,7 +167,7 @@ public class BatchingBuffers {
      */
     public static Map<RenderLayer, BufferBuilder> createLayerBuffers(final RenderLayer... layers) {
         final Object2ObjectMap<RenderLayer, BufferBuilder> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.length);
-        for (final RenderLayer layer : layers) {
+        for (RenderLayer layer : layers) {
             layerBuffers.put(layer, new BufferBuilder(layer.getExpectedBufferSize()));
         }
         return layerBuffers;
