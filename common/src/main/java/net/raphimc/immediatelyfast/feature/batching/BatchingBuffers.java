@@ -82,7 +82,7 @@ public class BatchingBuffers {
 
     private static SequencedMap<RenderLayer, BufferAllocator> createLayerBuffers(final Set<RenderLayer> layers) {
         final SequencedMap<RenderLayer, BufferAllocator> layerBuffers = new Object2ObjectLinkedOpenHashMap<>(layers.size());
-        for (final RenderLayer layer : layers) {
+        for (RenderLayer layer : layers) {
             layerBuffers.put(layer, new BufferAllocator(layer.getExpectedBufferSize()));
         }
         return layerBuffers;
