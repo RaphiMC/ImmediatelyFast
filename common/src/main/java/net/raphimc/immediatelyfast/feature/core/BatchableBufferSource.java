@@ -218,6 +218,8 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
                         return 2;
                     } else if (villagerTexturePath.startsWith("profession/")) {
                         return 3;
+                    } else if (villagerTexturePath.startsWith("profession_level/")) {
+                        return 4;
                     } else {
                         return 1;
                     }
