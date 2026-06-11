@@ -1,4 +1,4 @@
-accessWidener v1 named
+classTweaker v1 named
 
 accessible field net/minecraft/client/Minecraft fontManager Lnet/minecraft/client/gui/font/FontManager;
 accessible field com/mojang/blaze3d/vertex/ByteBufferBuilder pointer J
