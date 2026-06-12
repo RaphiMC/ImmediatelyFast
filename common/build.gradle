@@ -8,7 +8,7 @@ architectury {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/immediatelyfast.accesswidener")
+    accessWidenerPath = file("src/main/resources/immediatelyfast.classtweaker")
 }
 
 dependencies {

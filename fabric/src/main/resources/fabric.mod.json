@@ -19,7 +19,7 @@
     "immediatelyfast-fabric.mixins.json",
     "immediatelyfast-common.mixins.json"
   ],
-  "accessWidener": "immediatelyfast.accesswidener",
+  "accessWidener": "immediatelyfast.classtweaker",
   "depends": {
     "fabricloader": ">=0.18.5",
     "minecraft": "26.1.x",
