@@ -1,36 +1,35 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
+license = "LGPL-3.0-or-later"
 issueTrackerURL = "https://github.com/RaphiMC/ImmediatelyFast/issues"
-license = "LGPL-3.0"
 
 [[mods]]
 modId = "immediatelyfast"
 version = "${version}"
 displayName = "ImmediatelyFast"
+description = "Speed up and optimize immediate mode rendering in Minecraft"
 authors = "RK_01"
-description = '''
-Speed up and optimize immediate mode rendering in Minecraft
-'''
 logoFile = "immediatelyfast-icon.png"
+displayURL = "https://github.com/RaphiMC/ImmediatelyFast"
+displayTest = "IGNORE_ALL_VERSION"
+
+[[mixins]]
+config = "immediatelyfast-common.mixins.json"
 
 [[mixins]]
 config = "immediatelyfast-neoforge.mixins.json"
-[[mixins]]
-config = "immediatelyfast-common.mixins.json"
 
 # NeoForge decided to remove support for the "mandatory" field in 1.20.4 and crash the game if it is present. They want you to use the "required" field instead, which crashes the game on 1.20.3.
 # What a great modloader!
 
 #[[dependencies.immediatelyfast]]
-#modId = "neoforge"
-#mandatory = true
-#versionRange = "[20.2.86,)"
-#ordering = "NONE"
-#side = "CLIENT"
-#
-#[[dependencies.immediatelyfast]]
 #modId = "minecraft"
 #mandatory = true
 #versionRange = "[1.20.2,1.20.4]"
-#ordering = "NONE"
+#side = "CLIENT"
+#
+#[[dependencies.immediatelyfast]]
+#modId = "neoforge"
+#mandatory = true
+#versionRange = "[20.2.86,)"
 #side = "CLIENT"
