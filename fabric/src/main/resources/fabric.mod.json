@@ -5,27 +5,29 @@
   "name": "ImmediatelyFast",
   "description": "Speed up and optimize immediate mode rendering in Minecraft",
   "authors": [
-    "RK_01"
+    {
+      "name": "RK_01",
+      "contact": {
+        "homepage": "https://github.com/RaphiMC"
+      }
+    }
   ],
   "contact": {
-    "homepage": "https://modrinth.com/mod/immediatelyfast",
+    "homepage": "https://github.com/RaphiMC/ImmediatelyFast",
     "sources": "https://github.com/RaphiMC/ImmediatelyFast",
     "issues": "https://github.com/RaphiMC/ImmediatelyFast/issues"
   },
-  "license": "LGPL-3.0",
+  "license": "LGPL-3.0-or-later",
   "icon": "assets/immediatelyfast/icon.png",
   "environment": "client",
   "mixins": [
-    "immediatelyfast-fabric.mixins.json",
-    "immediatelyfast-common.mixins.json"
+    "immediatelyfast-common.mixins.json",
+    "immediatelyfast-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.14",
+    "java": ">=21",
     "minecraft": "1.21.8",
-    "java": ">=21"
-  },
-  "recommends": {
-    "sodium": "*"
+    "fabricloader": ">=0.16.14"
   },
   "conflicts": {
     "vulkanmod": "*"
@@ -33,7 +35,12 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.discord": "https://raphimc.net/discord"
+        "modmenu.discord": "https://raphimc.net/discord",
+        "modmenu.donate": "https://raphimc.net/donate",
+        "modmenu.kofi": "https://ko-fi.com/rk_01",
+        "modmenu.github_releases": "https://github.com/RaphiMC/ImmediatelyFast/releases",
+        "modmenu.modrinth": "https://modrinth.com/mod/immediatelyfast",
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/immediatelyfast"
       }
     }
   }
