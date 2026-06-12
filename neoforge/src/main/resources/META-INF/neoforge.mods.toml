@@ -1,33 +1,29 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
+license = "LGPL-3.0-or-later"
 issueTrackerURL = "https://github.com/RaphiMC/ImmediatelyFast/issues"
-license = "LGPL-3.0"
 
 [[mods]]
 modId = "immediatelyfast"
 version = "${version}"
 displayName = "ImmediatelyFast"
+description = "Speed up and optimize immediate mode rendering in Minecraft"
 authors = "RK_01"
-description = '''
-Speed up and optimize immediate mode rendering in Minecraft
-'''
-logoFile = "immediatelyfast-icon.png"
+logoFile = "assets/immediatelyfast/icon.png"
+displayURL = "https://github.com/RaphiMC/ImmediatelyFast"
 
-[[mixins]]
-config = "immediatelyfast-neoforge.mixins.json"
 [[mixins]]
 config = "immediatelyfast-common.mixins.json"
 
-[[dependencies.immediatelyfast]]
-modId = "neoforge"
-required = true
-versionRange = "[21.11.0,)"
-ordering = "NONE"
-side = "CLIENT"
+[[mixins]]
+config = "immediatelyfast-neoforge.mixins.json"
 
 [[dependencies.immediatelyfast]]
 modId = "minecraft"
-required = true
 versionRange = "[1.21.11]"
-ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.immediatelyfast]]
+modId = "neoforge"
+versionRange = "[21.11.0,)"
 side = "CLIENT"

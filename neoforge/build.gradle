@@ -37,9 +37,3 @@ processResources {
         expand("version": projectVersion)
     }
 }
-
-jar {
-    from("../common/src/main/resources/assets/immediatelyfast/icon.png") {
-        rename { "immediatelyfast-icon.png" }
-    }
-}
