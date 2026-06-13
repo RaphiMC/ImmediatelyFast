@@ -17,7 +17,7 @@ jobs:
         uses: "gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e" # v6.1.0
         with:
           cache-disabled: true
-      - name: "Set up Java 21"
+      - name: "Set up Java"
         uses: "actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654" # v5.2.0
         with:
           distribution: "temurin"
