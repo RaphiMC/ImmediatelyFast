@@ -21,31 +21,24 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
+import net.raphimc.immediatelyfast.service.PlatformService;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class PlatformCodeImpl {
+public class NeoForgePlatformService implements PlatformService {
 
-    public static Path getConfigDirectory() {
+    @Override
+    public Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get();
     }
 
-    public static Optional<String> getModVersion(final String mod) {
-        if (ModList.get() == null) {
-            return Optional.ofNullable(FMLLoader.getLoadingModList().getModFileById(mod)).map(ModFileInfo::versionString);
-        }
-
-        return ModList.get().getModContainerById(mod).map(m -> m.getModInfo().getVersion().toString());
-    }
-
-    public static void checkModCompatibility() {
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("optifine").ifPresent(version -> {
-                throw new IllegalStateException("Found OptiFine " + version + ". ImmediatelyFast is not compatible with OptiFine.");
-            });
+    @Override
+    public Optional<String> getModVersion(final String id) {
+        if (ModList.get() != null) {
+            return ModList.get().getModContainerById(id).map(m -> m.getModInfo().getVersion().toString());
+        } else {
+            return Optional.ofNullable(FMLLoader.getLoadingModList().getModFileById(id)).map(ModFileInfo::versionString);
         }
     }
 
