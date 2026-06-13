@@ -1,7 +1,6 @@
 plugins {
     id "java-library"
     id "base.base-conventions"
-    id "architectury-plugin"
     id "dev.architectury.loom"
     id "me.modmuss50.mod-publish-plugin"
 }
@@ -9,17 +8,6 @@ plugins {
 loom {
     mixin {
         useLegacyMixinAp = false
-    }
-}
-
-repositories {
-    maven {
-        name = "Lenni0451"
-        url = "https://maven.lenni0451.net/releases"
-
-        content {
-            includeGroup "net.lenni0451"
-        }
     }
 }
 
