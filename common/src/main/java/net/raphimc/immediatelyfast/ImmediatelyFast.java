@@ -27,6 +27,7 @@ import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
+import net.raphimc.immediatelyfast.service.PlatformService;
 import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class ImmediatelyFast {
 
         if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
             if (config.experimental_sign_text_buffering) {
-                if (PlatformCode.getModVersion("vulkanmod").isPresent()) {
+                if (PlatformService.INSTANCE.getModVersion("vulkanmod").isPresent()) {
                     LOGGER.warn("VulkanMod detected. Force disabling sign text buffering optimization.");
                     config.experimental_sign_text_buffering = false;
                 }
@@ -67,8 +68,7 @@ public class ImmediatelyFast {
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
-        VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
-        PlatformCode.checkModCompatibility();
+        VERSION = PlatformService.INSTANCE.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
 
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
@@ -101,7 +101,7 @@ public class ImmediatelyFast {
         }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("iris").ifPresent(version -> {
+            PlatformService.INSTANCE.getModVersion("iris").ifPresent(version -> {
                 ImmediatelyFast.LOGGER.info("Found Iris " + version + ". Enabling compatibility.");
                 IrisCompat.init();
             });
@@ -111,7 +111,7 @@ public class ImmediatelyFast {
     public static void lateInit() {
         if (config.experimental_sign_text_buffering) {
             signTextCache = new SignTextCache();
-            if (!PlatformCode.getModVersion("neoforge").isPresent()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
+            if (!PlatformService.INSTANCE.getModVersion("neoforge").isPresent()) { // NeoForge uses an event. Handled in ImmediatelyFastNeoForge
                 ((ReloadableResourceManagerImpl) MinecraftClient.getInstance().getResourceManager()).registerReloader(signTextCache);
             }
         }
@@ -124,7 +124,7 @@ public class ImmediatelyFast {
     }
 
     public static void loadConfig() {
-        final File configFile = PlatformCode.getConfigDirectory().resolve("immediatelyfast.json").toFile();
+        final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
         if (configFile.exists()) {
             try {
                 config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);

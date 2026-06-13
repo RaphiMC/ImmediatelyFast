@@ -15,28 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast;
+package net.raphimc.immediatelyfast.util;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import java.util.List;
+import java.util.ServiceLoader;
 
-import java.nio.file.Path;
-import java.util.Optional;
+public class ServiceUtil {
 
-public class PlatformCode {
-
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static Optional<String> getModVersion(final String mod) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static void checkModCompatibility() {
-        throw new AssertionError();
+    public static <T> T load(Class<T> service) {
+        final List<ServiceLoader.Provider<T>> providers = ServiceLoader.load(service).stream().toList();
+        if (providers.isEmpty()) {
+            throw new IllegalStateException("No implementation found for " + service.getName());
+        } else if (providers.size() > 1) {
+            throw new IllegalStateException("Multiple implementations found for " + service.getName() + ": " + providers.stream().map(p -> p.type().getName()).toList());
+        }
+        return providers.getFirst().get();
     }
 
 }
