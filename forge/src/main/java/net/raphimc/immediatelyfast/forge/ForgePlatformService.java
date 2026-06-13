@@ -15,24 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.fabric;
+package net.raphimc.immediatelyfast.forge;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
+import net.raphimc.immediatelyfast.service.PlatformService;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class PlatformCodeImpl {
+public class ForgePlatformService implements PlatformService {
 
-    public static Path getConfigDirectory() {
-        return FabricLoader.getInstance().getConfigDir();
+    @Override
+    public Path getConfigDirectory() {
+        return FMLPaths.CONFIGDIR.get();
     }
 
-    public static Optional<String> getModVersion(final String mod) {
-        return FabricLoader.getInstance().getModContainer(mod).map(m -> m.getMetadata().getVersion().getFriendlyString());
-    }
-
-    public static void checkModCompatibility() {
+    @Override
+    public Optional<String> getModVersion(final String id) {
+        if (ModList.get() != null) {
+            return ModList.get().getModContainerById(id).map(m -> m.getModInfo().getVersion().toString());
+        } else {
+            return Optional.ofNullable(FMLLoader.getLoadingModList().getModFileById(id)).map(ModFileInfo::versionString);
+        }
     }
 
 }

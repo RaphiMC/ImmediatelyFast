@@ -26,6 +26,7 @@ import net.raphimc.immediatelyfast.compat.IrisCompat;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
+import net.raphimc.immediatelyfast.service.PlatformService;
 import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.lwjgl.opengl.GL11C;
 import org.slf4j.Logger;
@@ -52,11 +53,11 @@ public class ImmediatelyFast {
 
         if (!config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
             if (config.hud_batching) {
-                if (PlatformCode.getModVersion("mbd2").isPresent()) {
+                if (PlatformService.INSTANCE.getModVersion("mbd2").isPresent()) {
                     // https://github.com/Low-Drag-MC/Multiblocked2/issues/80
                     LOGGER.warn("Multiblocked2 mod detected. Force disabling HUD Batching optimization.");
                     config.hud_batching = false;
-                } else if (PlatformCode.getModVersion("draconicevolution").isPresent()) {
+                } else if (PlatformService.INSTANCE.getModVersion("draconicevolution").isPresent()) {
                     // https://github.com/Draconic-Inc/Draconic-Evolution/issues/1868
                     LOGGER.warn("Draconic Evolution mod detected. Force disabling HUD Batching optimization.");
                     config.hud_batching = false;
@@ -67,8 +68,7 @@ public class ImmediatelyFast {
         ImmediatelyFast.createRuntimeConfig();
         ImmediatelyFastApi.setApiImpl(new ApiAccessImpl());
 
-        VERSION = PlatformCode.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
-        PlatformCode.checkModCompatibility();
+        VERSION = PlatformService.INSTANCE.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
 
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
@@ -101,7 +101,7 @@ public class ImmediatelyFast {
         }
 
         if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformCode.getModVersion("iris").or(() -> PlatformCode.getModVersion("oculus")).ifPresent(version -> {
+            PlatformService.INSTANCE.getModVersion("iris").or(() -> PlatformService.INSTANCE.getModVersion("oculus")).ifPresent(version -> {
                 ImmediatelyFast.LOGGER.info("Found Iris/Oculus " + version + ". Enabling compatibility.");
                 IrisCompat.init();
             });
@@ -122,7 +122,7 @@ public class ImmediatelyFast {
     }
 
     public static void loadConfig() {
-        final File configFile = PlatformCode.getConfigDirectory().resolve("immediatelyfast.json").toFile();
+        final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
         if (configFile.exists()) {
             try {
                 config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);

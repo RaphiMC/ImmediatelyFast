@@ -18,9 +18,9 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
 import net.raphimc.immediatelyfast.injection.processors.InjectAboveEverythingProcessor;
 import net.raphimc.immediatelyfast.injection.processors.InjectOnAllReturnsProcessor;
+import net.raphimc.immediatelyfast.service.PlatformService;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -76,15 +76,15 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformCode.getModVersion("armorchroma").isEmpty()) { // https://github.com/A5b84/armor-chroma-fabric
+        if (packageName.startsWith("hud_batching.compat.armorchroma") && PlatformService.INSTANCE.getModVersion("armorchroma").isEmpty()) { // https://github.com/A5b84/armor-chroma-fabric
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/squeek502/AppleSkin
+        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformService.INSTANCE.getModVersion("appleskin").isEmpty()) { // https://github.com/squeek502/AppleSkin
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.highlighter") && PlatformCode.getModVersion("highlighter").isEmpty()) { // https://github.com/AHilyard/Highlighter
+        } else if (packageName.startsWith("hud_batching.compat.highlighter") && PlatformService.INSTANCE.getModVersion("highlighter").isEmpty()) { // https://github.com/AHilyard/Highlighter
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformCode.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
+        } else if (packageName.startsWith("hud_batching.compat.itemborders") && PlatformService.INSTANCE.getModVersion("itemborders").isEmpty()) { // https://github.com/AHilyard/ItemBorders
             return false;
-        } else if (packageName.startsWith("core.compat.webdisplays") && PlatformCode.getModVersion("webdisplays").isEmpty()) { // https://github.com/CinemaMod/webdisplays
+        } else if (packageName.startsWith("core.compat.webdisplays") && PlatformService.INSTANCE.getModVersion("webdisplays").isEmpty()) { // https://github.com/CinemaMod/webdisplays
             return false;
         }
 
