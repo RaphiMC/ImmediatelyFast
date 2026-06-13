@@ -9,23 +9,21 @@ base {
     archivesName = project.jar_name
 }
 
-architectury {
-    platformSetupLoomIde()
-}
-
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
-}
-
-configurations {
-    common
-
-    compileClasspath.extendsFrom(common)
-    runtimeClasspath.extendsFrom(common)
+    mods {
+        "immediatelyfast" {
+            sourceSet(project(":common").sourceSets.main)
+            sourceSet(project.sourceSets.main)
+        }
+    }
+    runs.configureEach {
+        generateRunConfig = true
+    }
 }
 
 dependencies {
-    common(project(":common")) {
+    includeInJar(project(":common")) {
         transitive = false
     }
 }

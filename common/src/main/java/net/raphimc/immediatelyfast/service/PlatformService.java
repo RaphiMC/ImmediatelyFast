@@ -15,24 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast.fabric;
+package net.raphimc.immediatelyfast.service;
 
-import net.fabricmc.loader.api.FabricLoader;
+import net.raphimc.immediatelyfast.util.ServiceUtil;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class PlatformCodeImpl {
+public interface PlatformService {
 
-    public static Path getConfigDirectory() {
-        return FabricLoader.getInstance().getConfigDir();
-    }
+    PlatformService INSTANCE = ServiceUtil.load(PlatformService.class);
 
-    public static Optional<String> getModVersion(final String mod) {
-        return FabricLoader.getInstance().getModContainer(mod).map(m -> m.getMetadata().getVersion().getFriendlyString());
-    }
+    Path getConfigDirectory();
 
-    public static void checkModCompatibility() {
-    }
+    Optional<String> getModVersion(final String id);
 
 }

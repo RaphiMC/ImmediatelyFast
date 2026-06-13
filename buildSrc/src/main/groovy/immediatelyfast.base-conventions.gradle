@@ -1,7 +1,6 @@
 plugins {
     id "java-library"
     id "base.base-conventions"
-    id "architectury-plugin"
     id "dev.architectury.loom-no-remap"
     id "me.modmuss50.mod-publish-plugin"
 }

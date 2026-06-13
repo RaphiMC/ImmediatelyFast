@@ -15,28 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast;
+package net.raphimc.immediatelyfast.fabric;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.fabricmc.loader.api.FabricLoader;
+import net.raphimc.immediatelyfast.service.PlatformService;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class PlatformCode {
+public class FabricPlatformService implements PlatformService {
 
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError();
+    @Override
+    public Path getConfigDirectory() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 
-    @ExpectPlatform
-    public static Optional<String> getModVersion(final String mod) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static void checkModCompatibility() {
-        throw new AssertionError();
+    @Override
+    public Optional<String> getModVersion(final String id) {
+        return FabricLoader.getInstance().getModContainer(id).map(m -> m.getMetadata().getVersion().getFriendlyString());
     }
 
 }
