@@ -2,12 +2,10 @@ plugins {
     id "immediatelyfast.platform-conventions"
 }
 
-architectury {
-    neoForge()
-}
-
-configurations {
-    developmentNeoForge.extendsFrom(common)
+loom {
+    neoForge {
+        convertAccessWideners(tasks.named("remapJar"), loom.accessWidenerPath.get().getAsFile().name)
+    }
 }
 
 repositories {
@@ -18,15 +16,8 @@ repositories {
 }
 
 dependencies {
-    neoForge("net.neoforged:neoforge:${project.neoforge_version}")
-    forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${project.reflect_version}")))
-    includeInJar(project(path: ":common", configuration: "transformProductionNeoForge")) {
-        transitive = false
-    }
-}
-
-remapJar {
-    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+    neoForge "net.neoforged:neoforge:${project.neoforge_version}"
+    include "net.lenni0451:Reflect:${project.reflect_version}"
 }
 
 processResources {

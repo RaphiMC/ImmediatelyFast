@@ -18,7 +18,7 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.PlatformCode;
+import net.raphimc.immediatelyfast.service.PlatformService;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -74,15 +74,15 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
 
-        if (packageName.startsWith("core.compat.iris") && PlatformCode.getModVersion("iris").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/460
+        if (packageName.startsWith("core.compat.iris") && PlatformService.INSTANCE.getModVersion("iris").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/460
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformCode.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
+        } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformService.INSTANCE.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.journeymap") && PlatformCode.getModVersion("journeymap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/316
+        } else if (packageName.startsWith("hud_batching.compat.journeymap") && PlatformService.INSTANCE.getModVersion("journeymap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/316
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.xaerominimap") && PlatformCode.getModVersion("xaerominimap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/319
+        } else if (packageName.startsWith("hud_batching.compat.xaerominimap") && PlatformService.INSTANCE.getModVersion("xaerominimap").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/319
             return false;
-        } else if (packageName.startsWith("hud_batching.compat.ftbchunks") && PlatformCode.getModVersion("ftbchunks").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/318
+        } else if (packageName.startsWith("hud_batching.compat.ftbchunks") && PlatformService.INSTANCE.getModVersion("ftbchunks").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/318
             return false;
         }
 

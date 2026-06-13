@@ -2,33 +2,19 @@ plugins {
     id "immediatelyfast.platform-conventions"
 }
 
-architectury {
-    forge()
-}
-
 loom {
     forge {
+        convertAccessWideners(tasks.named("remapJar"), loom.accessWidenerPath.get().getAsFile().name)
         mixinConfig("immediatelyfast-common.mixins.json")
         mixinConfig("immediatelyfast-forge.mixins.json")
     }
 }
 
-configurations {
-    developmentForge.extendsFrom(common)
-}
-
 dependencies {
-    forge("net.minecraftforge:forge:${project.forge_version}")
+    forge "net.minecraftforge:forge:${project.forge_version}"
     annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
     implementation(include("io.github.llamalad7:mixinextras-forge:${project.mixin_extras_version}"))
-    forgeRuntimeLibrary(implementation(include("net.lenni0451:Reflect:${project.reflect_version}")))
-    includeInJar(project(path: ":common", configuration: "transformProductionForge")) {
-        transitive = false
-    }
-}
-
-remapJar {
-    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+    include "net.lenni0451:Reflect:${project.reflect_version}"
 }
 
 processResources {
