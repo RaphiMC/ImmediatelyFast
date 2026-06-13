@@ -15,28 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.immediatelyfast;
+package net.raphimc.immediatelyfast.service;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.raphimc.immediatelyfast.util.ServiceUtil;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class PlatformCode {
+public interface PlatformService {
 
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError();
-    }
+    PlatformService INSTANCE = ServiceUtil.load(PlatformService.class);
 
-    @ExpectPlatform
-    public static Optional<String> getModVersion(final String mod) {
-        throw new AssertionError();
-    }
+    Path getConfigDirectory();
 
-    @ExpectPlatform
-    public static void checkModCompatibility() {
-        throw new AssertionError();
-    }
+    Optional<String> getModVersion(final String id);
 
 }

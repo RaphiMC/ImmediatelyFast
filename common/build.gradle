@@ -2,17 +2,11 @@ plugins {
     id "immediatelyfast.base-conventions"
 }
 
-architectury {
-    common("fabric")
-    common("neoforge")
-}
-
 loom {
     accessWidenerPath = file("src/main/resources/immediatelyfast.classtweaker")
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
-    implementation("net.lenni0451:Reflect:${project.reflect_version}")
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}" // Needed to pull in mixin and mixin-extras
+    api "net.lenni0451:Reflect:${project.reflect_version}"
 }
