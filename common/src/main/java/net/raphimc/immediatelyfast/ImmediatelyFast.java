@@ -71,23 +71,16 @@ public class ImmediatelyFast {
         final String backendVersion = RenderSystem.getDevice().getVersion();
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with " + backendName + " " + backendVersion);
 
-        boolean isNvidia = false;
-        boolean isAmd = false;
-        boolean isIntel = false;
-        boolean isApple = false;
-        if (gpuVendor != null) {
-            final String gpuVendorLower = gpuVendor.toLowerCase();
-
-            isNvidia = gpuVendorLower.startsWith("nvidia");
-            isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
-            isIntel = gpuVendorLower.startsWith("intel");
-            isApple = gpuVendorLower.startsWith("apple");
-        }
+        final String gpuVendorLower = gpuVendor.toLowerCase();
+        final boolean isNvidia = gpuVendorLower.startsWith("nvidia");
+        final boolean isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
+        final boolean isIntel = gpuVendorLower.startsWith("intel");
+        final boolean isApple = gpuVendorLower.startsWith("apple");
 
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
+        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && backendName.equals("OpenGL") && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
             ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
         }
 

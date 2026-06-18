@@ -20,8 +20,8 @@ package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.GlBackend;
+import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.GlTexture;
 import net.minecraft.util.Identifier;
@@ -29,7 +29,7 @@ import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL30C;
 
-public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
+public class SignAtlasFramebuffer extends SimpleFramebuffer implements AutoCloseable {
 
     public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
@@ -37,8 +37,7 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
     private final Slot rootSlot;
 
     public SignAtlasFramebuffer(final int id) {
-        super("ImmediatelyFast Sign Atlas FBO", false);
-        this.resize(ATLAS_SIZE, ATLAS_SIZE);
+        super("ImmediatelyFast Sign Atlas FBO", ATLAS_SIZE, ATLAS_SIZE, false);
         this.textureId = Identifier.of("immediatelyfast", "sign_atlas/" + id);
         MinecraftClient.getInstance().getTextureManager().registerTexture(this.textureId, new FboTexture());
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
