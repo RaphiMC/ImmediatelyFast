@@ -17,14 +17,14 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.RenderTargetTexture;
 
-public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable {
+public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseable {
 
     public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
@@ -33,8 +33,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
     private final Slot rootSlot;
 
     public SignAtlasRenderTarget(final int id) {
-        super("ImmediatelyFast Sign Atlas", true);
-        this.resize(ATLAS_SIZE, ATLAS_SIZE);
+        super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, true);
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
         Minecraft.getInstance().getTextureManager().register(this.textureId, new RenderTargetTexture(this));
