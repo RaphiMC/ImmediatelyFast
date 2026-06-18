@@ -23,6 +23,7 @@ loom {
 }
 
 dependencies {
+    implementation project(":common")
     includeInJar(project(":common")) {
         transitive = false
     }
