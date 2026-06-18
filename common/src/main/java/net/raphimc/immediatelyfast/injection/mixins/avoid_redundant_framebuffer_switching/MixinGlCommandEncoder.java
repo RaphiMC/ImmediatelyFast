@@ -18,7 +18,6 @@
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.mojang.blaze3d.opengl.GlCommandEncoder;
 import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,17 +25,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GlCommandEncoder.class)
+@Mixin(targets = "com.mojang.blaze3d.opengl.GlCommandEncoder")
 public abstract class MixinGlCommandEncoder {
 
-    @WrapWithCondition(method = "finishRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
-    private boolean dontUnbindFramebuffer(int target, int framebuffer) {
+    @WrapWithCondition(method = "submitRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
+    private boolean dontUnbindFramebuffer(final int target, final int framebuffer) {
         return false;
     }
 
     // https://github.com/RaphiMC/ImmediatelyFast/issues/351
     @Inject(method = "presentTexture", at = @At("HEAD"))
-    private void unbindFramebufferBeforePresenting(CallbackInfo ci) {
+    private void unbindFramebufferBeforePresenting(final CallbackInfo ci) {
         GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
     }
 

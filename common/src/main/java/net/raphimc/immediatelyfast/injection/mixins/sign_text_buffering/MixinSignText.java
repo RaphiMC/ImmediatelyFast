@@ -71,14 +71,14 @@ public abstract class MixinSignText implements ISignText {
     private boolean immediatelyFast$calculatedHashCode;
 
     @Inject(method = "getRenderMessages", at = @At("RETURN"))
-    private void checkShouldCache(CallbackInfoReturnable<FormattedCharSequence[]> cir) {
+    private void checkShouldCache(final CallbackInfoReturnable<FormattedCharSequence[]> cir) {
         if (!this.immediatelyFast$checkedShouldCache) {
             this.immediatelyFast$checkedShouldCache = true;
             this.immediatelyFast$shouldCache = true;
             for (FormattedCharSequence line : this.renderMessages) {
                 if (!this.immediatelyFast$shouldCache) break;
 
-                line.accept((index, style, codePoint) -> {
+                line.accept((_, style, _) -> {
                     if (style.isObfuscated()) {
                         this.immediatelyFast$shouldCache = false;
                         return false;
@@ -91,7 +91,7 @@ public abstract class MixinSignText implements ISignText {
     }
 
     @Inject(method = "getRenderMessages", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/SignText;renderMessages:[Lnet/minecraft/util/FormattedCharSequence;", opcode = Opcodes.PUTFIELD))
-    private void invalidateCache(CallbackInfoReturnable<FormattedCharSequence[]> cir) {
+    private void invalidateCache(final CallbackInfoReturnable<FormattedCharSequence[]> cir) {
         this.immediatelyFast$shouldCache = false;
         this.immediatelyFast$checkedShouldCache = false;
         this.immediatelyFast$cachedHashCode = 0;
@@ -109,10 +109,10 @@ public abstract class MixinSignText implements ISignText {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MixinSignText that = (MixinSignText) o;
+        final MixinSignText that = (MixinSignText) o;
         return hasGlowingText == that.hasGlowingText && color == that.color && Arrays.equals(messages, that.messages) && Arrays.equals(filteredMessages, that.filteredMessages);
     }
 

@@ -17,15 +17,18 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.GpuFormat;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.util.RenderTargetTexture;
+import org.joml.Vector4f;
 
-public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable {
+public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseable {
 
+    private static final Vector4f CLEAR_COLOR = new Vector4f(0F);
     public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
     private final int id;
@@ -33,8 +36,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
     private final Slot rootSlot;
 
     public SignAtlasRenderTarget(final int id) {
-        super("ImmediatelyFast Sign Atlas", true);
-        this.resize(ATLAS_SIZE, ATLAS_SIZE);
+        super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, true, GpuFormat.RGBA8_UNORM);
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
         Minecraft.getInstance().getTextureManager().register(this.textureId, new RenderTargetTexture(this));
@@ -46,7 +48,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
     }
 
     public void clear() {
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.getColorTexture(), 0, this.getDepthTexture(), 1F);
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.getColorTexture(), CLEAR_COLOR, this.getDepthTexture(), 0F);
         this.rootSlot.subSlot1 = null;
         this.rootSlot.subSlot2 = null;
     }
@@ -93,7 +95,7 @@ public class SignAtlasRenderTarget extends RenderTarget implements AutoCloseable
             }
             this.occupied = false;
             removeUnoccupiedSubSlots(this);
-            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), 0, SignAtlasRenderTarget.this.getDepthTexture(), 1F, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
+            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), CLEAR_COLOR, SignAtlasRenderTarget.this.getDepthTexture(), 0F, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
         }
 
         public Slot findSlot(final int width, final int height) {

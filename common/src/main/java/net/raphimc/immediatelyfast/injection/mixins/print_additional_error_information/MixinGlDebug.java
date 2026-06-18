@@ -31,13 +31,13 @@ public abstract class MixinGlDebug {
     @Unique
     private static long immediatelyFast$lastTime;
 
-    @ModifyVariable(method = "enableDebugCallback", at = @At("HEAD"), index = 1, argsOnly = true)
-    private static boolean enableSyncDebug(boolean sync) {
+    @ModifyVariable(method = "enableDebugCallback", at = @At("HEAD"), name = "debugSynchronousGlLogs", argsOnly = true)
+    private static boolean enableSyncDebug(final boolean debugSynchronousGlLogs) {
         return true;
     }
 
     @Redirect(method = "printDebugLog", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;)V"))
-    private void appendStackTrace(Logger instance, String message, Object argument) {
+    private void appendStackTrace(final Logger instance, final String message, final Object argument) {
         if (System.currentTimeMillis() - immediatelyFast$lastTime > 1000) {
             immediatelyFast$lastTime = System.currentTimeMillis();
             instance.info(message, argument, new Exception());

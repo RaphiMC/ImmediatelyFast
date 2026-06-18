@@ -20,10 +20,10 @@ config = "immediatelyfast-neoforge.mixins.json"
 
 [[dependencies.immediatelyfast]]
 modId = "minecraft"
-versionRange = "[26.1.0,26.2.0)"
+versionRange = "[26.2.0]"
 side = "CLIENT"
 
 [[dependencies.immediatelyfast]]
 modId = "neoforge"
-versionRange = "[26.1.0.0,26.2.0.0)"
+versionRange = "[26.2.0.0,26.3.0.0)"
 side = "CLIENT"

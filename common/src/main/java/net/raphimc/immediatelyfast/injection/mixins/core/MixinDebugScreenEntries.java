@@ -43,12 +43,12 @@ public abstract class MixinDebugScreenEntries {
     public static Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> PROFILES;
 
     @Shadow
-    private static Identifier register(Identifier name, DebugScreenEntry entry) {
+    private static Identifier register(final Identifier identifier, final DebugScreenEntry entry) {
         return null;
     }
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
-    private static void addImmediatelyFastEntry(CallbackInfo ci) {
+    private static void addImmediatelyFastEntry(final CallbackInfo ci) {
         final Identifier entryId = register(ImmediatelyFastDebugScreenEntry.ENTRY_ID, new ImmediatelyFastDebugScreenEntry());
         final Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> profiles = new HashMap<>();
         for (Map.Entry<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {

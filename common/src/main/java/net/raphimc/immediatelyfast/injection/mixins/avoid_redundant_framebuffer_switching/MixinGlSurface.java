@@ -18,19 +18,19 @@
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
 import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.opengl.GlSurface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GlDevice.class)
-public abstract class MixinGlDevice {
+@Mixin(GlSurface.class)
+public abstract class MixinGlSurface {
 
     // https://github.com/RaphiMC/ImmediatelyFast/issues/350
-    @Inject(method = "presentFrame", at = @At("HEAD"))
-    private static void unbindFramebufferBeforeSwappingBuffers(CallbackInfo ci) {
+    @Inject(method = "present", at = @At("HEAD"))
+    private static void unbindFramebufferBeforeSwappingBuffers(final CallbackInfo ci) {
         GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
     }
 

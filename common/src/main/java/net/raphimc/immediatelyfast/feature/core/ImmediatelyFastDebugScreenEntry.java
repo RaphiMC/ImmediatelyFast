@@ -26,7 +26,6 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
-import net.raphimc.immediatelyfast.util.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,7 +40,6 @@ public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
     public void display(final DebugScreenDisplayer displayer, final Level level, final LevelChunk clientChunk, final LevelChunk serverChunk) {
         final List<String> lines = new ArrayList<>();
         lines.add("ImmediatelyFast " + ImmediatelyFast.VERSION);
-        lines.add("Buffer Pool: " + ByteBufferBuilderPool.getSize() + " buffers (" + MathUtil.formatBytes(ByteBufferBuilderPool.getAllocatedBytes()) + ")");
         if (Minecraft.getInstance().getMapTextureManager() instanceof IMapTextureManager mapTextureManager) {
             final Collection<MapAtlasTexture> atlasTextures = mapTextureManager.immediatelyFast$getAllMapAtlasTextures();
             final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlasTexture::getMapCount).sum();

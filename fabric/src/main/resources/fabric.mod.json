@@ -27,8 +27,8 @@
   "accessWidener": "immediatelyfast.classtweaker",
   "depends": {
     "java": ">=25",
-    "minecraft": "26.1.x",
-    "fabricloader": ">=0.18.5"
+    "minecraft": "26.2.x",
+    "fabricloader": ">=0.19.0"
   },
   "custom": {
     "modmenu": {

@@ -21,22 +21,18 @@ import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.entity.SignText;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.ByteBufferBuilderPool;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignAtlasRenderTarget;
 import net.raphimc.immediatelyfast.injection.interfaces.ISignText;
 import org.joml.Matrix4fStack;
@@ -58,17 +54,17 @@ public abstract class MixinAbstractSignRenderer {
     private Font font;
 
     @Shadow
-    protected abstract void submitSignText(SignRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, SignText signText);
+    protected abstract void submitSignText(final SignRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final SignText signText);
 
     @Inject(method = "submitSignText", at = @At("HEAD"), cancellable = true)
-    private void renderBufferedSignText(SignRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, SignText signText, CallbackInfo ci) {
+    private void renderBufferedSignText(final SignRenderState state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final SignText signText, final CallbackInfo ci) {
         if (!(signText instanceof ISignText mixinSignText)) return;
         if (!mixinSignText.immediatelyFast$shouldCache()) return;
 
         SignAtlasRenderTarget.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
-            final int width = this.immediatelyFast$getTextWidth(signText, renderState.isTextFilteringEnabled, renderState.maxTextLineWidth);
-            final int height = 4 * renderState.textLineHeight;
+            final int width = this.immediatelyFast$getTextWidth(signText, state.isTextFilteringEnabled, state.maxTextLineWidth);
+            final int height = 4 * state.textLineHeight;
             if (width <= 0 || height <= 0) {
                 mixinSignText.immediatelyFast$setShouldCache(false);
                 return;
@@ -87,24 +83,18 @@ public abstract class MixinAbstractSignRenderer {
                 final GpuTextureView previousDepthTextureOverride = RenderSystem.outputDepthTextureOverride;
                 RenderSystem.outputColorTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getColorTextureView();
                 RenderSystem.outputDepthTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getDepthTextureView();
-                final ByteBufferBuilder bufferBuilder = ByteBufferBuilderPool.borrowBufferBuilder();
                 mixinSignText.immediatelyFast$setShouldCache(false);
 
                 try {
-                    final MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(bufferBuilder);
-                    final SubmitNodeStorage submitNodeStorage = new SubmitNodeStorage();
-                    final FeatureRenderDispatcher renderDispatcher = new FeatureRenderDispatcher(submitNodeStorage, Minecraft.getInstance().getModelManager(), bufferSource, Minecraft.getInstance().getAtlasManager(), null, null, this.font, Minecraft.getInstance().gameRenderer.getGameRenderState());
                     final PoseStack textPoseStack = new PoseStack();
                     textPoseStack.translate(slot.x, slot.y, 0F);
                     textPoseStack.translate(slot.width / 2F, slot.height / 2F, 0F);
-                    renderState.drawOutline = true; // Always render outline, regardless of distance to sign
-                    this.submitSignText(renderState, textPoseStack, submitNodeStorage, signText);
-                    renderDispatcher.renderAllFeatures();
-                    bufferSource.endBatch();
-                    renderDispatcher.close();
+                    state.drawOutline = true; // Always render outline, regardless of distance to sign
+                    final SubmitNodeStorage submitNodeStorage = new SubmitNodeStorage();
+                    this.submitSignText(state, textPoseStack, submitNodeStorage, signText);
+                    Minecraft.getInstance().gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeStorage);
                 } finally {
                     mixinSignText.immediatelyFast$setShouldCache(true);
-                    ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder);
                     RenderSystem.outputColorTextureOverride = previousColorTextureOverride;
                     RenderSystem.outputDepthTextureOverride = previousDepthTextureOverride;
                     RenderSystem.setShaderFog(fog);
@@ -120,20 +110,20 @@ public abstract class MixinAbstractSignRenderer {
             }
         }
 
-        final float u1 = ((float) slot.x) / SignAtlasRenderTarget.ATLAS_SIZE;
-        final float u2 = ((float) slot.x + (float) slot.width) / SignAtlasRenderTarget.ATLAS_SIZE;
-        final float v1 = 1F - ((float) slot.y) / SignAtlasRenderTarget.ATLAS_SIZE;
-        final float v2 = 1F - ((float) slot.y + (float) slot.height) / SignAtlasRenderTarget.ATLAS_SIZE;
-        final int light = signText.hasGlowingText() ? LightCoordsUtil.FULL_BRIGHT : renderState.lightCoords;
+        final float u0 = ((float) slot.x) / SignAtlasRenderTarget.ATLAS_SIZE;
+        final float u1 = ((float) slot.x + (float) slot.width) / SignAtlasRenderTarget.ATLAS_SIZE;
+        final float v0 = 1F - ((float) slot.y) / SignAtlasRenderTarget.ATLAS_SIZE;
+        final float v1 = 1F - ((float) slot.y + (float) slot.height) / SignAtlasRenderTarget.ATLAS_SIZE;
+        final int lightCoords = signText.hasGlowingText() ? LightCoordsUtil.FULL_BRIGHT : state.lightCoords;
 
         poseStack.pushPose();
         poseStack.translate(-slot.width / 2F, -slot.height / 2F, 0F);
         final SignAtlasRenderTarget.Slot finalSlot = slot;
-        nodeCollector.submitCustomGeometry(poseStack, ImmediatelyFast.signTextCache.renderType, (entry, vertexConsumer) -> {
-            vertexConsumer.addVertex(entry, 0F, finalSlot.height, 0F).setColor(255, 255, 255, 255).setUv(u1, v2).setLight(light);
-            vertexConsumer.addVertex(entry, finalSlot.width, finalSlot.height, 0F).setColor(255, 255, 255, 255).setUv(u2, v2).setLight(light);
-            vertexConsumer.addVertex(entry, finalSlot.width, 0F, 0F).setColor(255, 255, 255, 255).setUv(u2, v1).setLight(light);
-            vertexConsumer.addVertex(entry, 0F, 0F, 0F).setColor(255, 255, 255, 255).setUv(u1, v1).setLight(light);
+        submitNodeCollector.submitCustomGeometry(poseStack, ImmediatelyFast.signTextCache.renderType, (entry, vertexConsumer) -> {
+            vertexConsumer.addVertex(entry, 0F, finalSlot.height, 0F).setColor(255, 255, 255, 255).setUv(u0, v1).setLight(lightCoords);
+            vertexConsumer.addVertex(entry, finalSlot.width, finalSlot.height, 0F).setColor(255, 255, 255, 255).setUv(u1, v1).setLight(lightCoords);
+            vertexConsumer.addVertex(entry, finalSlot.width, 0F, 0F).setColor(255, 255, 255, 255).setUv(u1, v0).setLight(lightCoords);
+            vertexConsumer.addVertex(entry, 0F, 0F, 0F).setColor(255, 255, 255, 255).setUv(u0, v0).setLight(lightCoords);
         });
         poseStack.popPose();
 

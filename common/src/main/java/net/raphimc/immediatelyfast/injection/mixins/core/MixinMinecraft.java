@@ -27,13 +27,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;initRenderer(Lcom/mojang/blaze3d/systems/GpuDevice;)V", shift = At.Shift.AFTER))
+    private static void hookRendererInit(final CallbackInfo ci) {
+        ImmediatelyFast.onRenderSystemInit();
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void initImmediatelyFast(CallbackInfo ci) {
+    private void hookConstructor(final CallbackInfo ci) {
         ImmediatelyFast.lateInit();
     }
 
     @Inject(method = "setLevel", at = @At("HEAD"))
-    private void hookLevelChange(CallbackInfo ci) {
+    private void hookLevelChange(final CallbackInfo ci) {
         ImmediatelyFast.onLevelChange();
     }
 

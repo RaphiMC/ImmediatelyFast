@@ -42,20 +42,20 @@ public abstract class MixinFontTexture {
     @Unique
     private int immediatelyFast$fontAtlasSize;
 
-    @Inject(method = "<init>", at = @At(value = "CTOR_HEAD", unsafe = true))
-    private void cacheConfigState(CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "CTOR_HEAD"))
+    private void cacheConfigState(final CallbackInfo ci) {
         this.immediatelyFast$shouldResizeFontAtlas = ImmediatelyFast.runtimeConfig.font_atlas_resizing;
         this.immediatelyFast$fontAtlasSize = ImmediatelyFast.config.font_atlas_size;
     }
 
     @ModifyConstant(method = "*", constant = @Constant(intValue = 256))
-    private int modifyTextureSize(int original) {
+    private int modifyTextureSize(final int original) {
         return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256;
     }
 
     @SuppressWarnings("MixinAnnotationTarget")
     @ModifyConstant(method = "*", constant = @Constant(floatValue = 256F))
-    private float modifyTextureSize(float original) {
+    private float modifyTextureSize(final float original) {
         return this.immediatelyFast$shouldResizeFontAtlas ? this.immediatelyFast$fontAtlasSize : 256F;
     }
 

@@ -42,18 +42,18 @@ import java.util.Set;
 public abstract class MixinShaderManager {
 
     @Inject(method = "apply(Lnet/minecraft/client/renderer/ShaderManager$Configs;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
-    private void checkForCoreShaderModifications(ShaderManager.Configs configs, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
+    private void checkForCoreShaderModifications(final ShaderManager.Configs preparations, final ResourceManager manager, final ProfilerFiller profiler, final CallbackInfo ci) {
         PackResources resourcePackWhichBreaksFontAtlasResizing = null;
         try {
             final Set<PackResources> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
                 final Identifier vertexShaderIdentifier = ShaderType.VERTEX.idConverter().idToFile(shaderIdentifier);
-                final PackResources vertexShaderResourcePack = resourceManager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
+                final PackResources vertexShaderResourcePack = manager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
                 if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
                     breakingResourcePacks.add(vertexShaderResourcePack);
                 }
                 final Identifier fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().idToFile(shaderIdentifier);
-                final PackResources fragmentShaderResourcePack = resourceManager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
+                final PackResources fragmentShaderResourcePack = manager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
                 if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
                     breakingResourcePacks.add(fragmentShaderResourcePack);
                 }

@@ -31,7 +31,7 @@ public abstract class MixinRenderTypes {
             "lambda$static$23" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
             "lambda$static$25" /*TEXT_INTENSITY_SEE_THROUGH*/
     }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;sortOnUpload()Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;"))
-    private static RenderSetup.RenderSetupBuilder disableTranslucencySorting(RenderSetup.RenderSetupBuilder instance) {
+    private static RenderSetup.RenderSetupBuilder disableTranslucencySorting(final RenderSetup.RenderSetupBuilder instance) {
         return instance;
     }
 

@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.systems.DeviceInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
@@ -26,7 +27,6 @@ import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastRuntimeConfig;
 import net.raphimc.immediatelyfast.feature.sign_text_buffering.SignTextCache;
 import net.raphimc.immediatelyfast.service.PlatformService;
-import net.raphimc.immediatelyfast.util.IrisCompat;
 import org.lwjgl.system.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,41 +51,37 @@ public class ImmediatelyFast {
         ImmediatelyFast.createRuntimeConfig();
         VERSION = PlatformService.INSTANCE.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);
 
+        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
+            if (ImmediatelyFast.config.experimental_sign_text_buffering) {
+                if (PlatformService.INSTANCE.getModVersion("iris").isPresent()) {
+                    LOGGER.warn("Iris detected. Force disabling sign text buffering optimization.");
+                    ImmediatelyFast.config.experimental_sign_text_buffering = false;
+                }
+            }
+        }
+
         //System.load("C:\\Program Files\\RenderDoc\\renderdoc.dll");
     }
 
     public static void onRenderSystemInit() {
-        final String gpuVendor = RenderSystem.getDevice().getVendor();
-        final String gpuModel = RenderSystem.getDevice().getRenderer();
-        final String backendName = RenderSystem.getDevice().getBackendName();
-        final String backendVersion = RenderSystem.getDevice().getVersion();
+        final DeviceInfo deviceInfo = RenderSystem.getDevice().getDeviceInfo();
+        final String gpuVendor = deviceInfo.vendorName();
+        final String gpuModel = deviceInfo.name();
+        final String backendName = deviceInfo.backendName();
+        final String backendVersion = deviceInfo.driverInfo();
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with " + backendName + " " + backendVersion);
 
-        boolean isNvidia = false;
-        boolean isAmd = false;
-        boolean isIntel = false;
-        boolean isApple = false;
-        if (gpuVendor != null) {
-            final String gpuVendorLower = gpuVendor.toLowerCase();
-
-            isNvidia = gpuVendorLower.startsWith("nvidia");
-            isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
-            isIntel = gpuVendorLower.startsWith("intel");
-            isApple = gpuVendorLower.startsWith("apple");
-        }
+        final String gpuVendorLower = gpuVendor.toLowerCase();
+        final boolean isNvidia = gpuVendorLower.startsWith("nvidia");
+        final boolean isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
+        final boolean isIntel = gpuVendorLower.startsWith("intel");
+        final boolean isApple = gpuVendorLower.startsWith("apple");
 
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
+        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getDeviceInfo().underlyingExtensions().contains("GL_ARB_buffer_storage"))) {
             ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
-        }
-
-        if (!ImmediatelyFast.config.debug_only_and_not_recommended_disable_mod_conflict_handling) {
-            PlatformService.INSTANCE.getModVersion("iris").ifPresent(version -> {
-                ImmediatelyFast.LOGGER.info("Found Iris " + version + ". Enabling compatibility.");
-                IrisCompat.init();
-            });
         }
     }
 

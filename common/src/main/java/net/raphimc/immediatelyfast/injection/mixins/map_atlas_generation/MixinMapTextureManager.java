@@ -55,8 +55,8 @@ public abstract class MixinMapTextureManager implements IMapTextureManager {
     }
 
     @Inject(method = "getOrCreateMapInstance", at = @At("HEAD"))
-    private void createMapAtlasTexture(MapId mapId, MapItemSavedData data, CallbackInfoReturnable<MapTextureManager.MapInstance> cir) {
-        this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(mapId.id(), k -> {
+    private void createMapAtlasTexture(final MapId id, final MapItemSavedData data, final CallbackInfoReturnable<MapTextureManager.MapInstance> cir) {
+        this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(id.id(), _ -> {
             for (MapAtlasTexture atlasTexture : this.immediatelyFast$mapAtlasTextures.values()) {
                 final int location = atlasTexture.getNextMapLocation();
                 if (location != -1) {
