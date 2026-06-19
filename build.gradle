@@ -1,4 +1,4 @@
 plugins {
     id "dev.architectury.loom-no-remap" version "1.17.483" apply false
-    id "me.modmuss50.mod-publish-plugin" version "1.1.0" apply false
+    id "me.modmuss50.mod-publish-plugin" version "2.0.1" apply false
 }
