@@ -13,15 +13,15 @@ publishMods {
     curseforge {
         accessToken = providers.gradleProperty("curseforge.publishing_token")
         projectId = "686911"
-        minecraftVersions.addAll(project.supported_minecraft_versions.split(','))
+        minecraftVersionList(project.supported_minecraft_versions)
         javaVersions.add(JavaVersion.toVersion(java.toolchain.getLanguageVersion().get().asInt()))
-        clientRequired = true
-        serverRequired = false
+        client = true
+        server = false
     }
     modrinth {
         accessToken = providers.gradleProperty("modrinth.publishing_token")
         projectId = "5ZwdcRci"
-        minecraftVersions.addAll(project.supported_minecraft_versions.split(','))
+        minecraftVersionList(project.supported_minecraft_versions)
     }
     github {
         parent project(":common").tasks.named("publishGithub")
