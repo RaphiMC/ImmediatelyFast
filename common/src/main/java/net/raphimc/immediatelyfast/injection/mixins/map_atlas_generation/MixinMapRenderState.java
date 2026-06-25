@@ -18,7 +18,7 @@
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
 import net.minecraft.client.renderer.state.MapRenderState;
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,13 +27,24 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class MixinMapRenderState implements IMapRenderState {
 
     @Unique
+    private Identifier immediatelyFast$atlasTextureId;
+
+    @Unique
     private int immediatelyFast$atlasX;
 
     @Unique
     private int immediatelyFast$atlasY;
 
-    @Unique
-    private MapAtlasTexture immediatelyFast$atlasTexture;
+    @Override
+    public Identifier immediatelyFast$getAtlasTextureId() {
+        return this.immediatelyFast$atlasTextureId;
+    }
+
+    @Override
+    public void immediatelyFast$setAtlasTextureId(final Identifier identifier) {
+        this.immediatelyFast$atlasTextureId = identifier;
+    }
+
 
     @Override
     public int immediatelyFast$getAtlasX() {
@@ -54,15 +65,4 @@ public abstract class MixinMapRenderState implements IMapRenderState {
     public void immediatelyFast$setAtlasY(final int y) {
         this.immediatelyFast$atlasY = y;
     }
-
-    @Override
-    public MapAtlasTexture immediatelyFast$getAtlasTexture() {
-        return this.immediatelyFast$atlasTexture;
-    }
-
-    @Override
-    public void immediatelyFast$setAtlasTexture(final MapAtlasTexture atlasTexture) {
-        this.immediatelyFast$atlasTexture = atlasTexture;
-    }
-
 }

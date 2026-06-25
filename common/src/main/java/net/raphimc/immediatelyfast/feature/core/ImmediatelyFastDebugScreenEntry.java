@@ -24,7 +24,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 
 import java.util.ArrayList;
@@ -41,9 +41,9 @@ public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
         final List<String> lines = new ArrayList<>();
         lines.add("ImmediatelyFast " + ImmediatelyFast.VERSION);
         if (Minecraft.getInstance().getMapTextureManager() instanceof IMapTextureManager mapTextureManager) {
-            final Collection<MapAtlasTexture> atlasTextures = mapTextureManager.immediatelyFast$getAllMapAtlasTextures();
-            final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlasTexture::getMapCount).sum();
-            lines.add("Map Atlas: " + atlasTextures.size() + "x" + MapAtlasTexture.ATLAS_SIZE + "x" + MapAtlasTexture.ATLAS_SIZE + " (" + totalMapCount + " maps)");
+            final Collection<MapAtlas> atlasTextures = mapTextureManager.immediatelyFast$getAtlases();
+            final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlas::getMapCount).sum();
+            lines.add("Map Atlas: " + atlasTextures.size() + "x" + MapAtlas.ATLAS_SIZE + "x" + MapAtlas.ATLAS_SIZE + " (" + totalMapCount + " maps)");
         }
         if (ImmediatelyFast.signTextCache != null) {
             lines.add("Sign Text Cache: " + ImmediatelyFast.signTextCache.slotCache.size() + " entries");

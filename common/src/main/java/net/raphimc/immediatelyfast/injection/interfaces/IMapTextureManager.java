@@ -17,16 +17,16 @@
  */
 package net.raphimc.immediatelyfast.injection.interfaces;
 
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 
 import java.util.Collection;
 
 public interface IMapTextureManager {
 
-    MapAtlasTexture immediatelyFast$getMapAtlasTexture(final int id);
+    MapAtlas immediatelyFast$getAtlas(final int id);
 
-    int immediatelyFast$getAtlasMapping(final int mapId);
+    int immediatelyFast$getAtlasLocation(final int mapId);
 
-    Collection<MapAtlasTexture> immediatelyFast$getAllMapAtlasTextures();
+    Collection<MapAtlas> immediatelyFast$getAtlases();
 
 }

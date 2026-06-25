@@ -17,7 +17,6 @@ repositories {
 
 dependencies {
     neoForge "net.neoforged:neoforge:${project.neoforge_version}"
-    include "net.lenni0451:Reflect:${project.reflect_version}"
 }
 
 processResources {

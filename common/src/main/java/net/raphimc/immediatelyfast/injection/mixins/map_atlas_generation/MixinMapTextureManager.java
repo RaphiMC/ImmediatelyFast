@@ -24,7 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.resources.MapTextureManager;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -39,50 +39,49 @@ import java.util.Collection;
 public abstract class MixinMapTextureManager implements IMapTextureManager {
 
     @Unique
-    private final Int2ObjectMap<MapAtlasTexture> immediatelyFast$mapAtlasTextures = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<MapAtlas> immediatelyFast$atlases = new Int2ObjectOpenHashMap<>();
 
     @Unique
-    private final Int2IntMap immediatelyFast$mapIdToAtlasMapping = new Int2IntOpenHashMap();
+    private final Int2IntMap immediatelyFast$mapIdToAtlasLocation = new Int2IntOpenHashMap();
 
     @Inject(method = "resetData", at = @At("RETURN"))
-    private void clearMapAtlas(final CallbackInfo ci) {
-        for (MapAtlasTexture texture : this.immediatelyFast$mapAtlasTextures.values()) {
-            texture.close();
+    private void resetAtlases(final CallbackInfo ci) {
+        for (MapAtlas atlas : this.immediatelyFast$atlases.values()) {
+            atlas.close();
         }
-
-        this.immediatelyFast$mapAtlasTextures.clear();
-        this.immediatelyFast$mapIdToAtlasMapping.clear();
+        this.immediatelyFast$atlases.clear();
+        this.immediatelyFast$mapIdToAtlasLocation.clear();
     }
 
     @Inject(method = "getOrCreateMapInstance", at = @At("HEAD"))
-    private void createMapAtlasTexture(final MapId id, final MapItemSavedData data, final CallbackInfoReturnable<MapTextureManager.MapInstance> cir) {
-        this.immediatelyFast$mapIdToAtlasMapping.computeIfAbsent(id.id(), _ -> {
-            for (MapAtlasTexture atlasTexture : this.immediatelyFast$mapAtlasTextures.values()) {
-                final int location = atlasTexture.getNextMapLocation();
+    private void ensureHasAtlasLocation(final MapId id, final MapItemSavedData data, final CallbackInfoReturnable<?> cir) {
+        this.immediatelyFast$mapIdToAtlasLocation.computeIfAbsent(id.id(), _ -> {
+            for (MapAtlas atlas : this.immediatelyFast$atlases.values()) {
+                final int location = atlas.getNextLocation();
                 if (location != -1) {
                     return location;
                 }
             }
 
-            final MapAtlasTexture atlasTexture = new MapAtlasTexture(this.immediatelyFast$mapAtlasTextures.size());
-            this.immediatelyFast$mapAtlasTextures.put(atlasTexture.getId(), atlasTexture);
-            return atlasTexture.getNextMapLocation();
+            final MapAtlas atlas = new MapAtlas(this.immediatelyFast$atlases.size());
+            this.immediatelyFast$atlases.put(atlas.getId(), atlas);
+            return atlas.getNextLocation();
         });
     }
 
     @Override
-    public MapAtlasTexture immediatelyFast$getMapAtlasTexture(final int id) {
-        return this.immediatelyFast$mapAtlasTextures.get(id);
+    public MapAtlas immediatelyFast$getAtlas(final int id) {
+        return this.immediatelyFast$atlases.get(id);
     }
 
     @Override
-    public int immediatelyFast$getAtlasMapping(final int mapId) {
-        return this.immediatelyFast$mapIdToAtlasMapping.getOrDefault(mapId, -1);
+    public int immediatelyFast$getAtlasLocation(final int mapId) {
+        return this.immediatelyFast$mapIdToAtlasLocation.getOrDefault(mapId, -1);
     }
 
     @Override
-    public Collection<MapAtlasTexture> immediatelyFast$getAllMapAtlasTextures() {
-        return this.immediatelyFast$mapAtlasTextures.values();
+    public Collection<MapAtlas> immediatelyFast$getAtlases() {
+        return this.immediatelyFast$atlases.values();
     }
 
 }

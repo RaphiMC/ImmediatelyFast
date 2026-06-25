@@ -8,5 +8,4 @@ loom {
 
 dependencies {
     implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}" // Needed to pull in mixin and mixin-extras
-    api "net.lenni0451:Reflect:${project.reflect_version}"
 }

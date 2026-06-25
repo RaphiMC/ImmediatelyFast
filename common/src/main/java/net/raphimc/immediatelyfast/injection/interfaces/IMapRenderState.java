@@ -17,9 +17,13 @@
  */
 package net.raphimc.immediatelyfast.injection.interfaces;
 
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.minecraft.resources.Identifier;
 
 public interface IMapRenderState {
+
+    Identifier immediatelyFast$getAtlasTextureId();
+
+    void immediatelyFast$setAtlasTextureId(final Identifier identifier);
 
     int immediatelyFast$getAtlasX();
 
@@ -28,9 +32,5 @@ public interface IMapRenderState {
     int immediatelyFast$getAtlasY();
 
     void immediatelyFast$setAtlasY(final int y);
-
-    MapAtlasTexture immediatelyFast$getAtlasTexture();
-
-    void immediatelyFast$setAtlasTexture(final MapAtlasTexture atlasTexture);
 
 }

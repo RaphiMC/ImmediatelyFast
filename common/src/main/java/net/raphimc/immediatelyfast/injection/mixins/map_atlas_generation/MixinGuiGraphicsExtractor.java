@@ -29,8 +29,8 @@ import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
+import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas.ATLAS_SIZE;
+import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas.MAP_SIZE;
 
 @Mixin(GuiGraphicsExtractor.class)
 public abstract class MixinGuiGraphicsExtractor {
@@ -38,7 +38,7 @@ public abstract class MixinGuiGraphicsExtractor {
     @WrapOperation(method = "map", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;innerBlit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;IIIIFFFFI)V", ordinal = 0))
     private void modifyTextureCoordinates(final GuiGraphicsExtractor instance, final RenderPipeline pipeline, final GpuTextureView textureView, final GpuSampler sampler, final int x0, final int y0, final int x1, final int y1, float u0, float u1, float v0, float v1, final int color, final Operation<Void> original, @Local(name = "mapRenderState", argsOnly = true) final MapRenderState mapRenderState) {
         final IMapRenderState immediatelyFast$mapRenderState = (IMapRenderState) mapRenderState;
-        if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTexture() != null && immediatelyFast$mapRenderState.immediatelyFast$getAtlasTexture().getTextureId().equals(mapRenderState.texture)) {
+        if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId() != null && immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId().equals(mapRenderState.texture)) {
             u0 = (float) immediatelyFast$mapRenderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
             u1 = (float) (immediatelyFast$mapRenderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
             v0 = (float) immediatelyFast$mapRenderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;

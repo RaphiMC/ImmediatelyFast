@@ -7,9 +7,6 @@ accessible method net/minecraft/client/renderer/feature/RenderTypeFeatureRendere
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferSubData (IJLjava/nio/ByteBuffer;I)V
 accessible method com/mojang/blaze3d/opengl/DirectStateAccess bufferData (ILjava/nio/ByteBuffer;I)V
 
-# map_atlas_generation
-accessible class net/minecraft/client/resources/MapTextureManager$MapInstance
-
 # resource_pack_conflict_handling
 accessible field net/minecraft/client/Minecraft fontManager Lnet/minecraft/client/gui/font/FontManager;
 

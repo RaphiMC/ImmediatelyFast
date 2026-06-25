@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.resources.MapTextureManager;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 import org.spongepowered.asm.mixin.Final;
@@ -35,8 +35,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.ATLAS_SIZE;
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
+import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas.ATLAS_SIZE;
+import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas.MAP_SIZE;
 
 @Mixin(MapRenderer.class)
 public abstract class MixinMapRenderer {
@@ -48,7 +48,7 @@ public abstract class MixinMapRenderer {
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitCustomGeometry(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/SubmitNodeCollector$CustomGeometryRenderer;)V", ordinal = 0))
     private SubmitNodeCollector.CustomGeometryRenderer modifyTextureCoordinates(final SubmitNodeCollector.CustomGeometryRenderer customGeometryRenderer, @Local(name = "mapRenderState", argsOnly = true) final MapRenderState mapRenderState, @Local(name = "lightCoords", argsOnly = true) final int lightCoords) {
         final IMapRenderState immediatelyFast$mapRenderState = (IMapRenderState) mapRenderState;
-        if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTexture() != null && immediatelyFast$mapRenderState.immediatelyFast$getAtlasTexture().getTextureId().equals(mapRenderState.texture)) {
+        if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId() != null && immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId().equals(mapRenderState.texture)) {
             final float u0 = (float) immediatelyFast$mapRenderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;
             final float u1 = (float) (immediatelyFast$mapRenderState.immediatelyFast$getAtlasX() + MAP_SIZE) / ATLAS_SIZE;
             final float v0 = (float) immediatelyFast$mapRenderState.immediatelyFast$getAtlasY() / ATLAS_SIZE;
@@ -65,20 +65,18 @@ public abstract class MixinMapRenderer {
     }
 
     @Inject(method = "extractRenderState", at = @At("RETURN"))
-    private void initAtlasParameters(final MapId mapId, final MapItemSavedData mapData, final MapRenderState mapRenderState, final CallbackInfo ci) {
-        final int packedLocation = ((IMapTextureManager) this.mapTextureManager).immediatelyFast$getAtlasMapping(mapId.id());
-        if (packedLocation == -1) {
-            ImmediatelyFast.LOGGER.warn("Map " + mapId.id() + " is not in an atlas");
-            // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
-            return;
-        }
-
+    private void setAtlasParameters(final MapId mapId, final MapItemSavedData mapData, final MapRenderState mapRenderState, final CallbackInfo ci) {
         final IMapRenderState immediatelyFast$mapRenderState = (IMapRenderState) mapRenderState;
-        immediatelyFast$mapRenderState.immediatelyFast$setAtlasX(((packedLocation >> 8) & 0xFF) * MAP_SIZE);
-        immediatelyFast$mapRenderState.immediatelyFast$setAtlasY((packedLocation & 0xFF) * MAP_SIZE);
-        immediatelyFast$mapRenderState.immediatelyFast$setAtlasTexture(((IMapTextureManager) this.mapTextureManager).immediatelyFast$getMapAtlasTexture(packedLocation >> 16));
-        if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTexture() == null) {
-            throw new IllegalStateException("getMapAtlasTexture returned null for packedLocation " + packedLocation + " (map " + mapId.id() + ")");
+        final int location = ((IMapTextureManager) this.mapTextureManager).immediatelyFast$getAtlasLocation(mapId.id());
+        if (location != -1) {
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasTextureId(((IMapTextureManager) this.mapTextureManager).immediatelyFast$getAtlas(MapAtlas.getAtlasIdFromLocation(location)).getTextureId());
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasX(MapAtlas.getAtlasXFromLocation(location) * MAP_SIZE);
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasY(MapAtlas.getAtlasYFromLocation(location) * MAP_SIZE);
+            mapRenderState.texture = immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId();
+        } else {
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasTextureId(null);
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasX(0);
+            immediatelyFast$mapRenderState.immediatelyFast$setAtlasY(0);
         }
     }
 

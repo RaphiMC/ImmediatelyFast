@@ -17,27 +17,24 @@
  */
 package net.raphimc.immediatelyfast.util;
 
-import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.Dumpable;
 import net.minecraft.resources.Identifier;
 
 import java.nio.file.Path;
 
-public class RenderTargetTexture extends AbstractTexture implements Dumpable {
+public class GpuOnlyTexture extends AbstractTexture implements Dumpable {
 
-    public RenderTargetTexture(final RenderTarget renderTarget) {
-        this.texture = renderTarget.getColorTexture();
-        this.textureView = renderTarget.getColorTextureView();
+    public GpuOnlyTexture(final String label, final int width, final int height) {
+        this.texture = RenderSystem.getDevice().createTexture(label, GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING, GpuFormat.RGBA8_UNORM, width, height, 1, 1);
+        this.textureView = RenderSystem.getDevice().createTextureView(this.texture);
         this.sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false);
-    }
-
-    @Override
-    public void close() {
     }
 
     @Override

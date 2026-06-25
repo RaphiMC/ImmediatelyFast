@@ -17,54 +17,31 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.lenni0451.reflect.Objects;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.MapTextureManager;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture;
+import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Supplier;
-
-import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlasTexture.MAP_SIZE;
-
-@Mixin(MapTextureManager.MapInstance.class)
+@Mixin(targets = "net.minecraft.client.resources.MapTextureManager$MapInstance")
 public abstract class MixinMapTextureManager_MapInstance {
 
-    @Shadow
-    private MapItemSavedData data;
-
-    @Mutable
     @Shadow
     @Final
     private DynamicTexture texture;
 
-    @Shadow
-    private boolean requiresUpload;
-
-    @Shadow
-    @Final
-    @Mutable
-    private Identifier location;
-
     @Unique
-    private static final DynamicTexture DUMMY_TEXTURE = Objects.allocate(DynamicTexture.class);
+    private AbstractTexture immediatelyFast$atlasTexture;
 
     @Unique
     private int immediatelyFast$atlasX;
@@ -72,66 +49,22 @@ public abstract class MixinMapTextureManager_MapInstance {
     @Unique
     private int immediatelyFast$atlasY;
 
-    @Unique
-    private MapAtlasTexture immediatelyFast$atlasTexture;
-
-    @SuppressWarnings({"LocalMayUseName", "NameDoesntMatchTargetClass"})
-    @Redirect(method = "<init>", at = @At(value = "NEW", target = "(Ljava/util/function/Supplier;IIZ)Lnet/minecraft/client/renderer/texture/DynamicTexture;"))
-    private DynamicTexture initAtlasParametersAndDontAllocateTexture(final Supplier<String> label, final int width, final int height, final boolean zero, @Local(argsOnly = true) final MapTextureManager mapTextureManager, @Local(name = "id", argsOnly = true) final int id) {
-        final int packedLocation = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlasMapping(id);
-        if (packedLocation == -1) {
-            ImmediatelyFast.LOGGER.warn("Map " + id + " is not in an atlas");
-            // Leave atlasTexture null to indicate that this map is not in an atlas, and it should use the vanilla system instead
-            return new DynamicTexture(label, width, height, zero);
-        }
-
-        this.immediatelyFast$atlasX = ((packedLocation >> 8) & 0xFF) * MAP_SIZE;
-        this.immediatelyFast$atlasY = (packedLocation & 0xFF) * MAP_SIZE;
-        this.immediatelyFast$atlasTexture = ((IMapTextureManager) mapTextureManager).immediatelyFast$getMapAtlasTexture(packedLocation >> 16);
-        if (this.immediatelyFast$atlasTexture == null) {
-            throw new IllegalStateException("getMapAtlasTexture returned null for packedLocation " + packedLocation + " (map " + id + ")");
-        }
-
-        return DUMMY_TEXTURE;
-    }
-
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/TextureManager;register(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/renderer/texture/AbstractTexture;)V"))
-    private void getAtlasTextureIdentifier(final TextureManager instance, final Identifier location, final AbstractTexture texture) {
-        if (this.immediatelyFast$atlasTexture != null) {
-            this.texture = null; // Don't leave the texture field pointing to the uninitialized dummy texture
-            this.location = this.immediatelyFast$atlasTexture.getTextureId();
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void getAtlasParameters(final MapTextureManager mapTextureManager, final int id, final MapItemSavedData data, final CallbackInfo ci) {
+        final int location = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlasLocation(id);
+        if (location != -1) {
+            this.immediatelyFast$atlasTexture = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlas(MapAtlas.getAtlasIdFromLocation(location)).getTexture();
+            this.immediatelyFast$atlasX = MapAtlas.getAtlasXFromLocation(location) * MapAtlas.MAP_SIZE;
+            this.immediatelyFast$atlasY = MapAtlas.getAtlasYFromLocation(location) * MapAtlas.MAP_SIZE;
         } else {
-            instance.register(location, texture);
+            ImmediatelyFast.LOGGER.warn("Map " + id + " has no atlas location, falling back to vanilla behavior.");
         }
     }
 
-    @Inject(method = "updateTextureIfNeeded", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V", shift = At.Shift.AFTER))
     private void updateAtlasTexture(final CallbackInfo ci) {
-        if (this.requiresUpload && this.immediatelyFast$atlasTexture != null) {
-            ci.cancel();
-            final DynamicTexture atlasTexture = this.immediatelyFast$atlasTexture.getTexture();
-            final NativeImage atlasImage = atlasTexture.getPixels();
-            for (int x = 0; x < MAP_SIZE; x++) {
-                for (int y = 0; y < MAP_SIZE; y++) {
-                    final int i = x + y * MAP_SIZE;
-                    atlasImage.setPixel(this.immediatelyFast$atlasX + x, this.immediatelyFast$atlasY + y, MapColor.getColorFromPackedId(this.data.colors[i]));
-                }
-            }
-
-            final CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
-            final GpuBufferSlice pixelBuffer = commandEncoder.transientMemory().uploadStaging(atlasImage.getPixelBytes(), atlasTexture.getTexture().getFormat().blockSize(), GpuBuffer.USAGE_COPY_SRC);
-            commandEncoder.copyBufferToTexture(
-                    pixelBuffer, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, atlasImage.getWidth(), atlasImage.getHeight(),
-                    atlasTexture.getTexture(), this.immediatelyFast$atlasX, this.immediatelyFast$atlasY, MAP_SIZE, MAP_SIZE, 0, 0
-            );
-            this.requiresUpload = false;
-        }
-    }
-
-    @Inject(method = "close", at = @At("HEAD"), cancellable = true)
-    private void dontCloseDummyTexture(final CallbackInfo ci) {
         if (this.immediatelyFast$atlasTexture != null) {
-            ci.cancel();
+            RenderSystem.getDevice().createCommandEncoder().writeToTexture(this.immediatelyFast$atlasTexture.getTexture(), this.texture.getPixels(), 0, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
         }
     }
 
