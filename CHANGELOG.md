@@ -1,2 +1,1 @@
-* Fixed villager type and profession layer render order
-* Fixed core shader incompatibility detection logic bug
+* Fixed villager profession level layer render order
