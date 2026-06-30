@@ -1,1 +1,3 @@
-* Added support for Minecraft 26.1.2
+* Made experimental sign buffering Vulkan compatible
+* Made sign atlas size configurable
+* Updated core shader blacklist
