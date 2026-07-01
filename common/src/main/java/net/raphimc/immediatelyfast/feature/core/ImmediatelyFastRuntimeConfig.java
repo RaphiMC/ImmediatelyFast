@@ -21,6 +21,7 @@ public class ImmediatelyFastRuntimeConfig {
 
     public boolean font_atlas_resizing;
     public boolean disable_fast_buffer_upload;
+    public boolean map_atlas_generation;
 
     public ImmediatelyFastRuntimeConfig(final ImmediatelyFastConfig config) {
         this.font_atlas_resizing = config.font_atlas_resizing;
@@ -31,6 +32,7 @@ public class ImmediatelyFastRuntimeConfig {
         return switch (key) {
             case "font_atlas_resizing" -> this.font_atlas_resizing;
             case "disable_fast_buffer_upload" -> this.disable_fast_buffer_upload;
+            case "map_atlas_generation" -> this.map_atlas_generation;
             default -> defaultValue;
         };
     }

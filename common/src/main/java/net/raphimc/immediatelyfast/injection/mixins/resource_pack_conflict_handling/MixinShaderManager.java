@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Mixin(ShaderManager.class)
@@ -43,7 +44,7 @@ public abstract class MixinShaderManager {
 
     @Inject(method = "apply(Lnet/minecraft/client/renderer/ShaderManager$Configs;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
     private void checkForCoreShaderModifications(final ShaderManager.Configs preparations, final ResourceManager manager, final ProfilerFiller profiler, final CallbackInfo ci) {
-        PackResources resourcePackWhichBreaksFontAtlasResizing = null;
+        PackResources resourcePackWhichBreaksFontAtlasResizingAndMapAtlasGeneration = null;
         try {
             final Set<PackResources> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
@@ -63,8 +64,9 @@ public abstract class MixinShaderManager {
                 if (metadata == null) {
                     metadata = ImmediatelyFastResourcePackMetadata.DEFAULT;
                 }
-                if (!metadata.compatibleFeatures().contains("font_atlas_resizing")) {
-                    resourcePackWhichBreaksFontAtlasResizing = resourcePack;
+                List<String> compatibleFeatures = metadata.compatibleFeatures();
+                if (!compatibleFeatures.contains("font_atlas_resizing") || !compatibleFeatures.contains("map_atlas_generation")) {
+                    resourcePackWhichBreaksFontAtlasResizingAndMapAtlasGeneration = resourcePack;
                 }
             }
         } catch (IOException e) {
@@ -72,16 +74,22 @@ public abstract class MixinShaderManager {
         }
 
         if (ImmediatelyFast.config.font_atlas_resizing) {
-            if (resourcePackWhichBreaksFontAtlasResizing != null) {
-                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizing.packId() + " is not compatible with font atlas resizing. Temporarily disabling font atlas resizing.");
+            if (resourcePackWhichBreaksFontAtlasResizingAndMapAtlasGeneration != null) {
+                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksFontAtlasResizingAndMapAtlasGeneration.packId() + " is not compatible with font atlas resizing and map atlas generation. Temporarily disabling both.");
                 if (ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
                     ImmediatelyFast.runtimeConfig.font_atlas_resizing = false;
                     this.immediatelyFast$reloadFontStorages();
                 }
+                if (ImmediatelyFast.runtimeConfig.map_atlas_generation) {
+                    ImmediatelyFast.runtimeConfig.map_atlas_generation = false;
+                    this.immediatelyFast$reloadMapAtlas();
+                }
             } else if (!ImmediatelyFast.runtimeConfig.font_atlas_resizing) {
-                ImmediatelyFast.LOGGER.info("Re-enabling font atlas resizing because no incompatible resource packs are loaded.");
+                ImmediatelyFast.LOGGER.info("Re-enabling font atlas resizing and map atlas generation because no incompatible resource packs are loaded.");
                 ImmediatelyFast.runtimeConfig.font_atlas_resizing = true;
+                ImmediatelyFast.runtimeConfig.map_atlas_generation = true;
                 this.immediatelyFast$reloadFontStorages();
+                this.immediatelyFast$reloadMapAtlas();
             }
         }
     }
@@ -90,6 +98,12 @@ public abstract class MixinShaderManager {
     private void immediatelyFast$reloadFontStorages() {
         // Force reload the font manager to rebuild the font atlas textures
         Minecraft.getInstance().fontManager.updateOptions(Minecraft.getInstance().options);
+    }
+
+    @Unique
+    private void immediatelyFast$reloadMapAtlas() {
+        // Force the map atlast thing
+        Minecraft.getInstance().getMapTextureManager().resetData();
     }
 
 }

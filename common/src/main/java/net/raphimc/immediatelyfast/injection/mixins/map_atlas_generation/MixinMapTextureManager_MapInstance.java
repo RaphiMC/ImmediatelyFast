@@ -51,6 +51,9 @@ public abstract class MixinMapTextureManager_MapInstance {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void getAtlasParameters(final MapTextureManager mapTextureManager, final int id, final MapItemSavedData data, final CallbackInfo ci) {
+        if (!ImmediatelyFast.runtimeConfig.map_atlas_generation) {
+            return;
+        }
         final int location = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlasLocation(id);
         if (location != -1) {
             this.immediatelyFast$atlasTexture = ((IMapTextureManager) mapTextureManager).immediatelyFast$getAtlas(MapAtlas.getAtlasIdFromLocation(location)).getTexture();
@@ -63,7 +66,7 @@ public abstract class MixinMapTextureManager_MapInstance {
 
     @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V", shift = At.Shift.AFTER))
     private void updateAtlasTexture(final CallbackInfo ci) {
-        if (this.immediatelyFast$atlasTexture != null) {
+        if (this.immediatelyFast$atlasTexture != null && ImmediatelyFast.runtimeConfig.map_atlas_generation) {
             RenderSystem.getDevice().createCommandEncoder().writeToTexture(this.immediatelyFast$atlasTexture.getTexture(), this.texture.getPixels(), 0, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
         }
     }
