@@ -44,6 +44,7 @@ public abstract class MixinShaderManager {
     @Inject(method = "apply(Lnet/minecraft/client/renderer/ShaderManager$Configs;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
     private void checkForCoreShaderModifications(final ShaderManager.Configs preparations, final ResourceManager manager, final ProfilerFiller profiler, final CallbackInfo ci) {
         PackResources resourcePackWhichBreaksFontAtlasResizing = null;
+        PackResources resourcePackWhichBreaksMapAtlasGeneration = null;
         try {
             final Set<PackResources> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
@@ -66,6 +67,9 @@ public abstract class MixinShaderManager {
                 if (!metadata.compatibleFeatures().contains("font_atlas_resizing")) {
                     resourcePackWhichBreaksFontAtlasResizing = resourcePack;
                 }
+                if (metadata.incompatibleFeatures().contains("map_atlas_generation")) {
+                    resourcePackWhichBreaksMapAtlasGeneration = resourcePack;
+                }
             }
         } catch (IOException e) {
             ImmediatelyFast.LOGGER.error("Failed to check for core shader modifications", e);
@@ -84,12 +88,30 @@ public abstract class MixinShaderManager {
                 this.immediatelyFast$reloadFontStorages();
             }
         }
+        if (ImmediatelyFast.config.map_atlas_generation) {
+            if (resourcePackWhichBreaksMapAtlasGeneration != null) {
+                ImmediatelyFast.LOGGER.warn("Resource pack " + resourcePackWhichBreaksMapAtlasGeneration.packId() + " is not compatible with map atlas generation. Temporarily disabling map atlas generation.");
+                if (ImmediatelyFast.runtimeConfig.map_atlas_generation) {
+                    ImmediatelyFast.runtimeConfig.map_atlas_generation = false;
+                    this.immediatelyFast$reloadMapTextures();
+                }
+            } else if (!ImmediatelyFast.runtimeConfig.map_atlas_generation) {
+                ImmediatelyFast.LOGGER.info("Re-enabling map atlas generation because no incompatible resource packs are loaded.");
+                ImmediatelyFast.runtimeConfig.map_atlas_generation = true;
+                this.immediatelyFast$reloadMapTextures();
+            }
+        }
     }
 
     @Unique
     private void immediatelyFast$reloadFontStorages() {
         // Force reload the font manager to rebuild the font atlas textures
         Minecraft.getInstance().fontManager.updateOptions(Minecraft.getInstance().options);
+    }
+    @Unique
+    private void immediatelyFast$reloadMapTextures() {
+        // Force reset the map texture manager
+        Minecraft.getInstance().getMapTextureManager().resetData();
     }
 
 }

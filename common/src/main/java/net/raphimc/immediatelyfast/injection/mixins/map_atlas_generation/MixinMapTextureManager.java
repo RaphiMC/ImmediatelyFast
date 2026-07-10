@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.resources.MapTextureManager;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,18 +56,20 @@ public abstract class MixinMapTextureManager implements IMapTextureManager {
 
     @Inject(method = "getOrCreateMapInstance", at = @At("HEAD"))
     private void ensureHasAtlasLocation(final MapId id, final MapItemSavedData data, final CallbackInfoReturnable<?> cir) {
-        this.immediatelyFast$mapIdToAtlasLocation.computeIfAbsent(id.id(), _ -> {
-            for (MapAtlas atlas : this.immediatelyFast$atlases.values()) {
-                final int location = atlas.getNextLocation();
-                if (location != -1) {
-                    return location;
+        if (ImmediatelyFast.runtimeConfig.map_atlas_generation) {
+            this.immediatelyFast$mapIdToAtlasLocation.computeIfAbsent(id.id(), _ -> {
+                for (MapAtlas atlas : this.immediatelyFast$atlases.values()) {
+                    final int location = atlas.getNextLocation();
+                    if (location != -1) {
+                        return location;
+                    }
                 }
-            }
 
-            final MapAtlas atlas = new MapAtlas(this.immediatelyFast$atlases.size());
-            this.immediatelyFast$atlases.put(atlas.getId(), atlas);
-            return atlas.getNextLocation();
-        });
+                final MapAtlas atlas = new MapAtlas(this.immediatelyFast$atlases.size());
+                this.immediatelyFast$atlases.put(atlas.getId(), atlas);
+                return atlas.getNextLocation();
+            });
+        }
     }
 
     @Override

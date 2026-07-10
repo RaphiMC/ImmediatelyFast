@@ -20,16 +20,19 @@ package net.raphimc.immediatelyfast.feature.core;
 public class ImmediatelyFastRuntimeConfig {
 
     public boolean font_atlas_resizing;
+    public boolean map_atlas_generation;
     public boolean disable_fast_buffer_upload;
 
     public ImmediatelyFastRuntimeConfig(final ImmediatelyFastConfig config) {
         this.font_atlas_resizing = config.font_atlas_resizing;
+        this.map_atlas_generation = config.map_atlas_generation;
         this.disable_fast_buffer_upload = false;
     }
 
     public boolean getBoolean(final String key, final boolean defaultValue) {
         return switch (key) {
             case "font_atlas_resizing" -> this.font_atlas_resizing;
+            case "map_atlas_generation" -> this.map_atlas_generation;
             case "disable_fast_buffer_upload" -> this.disable_fast_buffer_upload;
             default -> defaultValue;
         };

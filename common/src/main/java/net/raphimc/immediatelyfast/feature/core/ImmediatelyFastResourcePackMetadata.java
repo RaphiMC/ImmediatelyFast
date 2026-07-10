@@ -24,12 +24,13 @@ import net.minecraft.server.packs.metadata.MetadataSectionType;
 import java.util.Collections;
 import java.util.List;
 
-public record ImmediatelyFastResourcePackMetadata(List<String> compatibleFeatures) {
+public record ImmediatelyFastResourcePackMetadata(List<String> compatibleFeatures, List<String> incompatibleFeatures) {
 
-    public static final ImmediatelyFastResourcePackMetadata DEFAULT = new ImmediatelyFastResourcePackMetadata(Collections.emptyList());
+    public static final ImmediatelyFastResourcePackMetadata DEFAULT = new ImmediatelyFastResourcePackMetadata(Collections.emptyList(), Collections.emptyList());
     public static final Codec<ImmediatelyFastResourcePackMetadata> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.STRING.listOf().fieldOf("compatible_features").forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures)
+                    Codec.STRING.listOf().optionalFieldOf("compatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures),
+                    Codec.STRING.listOf().optionalFieldOf("incompatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::incompatibleFeatures)
             ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
     );
     public static final MetadataSectionType<ImmediatelyFastResourcePackMetadata> SERIALIZER = new MetadataSectionType<>("immediatelyfast", CODEC);
