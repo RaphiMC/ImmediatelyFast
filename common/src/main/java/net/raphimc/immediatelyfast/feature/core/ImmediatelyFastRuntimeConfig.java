@@ -21,19 +21,22 @@ public class ImmediatelyFastRuntimeConfig {
 
     public boolean font_atlas_resizing;
     public boolean map_atlas_generation;
-    public boolean disable_fast_buffer_upload;
+    public boolean fix_slow_buffer_upload_on_apple_gpu;
+    public boolean avoid_redundant_framebuffer_switching;
 
     public ImmediatelyFastRuntimeConfig(final ImmediatelyFastConfig config) {
         this.font_atlas_resizing = config.font_atlas_resizing;
         this.map_atlas_generation = config.map_atlas_generation;
-        this.disable_fast_buffer_upload = false;
+        this.fix_slow_buffer_upload_on_apple_gpu = config.fix_slow_buffer_upload_on_apple_gpu;
+        this.avoid_redundant_framebuffer_switching = config.avoid_redundant_framebuffer_switching;
     }
 
     public boolean getBoolean(final String key, final boolean defaultValue) {
         return switch (key) {
             case "font_atlas_resizing" -> this.font_atlas_resizing;
             case "map_atlas_generation" -> this.map_atlas_generation;
-            case "disable_fast_buffer_upload" -> this.disable_fast_buffer_upload;
+            case "disable_fast_buffer_upload", "fix_slow_buffer_upload_on_apple_gpu" -> this.fix_slow_buffer_upload_on_apple_gpu;
+            case "disable_avoid_redundant_framebuffer_switching" -> this.avoid_redundant_framebuffer_switching;
             default -> defaultValue;
         };
     }

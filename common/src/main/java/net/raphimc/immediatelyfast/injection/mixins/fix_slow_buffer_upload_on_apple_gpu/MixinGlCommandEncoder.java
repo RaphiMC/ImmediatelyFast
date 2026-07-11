@@ -32,7 +32,7 @@ public abstract class MixinGlCommandEncoder {
 
     @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/DirectStateAccess;bufferSubData(IJLjava/nio/ByteBuffer;I)V"))
     private void fixSlowBufferUploadOnAppleGpu(final DirectStateAccess instance, final int buffer, final long offset, final ByteBuffer data, final int usage, @Local(name = "slice", argsOnly = true) final GpuBufferSlice slice) {
-        if (ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload && offset == 0 && slice.length() == slice.buffer().size()) {
+        if (ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu && offset == 0 && slice.length() == slice.buffer().size()) {
             instance.bufferData(buffer, data, usage);
         } else {
             instance.bufferSubData(buffer, offset, data, usage);

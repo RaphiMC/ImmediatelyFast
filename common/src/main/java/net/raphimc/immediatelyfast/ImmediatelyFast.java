@@ -80,8 +80,10 @@ public class ImmediatelyFast {
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getDeviceInfo().underlyingExtensions().contains("GL_ARB_buffer_storage"))) {
-            ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
+        ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu &= isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getDeviceInfo().underlyingExtensions().contains("GL_ARB_buffer_storage"));
+        if (ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching && isIntel && backendName.equals("OpenGL") && (gpuModel.contains("UHD Graphics 770") || gpuModel.contains("Xe Graphics"))) {
+            LOGGER.warn("Intel UHD Graphics 770 or Intel Xe Graphics detected. Force disabling redundant framebuffer switching optimization.");
+            ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching = false;
         }
     }
 

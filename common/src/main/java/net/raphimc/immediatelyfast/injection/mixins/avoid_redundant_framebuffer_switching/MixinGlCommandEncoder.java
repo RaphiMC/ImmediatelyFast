@@ -20,6 +20,7 @@ package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,7 +31,7 @@ public abstract class MixinGlCommandEncoder {
 
     @WrapWithCondition(method = "submitRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
     private boolean dontUnbindFramebuffer(final int target, final int framebuffer) {
-        return false;
+        return !ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching;
     }
 
     // https://github.com/RaphiMC/ImmediatelyFast/issues/351
