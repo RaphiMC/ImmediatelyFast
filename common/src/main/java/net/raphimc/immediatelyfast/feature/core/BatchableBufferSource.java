@@ -71,7 +71,7 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
         }
 
         final BufferBuilder bufferBuilder;
-        boolean hasBufferForRenderType = renderType.canConsolidateConsecutiveGeometry() && this.dynamicBuffers.containsKey(renderType);
+        final boolean hasBufferForRenderType = renderType.canConsolidateConsecutiveGeometry() && this.dynamicBuffers.containsKey(renderType);
         if (!renderType.canConsolidateConsecutiveGeometry()) {
             bufferBuilder = new BufferBuilder(this.getNextByteBufferBuilder(), renderType.mode(), renderType.format());
             this.lastSharedType = renderType;
@@ -88,16 +88,13 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
             IrisCompat.skipExtension.set(false);
         }
 
-        if (!hasBufferForRenderType) {
-            this.dynamicBuffers.computeIfAbsent(renderType, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
-        }
-
         if (hasBufferForRenderType) {
             if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || renderType.name.contains("immediatelyfast:renderlast")) && this.activeRenderTypes.contains(renderType)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
                 this.activeRenderTypes.remove(renderType);
                 this.activeRenderTypes.add(renderType);
             }
         } else {
+            this.dynamicBuffers.computeIfAbsent(renderType, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
             this.activeRenderTypes.add(renderType);
         }
 
