@@ -70,7 +70,7 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         final BufferBuilder bufferBuilder;
-        boolean hasBufferForRenderLayer = layer.areVerticesNotShared() && this.pendingBuffers.containsKey(layer);
+        final boolean hasBufferForRenderLayer = layer.areVerticesNotShared() && this.pendingBuffers.containsKey(layer);
         if (!layer.areVerticesNotShared()) {
             bufferBuilder = new BufferBuilder(this.getNextBufferAllocator(), layer.getDrawMode(), layer.getVertexFormat());
             this.currentLayer = layer;
@@ -87,16 +87,13 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             IrisCompat.skipExtension.set(false);
         }
 
-        if (!hasBufferForRenderLayer) {
-            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
-        }
-
         if (hasBufferForRenderLayer) {
             if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
                 this.activeLayers.remove(layer);
                 this.activeLayers.add(layer);
             }
         } else {
+            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
             this.activeLayers.add(layer);
         }
 
