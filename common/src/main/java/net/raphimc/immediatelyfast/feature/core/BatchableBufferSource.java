@@ -84,17 +84,14 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         if (IrisCompat.IRIS_LOADED) {
             IrisCompat.skipExtension.set(false);
         }
-
-        if (!hasBufferForRenderLayer) {
-            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
-        }
-
+        
         if (hasBufferForRenderLayer) {
             if ((ImmediatelyFast.config.debug_only_use_last_usage_for_batch_ordering || layer.name.contains("immediatelyfast:renderlast")) && this.activeLayers.contains(layer)) { // Fix for https://github.com/RaphiMC/ImmediatelyFast/issues/181
                 this.activeLayers.remove(layer);
                 this.activeLayers.add(layer);
             }
         } else {
+            this.pendingBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
             this.activeLayers.add(layer);
         }
 
