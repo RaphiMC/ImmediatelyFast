@@ -11,6 +11,7 @@
     "core.MixinMinecraft",
     "enhanced_batching.MixinRenderTypeFeatureRenderer_Group",
     "enhanced_batching.MixinScissorState",
+    "fast_text_lookup.MixinNameTagFeatureRenderer_GlyphRenderer",
     "fast_text_lookup.MixinTextFeatureRenderer_GlyphRenderer",
     "fix_slow_buffer_upload_on_apple_gpu.MixinGlCommandEncoder",
     "font_atlas_resizing.MixinFontTexture",
