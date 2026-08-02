@@ -18,10 +18,14 @@
 package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.raphimc.immediatelyfast.feature.batching.HudBatchingBufferSource;
 import net.raphimc.immediatelyfast.feature.core.BatchableBufferSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,6 +51,20 @@ public abstract class MixinDrawContext {
 
     @Shadow
     protected abstract void drawIfRunning();
+
+    @WrapMethod(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V")
+    private void renderItemDecorations(final TextRenderer textRenderer, final ItemStack stack, final int x, final int y, final String countOverride, final Operation<Void> original) {
+        if (this.vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
+            hudBatchingBufferSource.setRenderingItemDecorations(true);
+        }
+        try {
+            original.call(textRenderer, stack, x, y, countOverride);
+        } finally {
+            if (this.vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
+                hudBatchingBufferSource.setRenderingItemDecorations(false);
+            }
+        }
+    }
 
     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ItemCooldownManager;getCooldownProgress(Lnet/minecraft/item/Item;F)F")), at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;fill(Lnet/minecraft/client/render/RenderLayer;IIIII)V"))
     private void forceDraw(CallbackInfo ci) {
@@ -74,15 +92,6 @@ public abstract class MixinDrawContext {
     @WrapWithCondition(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V"))
     private boolean translateZEarlier(MatrixStack instance, float x, float y, float z) {
         return !(this.vertexConsumers instanceof BatchableBufferSource);
-    }
-
-    @Redirect(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;getGuiOverlay()Lnet/minecraft/client/render/RenderLayer;"))
-    private RenderLayer useGuiRenderLayer() {
-        if (this.vertexConsumers instanceof BatchableBufferSource) {
-            return RenderLayer.getGui();
-        } else {
-            return RenderLayer.getGuiOverlay();
-        }
     }
 
 }

@@ -31,6 +31,7 @@ public class HudBatchingBufferSource extends BatchableBufferSource {
     private final Object2ObjectMap<ReferenceObjectPair<RenderLayer, LightingState>, RenderLayer> lightingRenderLayers = new Object2ObjectOpenHashMap<>();
     private final Reference2ObjectMap<RenderLayer, ReferenceSet<RenderLayer>> renderLayerMap = new Reference2ObjectOpenHashMap<>();
     private boolean renderingItem = false;
+    private boolean renderingItemDecorations = false;
     private boolean currentlyDrawing = false;
 
     public HudBatchingBufferSource(final BufferAllocator fallbackBuffer, final SequencedMap<RenderLayer, BufferAllocator> layerBuffers) {
@@ -41,20 +42,29 @@ public class HudBatchingBufferSource extends BatchableBufferSource {
         this.renderingItem = renderingItem;
     }
 
+    public void setRenderingItemDecorations(final boolean renderingItemDecorations) {
+        this.renderingItemDecorations = renderingItemDecorations;
+    }
+
     public boolean isCurrentlyDrawing() {
         return this.currentlyDrawing;
     }
 
     @Override
     public VertexConsumer getBuffer(final RenderLayer layer) {
-        if (!this.renderingItem || layer.name.contains("glint")) {
+        if (layer.name.contains("glint")) {
             return super.getBuffer(layer);
+        } else if (this.renderingItem) {
+            final LightingState lightingState = LightingState.current();
+            final RenderLayer newLayer = this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingBuffers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert));
+            this.renderLayerMap.computeIfAbsent(layer, key -> new ReferenceOpenHashSet<>()).add(newLayer);
+            return super.getBuffer(newLayer);
+        } else if (this.renderingItemDecorations) {
+            if (layer == RenderLayer.getGuiOverlay()) {
+                return super.getBuffer(RenderLayer.getGui());
+            }
         }
-
-        final LightingState lightingState = LightingState.current();
-        final RenderLayer newLayer = this.lightingRenderLayers.computeIfAbsent(new ReferenceObjectImmutablePair<>(layer, lightingState), key -> new BatchingBuffers.WrappedRenderLayer(layer, lightingState::saveAndApply, lightingState::revert));
-        this.renderLayerMap.computeIfAbsent(layer, key -> new ReferenceOpenHashSet<>()).add(newLayer);
-        return super.getBuffer(newLayer);
+        return super.getBuffer(layer);
     }
 
     @Override
