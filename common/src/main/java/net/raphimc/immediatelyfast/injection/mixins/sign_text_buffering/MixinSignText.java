@@ -76,7 +76,9 @@ public abstract class MixinSignText implements ISignText {
             this.immediatelyFast$checkedShouldCache = true;
             this.immediatelyFast$shouldCache = true;
             for (FormattedCharSequence line : this.renderMessages) {
-                if (!this.immediatelyFast$shouldCache) break;
+                if (!this.immediatelyFast$shouldCache) {
+                    break;
+                }
 
                 line.accept((index, style, codePoint) -> {
                     if (style.isObfuscated()) {
@@ -110,8 +112,12 @@ public abstract class MixinSignText implements ISignText {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MixinSignText that = (MixinSignText) o;
         return hasGlowingText == that.hasGlowingText && color == that.color && Arrays.equals(messages, that.messages) && Arrays.equals(filteredMessages, that.filteredMessages);
     }

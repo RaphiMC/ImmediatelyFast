@@ -71,10 +71,16 @@ public abstract class MixinAbstractSignRenderer {
 
     @Inject(method = "submitSignText", at = @At("HEAD"), cancellable = true)
     private void renderBufferedSignText(SignRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, boolean isFront, CallbackInfo ci) {
-        if (poseStack instanceof NoTextTransformPoseStack) return;
+        if (poseStack instanceof NoTextTransformPoseStack) {
+            return;
+        }
         final SignText signText = isFront ? renderState.frontText : renderState.backText;
-        if (!(signText instanceof ISignText mixinSignText)) return;
-        if (!mixinSignText.immediatelyFast$shouldCache()) return;
+        if (!(signText instanceof ISignText mixinSignText)) {
+            return;
+        }
+        if (!mixinSignText.immediatelyFast$shouldCache()) {
+            return;
+        }
 
         SignAtlasRenderTarget.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
@@ -152,7 +158,9 @@ public abstract class MixinAbstractSignRenderer {
 
     @Redirect(method = "submitSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/AbstractSignRenderer;translateSignText(Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/world/phys/Vec3;)V"))
     private void dontApplyTextTransform(AbstractSignRenderer instance, PoseStack poseStack, boolean isFront, Vec3 offset) {
-        if (poseStack instanceof NoTextTransformPoseStack) return;
+        if (poseStack instanceof NoTextTransformPoseStack) {
+            return;
+        }
 
         this.translateSignText(poseStack, isFront, offset);
     }
@@ -168,7 +176,9 @@ public abstract class MixinAbstractSignRenderer {
         for (FormattedCharSequence line : renderMessages) {
             width = Math.max(width, this.font.width(line));
         }
-        if (width % 2 != 0) width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        if (width % 2 != 0) {
+            width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        }
 
         return width;
     }

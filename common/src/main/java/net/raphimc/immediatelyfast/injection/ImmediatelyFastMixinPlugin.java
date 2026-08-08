@@ -43,7 +43,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(final String targetClassName, final String mixinClassName) {
-        if (!mixinClassName.startsWith(this.mixinPackage)) return false;
+        if (!mixinClassName.startsWith(this.mixinPackage)) {
+            return false;
+        }
 
         final String mixinName = mixinClassName.substring(this.mixinPackage.length());
         final String packageName = mixinName.substring(0, mixinName.lastIndexOf('.'));
