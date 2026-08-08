@@ -28,10 +28,10 @@ public record ImmediatelyFastResourcePackMetadata(List<String> compatibleFeature
 
     public static final ImmediatelyFastResourcePackMetadata DEFAULT = new ImmediatelyFastResourcePackMetadata(Collections.emptyList(), Collections.emptyList());
     public static final Codec<ImmediatelyFastResourcePackMetadata> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.STRING.listOf().optionalFieldOf("compatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures),
-                    Codec.STRING.listOf().optionalFieldOf("incompatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::incompatibleFeatures)
-            ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
+        instance.group(
+            Codec.STRING.listOf().optionalFieldOf("compatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures),
+            Codec.STRING.listOf().optionalFieldOf("incompatible_features", Collections.emptyList()).forGetter(ImmediatelyFastResourcePackMetadata::incompatibleFeatures)
+        ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
     );
     public static final MetadataSectionType<ImmediatelyFastResourcePackMetadata> SERIALIZER = new MetadataSectionType<>("immediatelyfast", CODEC);
 

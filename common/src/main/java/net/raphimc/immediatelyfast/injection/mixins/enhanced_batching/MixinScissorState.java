@@ -46,8 +46,12 @@ public abstract class MixinScissorState {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         final MixinScissorState that = (MixinScissorState) o;
         return enabled == that.enabled && x == that.x && y == that.y && width == that.width && height == that.height;
     }

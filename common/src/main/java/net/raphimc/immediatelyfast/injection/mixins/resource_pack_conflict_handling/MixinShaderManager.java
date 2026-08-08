@@ -108,6 +108,7 @@ public abstract class MixinShaderManager {
         // Force reload the font manager to rebuild the font atlas textures
         Minecraft.getInstance().fontManager.updateOptions(Minecraft.getInstance().options);
     }
+
     @Unique
     private void immediatelyFast$reloadMapTextures() {
         // Force reset the map texture manager

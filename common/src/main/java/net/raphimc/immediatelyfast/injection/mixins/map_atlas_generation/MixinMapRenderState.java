@@ -45,7 +45,6 @@ public abstract class MixinMapRenderState implements IMapRenderState {
         this.immediatelyFast$atlasTextureId = identifier;
     }
 
-
     @Override
     public int immediatelyFast$getAtlasX() {
         return this.immediatelyFast$atlasX;

@@ -28,8 +28,8 @@ import java.util.Set;
 public class CoreShaderBlacklist {
 
     private static final Set<Identifier> BLACKLIST = Set.of(
-            Identifier.withDefaultNamespace("core/text"),
-            Identifier.withDefaultNamespace("core/text_background")
+        Identifier.withDefaultNamespace("core/text"),
+        Identifier.withDefaultNamespace("core/text_background")
     );
 
     static {
