@@ -38,16 +38,18 @@ public class SignTextCache implements ResourceManagerReloadListener {
     public final RenderType renderType;
     public final GpuBufferSlice signProjectionMatrix;
     public final Cache<SignText, SignAtlasRenderTarget.Slot> slotCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(Duration.ofSeconds(5L))
-            .removalListener(notification -> {
-                if (notification.getCause().equals(RemovalCause.EXPLICIT)) return;
+        .expireAfterAccess(Duration.ofSeconds(5L))
+        .removalListener(notification -> {
+            if (notification.getCause().equals(RemovalCause.EXPLICIT)) {
+                return;
+            }
 
-                final SignAtlasRenderTarget.Slot slot = (SignAtlasRenderTarget.Slot) notification.getValue();
-                if (slot != null) {
-                    slot.markFree();
-                }
-            })
-            .build();
+            final SignAtlasRenderTarget.Slot slot = (SignAtlasRenderTarget.Slot) notification.getValue();
+            if (slot != null) {
+                slot.markFree();
+            }
+        })
+        .build();
 
     public SignTextCache() {
         RenderSystem.assertOnRenderThread();

@@ -20,7 +20,12 @@ package net.raphimc.immediatelyfast.feature.core;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -191,7 +196,9 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
     }
 
     protected int getRenderTypeOrder(final RenderType renderType) {
-        if (renderType == null) return Integer.MAX_VALUE;
+        if (renderType == null) {
+            return Integer.MAX_VALUE;
+        }
 
         int order = 0;
         final RenderSetup.TextureBinding textureBinding = renderType.state.textures.get("Sampler0");

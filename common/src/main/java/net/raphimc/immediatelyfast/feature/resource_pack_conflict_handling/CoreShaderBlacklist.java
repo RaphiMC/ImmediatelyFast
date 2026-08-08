@@ -28,12 +28,12 @@ import java.util.Set;
 public class CoreShaderBlacklist {
 
     private static final Set<Identifier> BLACKLIST = Set.of(
-            Identifier.withDefaultNamespace("core/rendertype_text"),
-            Identifier.withDefaultNamespace("core/rendertype_text_background"),
-            Identifier.withDefaultNamespace("core/rendertype_text_background_see_through"),
-            Identifier.withDefaultNamespace("core/rendertype_text_intensity"),
-            Identifier.withDefaultNamespace("core/rendertype_text_intensity_see_through"),
-            Identifier.withDefaultNamespace("core/rendertype_text_see_through")
+        Identifier.withDefaultNamespace("core/rendertype_text"),
+        Identifier.withDefaultNamespace("core/rendertype_text_background"),
+        Identifier.withDefaultNamespace("core/rendertype_text_background_see_through"),
+        Identifier.withDefaultNamespace("core/rendertype_text_intensity"),
+        Identifier.withDefaultNamespace("core/rendertype_text_intensity_see_through"),
+        Identifier.withDefaultNamespace("core/rendertype_text_see_through")
     );
 
     static {

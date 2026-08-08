@@ -46,7 +46,9 @@ public class ImmediatelyFast {
     public static SignTextCache signTextCache;
 
     public static void earlyInit() {
-        if (ImmediatelyFast.config != null) return;
+        if (ImmediatelyFast.config != null) {
+            return;
+        }
         ImmediatelyFast.loadConfig();
         ImmediatelyFast.createRuntimeConfig();
         VERSION = PlatformService.INSTANCE.getModVersion("immediatelyfast").orElseThrow(NullPointerException::new);

@@ -62,8 +62,12 @@ public abstract class MixinAbstractSignRenderer {
 
     @Inject(method = "submitSignText", at = @At("HEAD"), cancellable = true)
     private void renderBufferedSignText(SignRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, SignText signText, CallbackInfo ci) {
-        if (!(signText instanceof ISignText mixinSignText)) return;
-        if (!mixinSignText.immediatelyFast$shouldCache()) return;
+        if (!(signText instanceof ISignText mixinSignText)) {
+            return;
+        }
+        if (!mixinSignText.immediatelyFast$shouldCache()) {
+            return;
+        }
 
         SignAtlasRenderTarget.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
@@ -151,7 +155,9 @@ public abstract class MixinAbstractSignRenderer {
         for (FormattedCharSequence line : renderMessages) {
             width = Math.max(width, this.font.width(line));
         }
-        if (width % 2 != 0) width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        if (width % 2 != 0) {
+            width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        }
 
         return width;
     }

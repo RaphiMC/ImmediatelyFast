@@ -27,9 +27,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinRenderTypes {
 
     @Redirect(method = {
-            "lambda$static$22" /*TEXT_POLYGON_OFFSET*/,
-            "lambda$static$23" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
-            "lambda$static$25" /*TEXT_INTENSITY_SEE_THROUGH*/
+        "lambda$static$22" /*TEXT_POLYGON_OFFSET*/,
+        "lambda$static$23" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
+        "lambda$static$25" /*TEXT_INTENSITY_SEE_THROUGH*/
     }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;sortOnUpload()Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;"))
     private static RenderSetup.RenderSetupBuilder disableTranslucencySorting(RenderSetup.RenderSetupBuilder instance) {
         return instance;
