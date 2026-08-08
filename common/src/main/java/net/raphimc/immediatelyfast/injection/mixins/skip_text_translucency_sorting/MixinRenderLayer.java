@@ -26,12 +26,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class MixinRenderLayer {
 
     @ModifyArg(method = {
-            "method_34834" /*TEXT*/,
-            "method_34833" /*TEXT_INTENSITY*/,
-            "method_36437" /*TEXT_POLYGON_OFFSET*/,
-            "method_36436" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
-            "method_37348" /*TEXT_SEE_THROUGH*/,
-            "method_37347" /*TEXT_INTENSITY_SEE_THROUGH*/
+        "method_34834" /*TEXT*/,
+        "method_34833" /*TEXT_INTENSITY*/,
+        "method_36437" /*TEXT_POLYGON_OFFSET*/,
+        "method_36436" /*TEXT_INTENSITY_POLYGON_OFFSET*/,
+        "method_37348" /*TEXT_SEE_THROUGH*/,
+        "method_37347" /*TEXT_INTENSITY_SEE_THROUGH*/
     }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 3)
     private static boolean changeTranslucency(boolean value) {
         return false;

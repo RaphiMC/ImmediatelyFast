@@ -25,12 +25,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class MixinNeoForgeRenderTypes {
 
     @ModifyArg(method = {
-            "getTextFiltered",
-            "getTextIntensityFiltered",
-            "getTextPolygonOffsetFiltered",
-            "getTextIntensityPolygonOffsetFiltered",
-            "getTextSeeThroughFiltered",
-            "getTextIntensitySeeThroughFiltered"
+        "getTextFiltered",
+        "getTextIntensityFiltered",
+        "getTextPolygonOffsetFiltered",
+        "getTextIntensityPolygonOffsetFiltered",
+        "getTextSeeThroughFiltered",
+        "getTextIntensitySeeThroughFiltered"
     }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;of(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters;)Lnet/minecraft/client/render/RenderLayer$MultiPhase;"), index = 3)
     private static boolean changeTranslucency(boolean value) {
         return false;

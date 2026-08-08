@@ -28,16 +28,16 @@ import java.util.Set;
 public class CoreShaderBlacklist {
 
     private static final Set<Identifier> BLACKLIST = Set.of(
-            Identifier.ofVanilla("core/position_color"),
-            Identifier.ofVanilla("core/position_tex"),
-            Identifier.ofVanilla("core/position_tex_color"),
-            Identifier.ofVanilla("core/rendertype_text"),
-            Identifier.ofVanilla("core/rendertype_text_background"),
-            Identifier.ofVanilla("core/rendertype_text_background_see_through"),
-            Identifier.ofVanilla("core/rendertype_text_intensity"),
-            Identifier.ofVanilla("core/rendertype_text_intensity_see_through"),
-            Identifier.ofVanilla("core/rendertype_text_see_through"),
-            Identifier.ofVanilla("core/rendertype_item_entity_translucent_cull")
+        Identifier.ofVanilla("core/position_color"),
+        Identifier.ofVanilla("core/position_tex"),
+        Identifier.ofVanilla("core/position_tex_color"),
+        Identifier.ofVanilla("core/rendertype_text"),
+        Identifier.ofVanilla("core/rendertype_text_background"),
+        Identifier.ofVanilla("core/rendertype_text_background_see_through"),
+        Identifier.ofVanilla("core/rendertype_text_intensity"),
+        Identifier.ofVanilla("core/rendertype_text_intensity_see_through"),
+        Identifier.ofVanilla("core/rendertype_text_see_through"),
+        Identifier.ofVanilla("core/rendertype_item_entity_translucent_cull")
     );
 
     static {
