@@ -32,7 +32,9 @@ public abstract class MixinDebugHud {
 
     @Inject(method = "getRightText", at = @At("RETURN"))
     private void appendAllocationInfo(CallbackInfoReturnable<List<String>> cir) {
-        if (ImmediatelyFast.config.dont_add_info_into_debug_hud) return;
+        if (ImmediatelyFast.config.dont_add_info_into_debug_hud) {
+            return;
+        }
 
         cir.getReturnValue().add("");
         cir.getReturnValue().add("ImmediatelyFast " + ImmediatelyFast.VERSION);

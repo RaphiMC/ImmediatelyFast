@@ -17,8 +17,17 @@
  */
 package net.raphimc.immediatelyfast.feature.core;
 
-import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.render.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.WolfCollarFeatureRenderer;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Identifier;
@@ -188,7 +197,9 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
-        if (layer == null) return Integer.MAX_VALUE;
+        if (layer == null) {
+            return Integer.MAX_VALUE;
+        }
 
         int order = 0;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {

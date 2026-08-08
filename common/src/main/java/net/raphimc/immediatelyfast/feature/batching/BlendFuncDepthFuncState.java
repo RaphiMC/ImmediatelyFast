@@ -28,13 +28,13 @@ public record BlendFuncDepthFuncState(boolean BLEND, boolean DEPTH_TEST, int GL_
 
     public static BlendFuncDepthFuncState current() {
         return new BlendFuncDepthFuncState(
-                GlStateManager.BLEND.capState.state,
-                GlStateManager.DEPTH.capState.state,
-                GlStateManager.BLEND.srcFactorRGB,
-                GlStateManager.BLEND.srcFactorAlpha,
-                GlStateManager.BLEND.dstFactorRGB,
-                GlStateManager.BLEND.dstFactorAlpha,
-                GlStateManager.DEPTH.func
+            GlStateManager.BLEND.capState.state,
+            GlStateManager.DEPTH.capState.state,
+            GlStateManager.BLEND.srcFactorRGB,
+            GlStateManager.BLEND.srcFactorAlpha,
+            GlStateManager.BLEND.dstFactorRGB,
+            GlStateManager.BLEND.dstFactorAlpha,
+            GlStateManager.DEPTH.func
         );
     }
 

@@ -28,9 +28,9 @@ public record ImmediatelyFastResourcePackMetadata(List<String> compatibleFeature
 
     public static final ImmediatelyFastResourcePackMetadata DEFAULT = new ImmediatelyFastResourcePackMetadata(Collections.emptyList());
     public static final Codec<ImmediatelyFastResourcePackMetadata> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.STRING.listOf().fieldOf("compatible_features").forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures)
-            ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
+        instance.group(
+            Codec.STRING.listOf().fieldOf("compatible_features").forGetter(ImmediatelyFastResourcePackMetadata::compatibleFeatures)
+        ).apply(instance, ImmediatelyFastResourcePackMetadata::new)
     );
     public static final ResourceMetadataSerializer<ImmediatelyFastResourcePackMetadata> SERIALIZER = ResourceMetadataSerializer.fromCodec("immediatelyfast", CODEC);
 

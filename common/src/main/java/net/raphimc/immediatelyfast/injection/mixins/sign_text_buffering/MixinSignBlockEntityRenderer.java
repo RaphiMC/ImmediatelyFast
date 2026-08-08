@@ -68,9 +68,13 @@ public abstract class MixinSignBlockEntityRenderer {
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
     private void renderBufferedSignText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front, CallbackInfo ci) {
-        if (matrices instanceof NoSetTextAnglesMatrixStack) return;
+        if (matrices instanceof NoSetTextAnglesMatrixStack) {
+            return;
+        }
         final ISignText iSignText = (ISignText) signText;
-        if (!iSignText.immediatelyFast$shouldCache()) return;
+        if (!iSignText.immediatelyFast$shouldCache()) {
+            return;
+        }
 
         SignAtlasFramebuffer.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
@@ -143,7 +147,9 @@ public abstract class MixinSignBlockEntityRenderer {
 
     @Redirect(method = "renderText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/entity/SignBlockEntityRenderer;setTextAngles(Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/util/math/Vec3d;)V"))
     private void dontSetTextAngles(SignBlockEntityRenderer instance, MatrixStack matrices, boolean front, Vec3d translation) {
-        if (matrices instanceof NoSetTextAnglesMatrixStack) return;
+        if (matrices instanceof NoSetTextAnglesMatrixStack) {
+            return;
+        }
 
         this.setTextAngles(matrices, front, translation);
     }
@@ -159,7 +165,9 @@ public abstract class MixinSignBlockEntityRenderer {
         for (OrderedText orderedText : orderedTexts) {
             width = Math.max(width, this.textRenderer.getWidth(orderedText));
         }
-        if (width % 2 != 0) width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        if (width % 2 != 0) {
+            width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        }
 
         return width;
     }

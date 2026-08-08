@@ -59,7 +59,9 @@ public abstract class MixinGameRenderer {
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
             for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
-                if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
+                if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) {
+                    continue;
+                }
 
                 final Identifier vertexShaderIdentifier = Identifier.of("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
                 final ResourcePack vertexShaderResourcePack = factory.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
