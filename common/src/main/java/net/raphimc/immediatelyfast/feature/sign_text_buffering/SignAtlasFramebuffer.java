@@ -131,7 +131,9 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
         }
 
         private static void removeUnoccupiedSubSlots(final Slot slot) {
-            if (slot == null) return;
+            if (slot == null) {
+                return;
+            }
             removeUnoccupiedSubSlots(slot.parentSlot);
             final boolean subSlot1Unoccupied = slot.subSlot1 != null && !hasOccupiedSlot(slot.subSlot1);
             final boolean subSlot2Unoccupied = slot.subSlot2 != null && !hasOccupiedSlot(slot.subSlot2);
@@ -143,8 +145,12 @@ public class SignAtlasFramebuffer extends Framebuffer implements AutoCloseable {
         }
 
         private static boolean hasOccupiedSlot(final Slot slot) {
-            if (slot == null) return false;
-            if (slot.occupied) return true;
+            if (slot == null) {
+                return false;
+            }
+            if (slot.occupied) {
+                return true;
+            }
             return hasOccupiedSlot(slot.subSlot1) || hasOccupiedSlot(slot.subSlot2);
         }
 

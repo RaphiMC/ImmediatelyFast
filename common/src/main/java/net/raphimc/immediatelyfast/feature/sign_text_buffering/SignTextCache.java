@@ -31,16 +31,18 @@ public class SignTextCache implements SynchronousResourceReloader {
 
     public final SignAtlasFramebuffer signAtlasFramebuffer = new SignAtlasFramebuffer();
     public final Cache<SignText, SignAtlasFramebuffer.Slot> slotCache = CacheBuilder.newBuilder()
-            .expireAfterAccess(5, TimeUnit.SECONDS)
-            .removalListener(notification -> {
-                if (notification.getCause().equals(RemovalCause.EXPLICIT)) return;
+        .expireAfterAccess(5, TimeUnit.SECONDS)
+        .removalListener(notification -> {
+            if (notification.getCause().equals(RemovalCause.EXPLICIT)) {
+                return;
+            }
 
-                final SignAtlasFramebuffer.Slot slot = (SignAtlasFramebuffer.Slot) notification.getValue();
-                if (slot != null) {
-                    slot.markFree();
-                }
-            })
-            .build();
+            final SignAtlasFramebuffer.Slot slot = (SignAtlasFramebuffer.Slot) notification.getValue();
+            if (slot != null) {
+                slot.markFree();
+            }
+        })
+        .build();
     public final RenderLayer renderLayer = RenderLayer.getText(this.signAtlasFramebuffer.getTextureId());
     public boolean lockFramebuffer = false;
 

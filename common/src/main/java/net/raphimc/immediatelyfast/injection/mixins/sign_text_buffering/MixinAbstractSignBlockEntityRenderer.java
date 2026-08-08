@@ -68,9 +68,13 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
     private void renderBufferedSignText(BlockPos pos, SignText signText, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int lineHeight, int lineWidth, boolean front, CallbackInfo ci) {
-        if (matrices instanceof NoTextTransformMatrixStack) return;
+        if (matrices instanceof NoTextTransformMatrixStack) {
+            return;
+        }
         final ISignText iSignText = (ISignText) signText;
-        if (!iSignText.immediatelyFast$shouldCache()) return;
+        if (!iSignText.immediatelyFast$shouldCache()) {
+            return;
+        }
 
         SignAtlasFramebuffer.Slot slot = ImmediatelyFast.signTextCache.slotCache.getIfPresent(signText);
         if (slot == null) {
@@ -145,7 +149,9 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
 
     @Redirect(method = "renderText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/entity/AbstractSignBlockEntityRenderer;applyTextTransforms(Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/util/math/Vec3d;)V"))
     private void dontApplyTextTransform(AbstractSignBlockEntityRenderer instance, MatrixStack matrices, boolean front, Vec3d textOffset) {
-        if (matrices instanceof NoTextTransformMatrixStack) return;
+        if (matrices instanceof NoTextTransformMatrixStack) {
+            return;
+        }
 
         this.applyTextTransforms(matrices, front, textOffset);
     }
@@ -161,7 +167,9 @@ public abstract class MixinAbstractSignBlockEntityRenderer {
         for (OrderedText orderedText : orderedTexts) {
             width = Math.max(width, this.textRenderer.getWidth(orderedText));
         }
-        if (width % 2 != 0) width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        if (width % 2 != 0) {
+            width++; // Fixes issue which squishes the text when the width is odd (Test text: "hhhl")
+        }
 
         return width;
     }

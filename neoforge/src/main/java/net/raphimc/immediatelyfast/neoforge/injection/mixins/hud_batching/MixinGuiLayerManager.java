@@ -32,11 +32,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGuiLayerManager {
 
     @Inject(
-            method = "renderInner",
-            at = @At(value = "INVOKE", target = "Lnet/neoforged/bus/api/IEventBus;post(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event;", shift = At.Shift.AFTER, remap = false),
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer$Layer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V")
-            )
+        method = "renderInner",
+        at = @At(value = "INVOKE", target = "Lnet/neoforged/bus/api/IEventBus;post(Lnet/neoforged/bus/api/Event;)Lnet/neoforged/bus/api/Event;", shift = At.Shift.AFTER, remap = false),
+        slice = @Slice(
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer$Layer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V")
+        )
     )
     private void renderBatch(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {

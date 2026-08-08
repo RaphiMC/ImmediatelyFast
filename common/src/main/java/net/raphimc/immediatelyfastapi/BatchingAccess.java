@@ -23,6 +23,7 @@ public interface BatchingAccess {
     /**
      * Starts batching all rendered HUD elements between {@link #beginHudBatching()} and {@link #endHudBatching()}.<br>
      * Make sure to <b>always</b> call {@link #endHudBatching()} after you began batching when rendering your HUD elements even if you didn't render anything.
+     *
      * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
     @Deprecated
@@ -30,6 +31,7 @@ public interface BatchingAccess {
 
     /**
      * Draws all batched HUD elements at once.
+     *
      * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
     @Deprecated
@@ -51,6 +53,7 @@ public interface BatchingAccess {
 
     /**
      * Draws all currently stored batches immediately.
+     *
      * @deprecated Mojang added basic batching into the DrawContext class. ImmediatelyFast now uses and extends this system, so this method is no longer needed.
      */
     @Deprecated

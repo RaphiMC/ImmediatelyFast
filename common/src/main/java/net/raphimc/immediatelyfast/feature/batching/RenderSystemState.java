@@ -24,13 +24,13 @@ public record RenderSystemState(int texture0, int texture1, int texture2, Shader
 
     public static RenderSystemState current() {
         return new RenderSystemState(
-                RenderSystem.getShaderTexture(0),
-                RenderSystem.getShaderTexture(1),
-                RenderSystem.getShaderTexture(2),
-                RenderSystem.getShader(),
-                RenderSystem.getShaderColor().clone(),
-                RenderSystem.getShaderLineWidth(),
-                BlendFuncDepthFuncState.current()
+            RenderSystem.getShaderTexture(0),
+            RenderSystem.getShaderTexture(1),
+            RenderSystem.getShaderTexture(2),
+            RenderSystem.getShader(),
+            RenderSystem.getShaderColor().clone(),
+            RenderSystem.getShaderLineWidth(),
+            BlendFuncDepthFuncState.current()
         );
     }
 

@@ -25,16 +25,16 @@ import java.util.List;
 public class CoreShaderBlacklist {
 
     private static final List<ShaderProgramKey> BLACKLIST = List.of(
-            ShaderProgramKeys.POSITION_COLOR,
-            ShaderProgramKeys.POSITION_TEX,
-            ShaderProgramKeys.POSITION_TEX_COLOR,
-            ShaderProgramKeys.RENDERTYPE_TEXT,
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND,
-            ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY,
-            ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH,
-            ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
+        ShaderProgramKeys.POSITION_COLOR,
+        ShaderProgramKeys.POSITION_TEX,
+        ShaderProgramKeys.POSITION_TEX_COLOR,
+        ShaderProgramKeys.RENDERTYPE_TEXT,
+        ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND,
+        ShaderProgramKeys.RENDERTYPE_TEXT_BACKGROUND_SEE_THROUGH,
+        ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY,
+        ShaderProgramKeys.RENDERTYPE_TEXT_INTENSITY_SEE_THROUGH,
+        ShaderProgramKeys.RENDERTYPE_TEXT_SEE_THROUGH,
+        ShaderProgramKeys.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
     );
 
     public static List<ShaderProgramKey> getBlacklist() {
