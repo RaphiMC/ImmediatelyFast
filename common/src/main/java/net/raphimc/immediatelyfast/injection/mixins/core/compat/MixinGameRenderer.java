@@ -38,7 +38,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
@@ -58,7 +62,9 @@ public abstract class MixinGameRenderer {
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
             for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
-                if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) continue;
+                if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) {
+                    continue;
+                }
 
                 final Identifier vertexShaderIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getVertexShader().getName() + ".vsh");
                 final ResourcePack vertexShaderResourcePack = factory.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);

@@ -28,8 +28,8 @@ public record LightingState(Vector3f shaderLightDirection0, Vector3f shaderLight
 
     public static LightingState current() {
         return new LightingState(
-                RenderSystem.shaderLightDirections[0],
-                RenderSystem.shaderLightDirections[1]
+            RenderSystem.shaderLightDirections[0],
+            RenderSystem.shaderLightDirections[1]
         );
     }
 

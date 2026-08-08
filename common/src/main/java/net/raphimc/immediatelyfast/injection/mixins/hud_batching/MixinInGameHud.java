@@ -32,15 +32,15 @@ public abstract class MixinInGameHud {
 
     @InjectAboveEverything
     @Inject(method = {
-            "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
-            "renderCrosshair",
-            "renderStatusEffectOverlay",
-            "renderHotbar",
-            "renderMountJumpBar",
-            "renderExperienceBar",
-            "renderHeldItemTooltip",
-            "renderStatusBars",
-            "renderMountHealth"
+        "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
+        "renderCrosshair",
+        "renderStatusEffectOverlay",
+        "renderHotbar",
+        "renderMountJumpBar",
+        "renderExperienceBar",
+        "renderHeldItemTooltip",
+        "renderStatusBars",
+        "renderMountHealth"
     }, at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
@@ -50,15 +50,15 @@ public abstract class MixinInGameHud {
 
     @InjectOnAllReturns
     @Inject(method = {
-            "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
-            "renderCrosshair",
-            "renderStatusEffectOverlay",
-            "renderHotbar",
-            "renderMountJumpBar",
-            "renderExperienceBar",
-            "renderHeldItemTooltip",
-            "renderStatusBars",
-            "renderMountHealth"
+        "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V",
+        "renderCrosshair",
+        "renderStatusEffectOverlay",
+        "renderHotbar",
+        "renderMountJumpBar",
+        "renderExperienceBar",
+        "renderHeldItemTooltip",
+        "renderStatusBars",
+        "renderMountHealth"
     }, at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {

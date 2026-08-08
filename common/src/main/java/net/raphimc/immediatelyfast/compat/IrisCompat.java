@@ -23,8 +23,11 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.VertexFormat;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 
-import java.lang.invoke.*;
-import java.lang.reflect.Field;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.function.BooleanSupplier;
 
 public class IrisCompat {
@@ -35,9 +38,9 @@ public class IrisCompat {
     public static BooleanConsumer renderWithExtendedVertexFormat;
     public static TriConsumer<BufferBuilder, VertexFormat.DrawMode, VertexFormat> iris$beginWithoutExtending;
 
-    private static String[] PACKAGE_NAMES = new String[] {
-            "net.coderbot.iris.vertices",
-            "net.irisshaders.iris.vertices"
+    private static String[] PACKAGE_NAMES = new String[]{
+        "net.coderbot.iris.vertices",
+        "net.irisshaders.iris.vertices"
     };
 
     public static void init() {

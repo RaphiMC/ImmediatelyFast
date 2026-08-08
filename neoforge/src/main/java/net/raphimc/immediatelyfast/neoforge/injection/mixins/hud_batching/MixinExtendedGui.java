@@ -32,11 +32,11 @@ public abstract class MixinExtendedGui {
 
     @InjectAboveEverything
     @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
+        "renderArmor",
+        "renderAir",
+        "renderFood",
+        "renderTitle",
+        "renderHealthMount"
     }, at = @At("HEAD"))
     private void beginBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {
@@ -46,11 +46,11 @@ public abstract class MixinExtendedGui {
 
     @InjectOnAllReturns
     @Inject(method = {
-            "renderArmor",
-            "renderAir",
-            "renderFood",
-            "renderTitle",
-            "renderHealthMount"
+        "renderArmor",
+        "renderAir",
+        "renderFood",
+        "renderTitle",
+        "renderHealthMount"
     }, at = @At("RETURN"))
     private void endBatching(CallbackInfo ci) {
         if (ImmediatelyFast.runtimeConfig.hud_batching) {

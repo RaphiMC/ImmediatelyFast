@@ -4,8 +4,8 @@ plugins {
 
 publishMods {
     file = remapJar.archiveFile
-    version = project.version + '-' + project.loom.platform.get().id()
-    modLoaders.add(project.loom.platform.get().id())
+    version = project.version + '-' + loom.platform.get().id()
+    modLoaders.add(loom.platform.get().id())
     if (project.name == "fabric") {
         modLoaders.add("quilt")
     }
@@ -14,7 +14,7 @@ publishMods {
         accessToken = providers.gradleProperty("curseforge.publishing_token")
         projectId = "686911"
         minecraftVersionList(project.supported_minecraft_versions)
-        javaVersions.add(JavaVersion.toVersion(java.toolchain.getLanguageVersion().get().asInt()))
+        javaVersions.add(JavaVersion.toVersion(java.toolchain.languageVersion.get().asInt()))
         client = true
         server = false
     }

@@ -19,14 +19,26 @@ package net.raphimc.immediatelyfast.feature.core;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.client.render.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.item.HorseArmorItem;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class BatchableBufferSource extends VertexConsumerProvider.Immediate implements AutoCloseable {
 
@@ -190,7 +202,9 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
-        if (layer == null) return Integer.MAX_VALUE;
+        if (layer == null) {
+            return Integer.MAX_VALUE;
+        }
 
         int order = 0;
         if (layer instanceof RenderLayer.MultiPhase multiPhase) {

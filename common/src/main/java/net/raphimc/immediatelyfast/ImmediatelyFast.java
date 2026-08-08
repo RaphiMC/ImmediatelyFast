@@ -47,7 +47,9 @@ public class ImmediatelyFast {
     public static SignTextCache signTextCache;
 
     public static void earlyInit() {
-        if (config != null) return;
+        if (config != null) {
+            return;
+        }
 
         ImmediatelyFast.loadConfig();
 

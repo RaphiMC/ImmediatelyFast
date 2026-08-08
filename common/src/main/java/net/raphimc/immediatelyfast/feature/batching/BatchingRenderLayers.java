@@ -44,7 +44,6 @@ public class BatchingRenderLayers {
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
     }, blendFuncDepthFunc::revert));
 
-
     public static <A> Function<A, RenderLayer> memoizeTemp(final Function<A, RenderLayer> function) {
         return new Function<>() {
             private final Map<A, RenderLayer> cache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.SECONDS).<A, RenderLayer>build().asMap();
@@ -64,7 +63,6 @@ public class BatchingRenderLayers {
             }
         };
     }
-
 
     private static class ImmediatelyFastRenderLayer extends RenderLayer {
 

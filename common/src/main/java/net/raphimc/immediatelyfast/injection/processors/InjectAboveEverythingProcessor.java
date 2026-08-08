@@ -19,14 +19,23 @@ package net.raphimc.immediatelyfast.injection.processors;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class InjectAboveEverythingProcessor {
 
     public static void process(final ClassNode classNode) {
         for (MethodNode methodNode : classNode.methods) {
-            if (methodNode.visibleAnnotations == null) continue;
+            if (methodNode.visibleAnnotations == null) {
+                continue;
+            }
             for (AnnotationNode annotationNode : methodNode.visibleAnnotations) {
                 if (annotationNode.desc.equals(Type.getDescriptor(InjectAboveEverything.class))) {
                     if (!methodNode.desc.equals("(" + Type.getDescriptor(CallbackInfo.class) + ")V")) {

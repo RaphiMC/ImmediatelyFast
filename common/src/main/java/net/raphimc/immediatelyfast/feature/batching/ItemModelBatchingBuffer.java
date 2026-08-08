@@ -18,7 +18,14 @@
 package net.raphimc.immediatelyfast.feature.batching;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ReferenceObjectImmutablePair;
+import it.unimi.dsi.fastutil.objects.ReferenceObjectPair;
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -32,8 +39,8 @@ public class ItemModelBatchingBuffer extends BatchingBuffer {
 
     public ItemModelBatchingBuffer() {
         super(BatchingBuffers.createLayerBuffers(MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers().layerBuffers.keySet().stream()
-                .filter(layer -> layer.name.contains("glint"))
-                .toArray(RenderLayer[]::new)));
+            .filter(layer -> layer.name.contains("glint"))
+            .toArray(RenderLayer[]::new)));
     }
 
     @Override
