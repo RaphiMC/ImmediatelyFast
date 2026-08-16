@@ -32,9 +32,8 @@ import net.raphimc.immediatelyfastapi.ImmediatelyFastApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class ImmediatelyFast {
@@ -126,10 +125,10 @@ public class ImmediatelyFast {
     }
 
     public static void loadConfig() {
-        final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
-        if (configFile.exists()) {
+        final Path configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json");
+        if (Files.isRegularFile(configFile)) {
             try {
-                config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+                config = new Gson().fromJson(Files.readString(configFile), ImmediatelyFastConfig.class);
             } catch (Throwable e) {
                 LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
             }
@@ -138,7 +137,7 @@ public class ImmediatelyFast {
             config = new ImmediatelyFastConfig();
         }
         try {
-            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(config));
+            Files.writeString(configFile, new GsonBuilder().setPrettyPrinting().create().toJson(config));
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
