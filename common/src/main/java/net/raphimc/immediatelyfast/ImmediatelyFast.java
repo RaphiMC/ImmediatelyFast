@@ -74,15 +74,13 @@ public class ImmediatelyFast {
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with " + backendName + " " + backendVersion);
 
         final String gpuVendorLower = gpuVendor.toLowerCase();
-        final boolean isNvidia = gpuVendorLower.startsWith("nvidia");
-        final boolean isAmd = gpuVendorLower.startsWith("ati") || gpuVendorLower.startsWith("amd");
         final boolean isIntel = gpuVendorLower.startsWith("intel");
         final boolean isApple = gpuVendorLower.startsWith("apple");
 
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu &= isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getDeviceInfo().underlyingExtensions().contains("GL_ARB_buffer_storage"));
+        ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu &= isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || deviceInfo.underlyingExtensions().contains("GL_ARB_buffer_storage"));
         if (ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling && isIntel && backendName.equals("OpenGL") && (gpuModel.contains("UHD Graphics") || gpuModel.contains("Xe Graphics"))) {
             LOGGER.warn("Intel UHD Graphics or Intel Xe Graphics detected. Force disabling redundant framebuffer switching optimization.");
             ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching = false;
@@ -107,8 +105,8 @@ public class ImmediatelyFast {
     public static void loadConfig() {
         final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
         if (configFile.exists()) {
-            try {
-                ImmediatelyFast.config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+            try (FileReader reader = new FileReader(configFile)) {
+                ImmediatelyFast.config = new Gson().fromJson(reader, ImmediatelyFastConfig.class);
             } catch (Throwable e) {
                 LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
             }
