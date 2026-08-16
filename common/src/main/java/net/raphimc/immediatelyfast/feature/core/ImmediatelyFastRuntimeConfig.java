@@ -36,7 +36,7 @@ public class ImmediatelyFastRuntimeConfig {
             case "font_atlas_resizing" -> this.font_atlas_resizing;
             case "map_atlas_generation" -> this.map_atlas_generation;
             case "disable_fast_buffer_upload", "fix_slow_buffer_upload_on_apple_gpu" -> this.fix_slow_buffer_upload_on_apple_gpu;
-            case "disable_avoid_redundant_framebuffer_switching" -> this.avoid_redundant_framebuffer_switching;
+            case "disable_avoid_redundant_framebuffer_switching", "avoid_redundant_framebuffer_switching" -> this.avoid_redundant_framebuffer_switching;
             default -> defaultValue;
         };
     }
