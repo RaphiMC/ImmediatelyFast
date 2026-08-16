@@ -31,9 +31,8 @@ import org.lwjgl.system.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class ImmediatelyFast {
@@ -82,7 +81,7 @@ public class ImmediatelyFast {
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu &= isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getDeviceInfo().underlyingExtensions().contains("GL_ARB_buffer_storage"));
+        ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu &= isApple && backendName.equals("OpenGL") && !(deviceInfo.underlyingExtensions().contains("GL_ARB_direct_state_access") || deviceInfo.underlyingExtensions().contains("GL_ARB_buffer_storage"));
         if (ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching && !ImmediatelyFast.config.debug_only_and_not_recommended_disable_hardware_conflict_handling && isIntel && backendName.equals("OpenGL") && (gpuModel.contains("UHD Graphics") || gpuModel.contains("Xe Graphics"))) {
             LOGGER.warn("Intel UHD Graphics or Intel Xe Graphics detected. Force disabling redundant framebuffer switching optimization.");
             ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching = false;
@@ -105,10 +104,10 @@ public class ImmediatelyFast {
     }
 
     public static void loadConfig() {
-        final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
-        if (configFile.exists()) {
+        final Path configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json");
+        if (Files.isRegularFile(configFile)) {
             try {
-                ImmediatelyFast.config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+                ImmediatelyFast.config = new Gson().fromJson(Files.readString(configFile), ImmediatelyFastConfig.class);
             } catch (Throwable e) {
                 LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
             }
@@ -131,7 +130,7 @@ public class ImmediatelyFast {
         }
 
         try {
-            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
+            Files.writeString(configFile, new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
