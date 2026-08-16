@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
@@ -31,9 +32,8 @@ import org.lwjgl.system.MathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class ImmediatelyFast {
@@ -67,10 +67,11 @@ public class ImmediatelyFast {
     }
 
     public static void onRenderSystemInit() {
-        final String gpuVendor = RenderSystem.getDevice().getVendor();
-        final String gpuModel = RenderSystem.getDevice().getRenderer();
-        final String backendName = RenderSystem.getDevice().getBackendName();
-        final String backendVersion = RenderSystem.getDevice().getVersion();
+        final GpuDevice gpuDevice = RenderSystem.getDevice();
+        final String gpuVendor = gpuDevice.getVendor();
+        final String gpuModel = gpuDevice.getRenderer();
+        final String backendName = gpuDevice.getBackendName();
+        final String backendVersion = gpuDevice.getVersion();
         LOGGER.info("Initializing ImmediatelyFast " + VERSION + " on " + gpuModel + " (" + gpuVendor + ") with " + backendName + " " + backendVersion);
 
         final String gpuVendorLower = gpuVendor.toLowerCase();
@@ -82,7 +83,7 @@ public class ImmediatelyFast {
         Objects.requireNonNull(ImmediatelyFast.config, "Config not loaded yet");
         Objects.requireNonNull(ImmediatelyFast.runtimeConfig, "Runtime config not created yet");
 
-        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && backendName.equals("OpenGL") && !(RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_direct_state_access") || RenderSystem.getDevice().getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
+        if (ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && isApple && backendName.equals("OpenGL") && !(gpuDevice.getEnabledExtensions().contains("GL_ARB_direct_state_access") || gpuDevice.getEnabledExtensions().contains("GL_ARB_buffer_storage"))) {
             ImmediatelyFast.runtimeConfig.disable_fast_buffer_upload = true;
         }
 
@@ -110,10 +111,10 @@ public class ImmediatelyFast {
     }
 
     public static void loadConfig() {
-        final File configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json").toFile();
-        if (configFile.exists()) {
+        final Path configFile = PlatformService.INSTANCE.getConfigDirectory().resolve("immediatelyfast.json");
+        if (Files.isRegularFile(configFile)) {
             try {
-                ImmediatelyFast.config = new Gson().fromJson(new FileReader(configFile), ImmediatelyFastConfig.class);
+                ImmediatelyFast.config = new Gson().fromJson(Files.readString(configFile), ImmediatelyFastConfig.class);
             } catch (Throwable e) {
                 LOGGER.error("Failed to load ImmediatelyFast config. Resetting it.", e);
             }
@@ -136,7 +137,7 @@ public class ImmediatelyFast {
         }
 
         try {
-            Files.writeString(configFile.toPath(), new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
+            Files.writeString(configFile, new GsonBuilder().setPrettyPrinting().create().toJson(ImmediatelyFast.config));
         } catch (Throwable e) {
             LOGGER.error("Failed to save ImmediatelyFast config.", e);
         }
