@@ -20,6 +20,8 @@ package net.raphimc.immediatelyfast.injection.mixins.hud_batching.compat;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -62,6 +64,19 @@ public abstract class MixinDrawContext {
         } finally {
             if (this.vertexConsumers instanceof HudBatchingBufferSource hudBatchingBufferSource) {
                 hudBatchingBufferSource.setRenderingItemDecorations(false);
+            }
+        }
+    }
+
+    @WrapMethod(method = "draw()V")
+    private void restoreDepthTestState(final Operation<Void> original) {
+        final boolean currentDepthTestState = GlStateManager.DEPTH.capState.state;
+        original.call();
+        if (GlStateManager.DEPTH.capState.state != currentDepthTestState) {
+            if (currentDepthTestState) {
+                RenderSystem.enableDepthTest();
+            } else {
+                RenderSystem.disableDepthTest();
             }
         }
     }
