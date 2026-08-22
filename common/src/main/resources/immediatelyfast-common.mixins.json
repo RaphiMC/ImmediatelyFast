@@ -9,6 +9,8 @@
     "avoid_redundant_framebuffer_switching.MixinGlSurface",
     "core.MixinDebugScreenEntries",
     "core.MixinMinecraft",
+    "enhanced_batching.MixinGuiItemAtlas",
+    "enhanced_batching.MixinGuiRenderer",
     "enhanced_batching.MixinRenderTypeFeatureRenderer_Group",
     "enhanced_batching.MixinScissorState",
     "fast_text_lookup.MixinNameTagFeatureRenderer_GlyphRenderer",
