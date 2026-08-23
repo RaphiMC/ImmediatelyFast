@@ -1,5 +1,13 @@
 classTweaker v1 official
 
+# batch_animated_item_updates
+accessible field net/minecraft/client/gui/render/GuiItemAtlas texture Lcom/mojang/blaze3d/textures/GpuTexture;
+accessible field net/minecraft/client/gui/render/GuiItemAtlas depthTexture Lcom/mojang/blaze3d/textures/GpuTexture;
+accessible field net/minecraft/client/gui/render/GuiItemAtlas allocator Lnet/minecraft/client/gui/render/DynamicAtlasAllocator;
+accessible field net/minecraft/client/gui/render/DynamicAtlasAllocator usedSlotByKey Ljava/util/Map;
+accessible field net/minecraft/client/gui/render/DynamicAtlasAllocator$Slot fresh Z
+accessible field net/minecraft/client/renderer/GameRenderer guiRenderer Lnet/minecraft/client/gui/render/GuiRenderer;
+
 # fast_text_lookup
 accessible method net/minecraft/client/renderer/feature/RenderTypeFeatureRenderer getVertexBuilder (Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;
 

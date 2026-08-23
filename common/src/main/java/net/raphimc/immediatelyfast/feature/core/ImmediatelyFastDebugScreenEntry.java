@@ -24,7 +24,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.feature.batch_animated_item_updates.AnimatedItemAtlas;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
+import net.raphimc.immediatelyfast.injection.interfaces.IGuiRenderer;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
 
 import java.util.ArrayList;
@@ -44,6 +46,14 @@ public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
             final Collection<MapAtlas> atlasTextures = mapTextureManager.immediatelyFast$getAtlases();
             final int totalMapCount = atlasTextures.stream().mapToInt(MapAtlas::getMapCount).sum();
             lines.add("Map Atlas: " + atlasTextures.size() + "x" + MapAtlas.ATLAS_SIZE + "x" + MapAtlas.ATLAS_SIZE + " (" + totalMapCount + " maps)");
+        }
+        if (Minecraft.getInstance().gameRenderer.guiRenderer instanceof IGuiRenderer guiRenderer) {
+            final AnimatedItemAtlas animatedItemAtlas = guiRenderer.immediatelyFast$getAnimatedItemAtlas();
+            if (animatedItemAtlas != null) {
+                lines.add("Animated Item Atlas: " + animatedItemAtlas.textureSize() + "x" + animatedItemAtlas.textureSize() + " (" + animatedItemAtlas.getLastUsedSlotCount() + " items)");
+            } else {
+                lines.add("Animated Item Atlas: Not allocated");
+            }
         }
         if (ImmediatelyFast.signTextCache != null) {
             lines.add("Sign Text Cache: " + ImmediatelyFast.signTextCache.slotCache.size() + " entries");
