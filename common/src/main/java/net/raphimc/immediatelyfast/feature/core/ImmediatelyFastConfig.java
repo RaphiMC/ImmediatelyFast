@@ -30,6 +30,7 @@ public class ImmediatelyFastConfig {
     public boolean fast_text_lookup = true;
     public boolean avoid_redundant_framebuffer_switching = true;
     public boolean fix_slow_buffer_upload_on_apple_gpu = true;
+    public boolean batch_animated_item_updates = true;
 
     // Experimental config values
     private String EXPERIMENTAL_INFO = "----- Experimental config values below (Rendering glitches may occur) -----";
@@ -54,6 +55,7 @@ public class ImmediatelyFastConfig {
             case "fast_text_lookup" -> this.fast_text_lookup;
             case "avoid_redundant_framebuffer_switching" -> this.avoid_redundant_framebuffer_switching;
             case "fix_slow_buffer_upload_on_apple_gpu" -> this.fix_slow_buffer_upload_on_apple_gpu;
+            case "batch_animated_item_updates" -> this.batch_animated_item_updates;
             case "experimental_disable_resource_pack_conflict_handling" -> this.experimental_disable_resource_pack_conflict_handling;
             case "experimental_sign_text_buffering" -> this.experimental_sign_text_buffering;
             case "debug_only_and_not_recommended_disable_mod_conflict_handling" -> this.debug_only_and_not_recommended_disable_mod_conflict_handling;

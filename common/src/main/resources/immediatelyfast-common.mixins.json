@@ -7,6 +7,7 @@
   "client": [
     "avoid_redundant_framebuffer_switching.MixinGlCommandEncoder",
     "avoid_redundant_framebuffer_switching.MixinGlDevice",
+    "batch_animated_item_updates.MixinGuiRenderer",
     "core.MixinDebugScreenEntries",
     "core.MixinMinecraft",
     "core.MixinRenderSystem",
