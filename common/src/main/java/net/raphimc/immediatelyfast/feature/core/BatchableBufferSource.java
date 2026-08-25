@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
@@ -158,7 +159,10 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
         for (Set<BufferBuilder> buffers : this.pendingBuffers.values()) {
             for (BufferBuilder bufferBuilder : buffers) {
-                bufferBuilder.endNullable().close();
+                final BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+                if (builtBuffer != null) {
+                    builtBuffer.close();
+                }
                 BufferAllocatorPool.returnBufferAllocatorSafe(bufferBuilder.allocator);
             }
         }
