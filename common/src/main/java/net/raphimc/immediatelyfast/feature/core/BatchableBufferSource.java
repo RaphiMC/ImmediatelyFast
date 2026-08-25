@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.feature.core;
 
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps;
@@ -157,7 +158,10 @@ public class BatchableBufferSource extends MultiBufferSource.BufferSource implem
 
         for (Set<BufferBuilder> buffers : this.dynamicBuffers.values()) {
             for (BufferBuilder bufferBuilder : buffers) {
-                bufferBuilder.build().close();
+                final MeshData meshData = bufferBuilder.build();
+                if (meshData != null) {
+                    meshData.close();
+                }
                 ByteBufferBuilderPool.returnBufferBuilderSafe(bufferBuilder.buffer);
             }
         }
