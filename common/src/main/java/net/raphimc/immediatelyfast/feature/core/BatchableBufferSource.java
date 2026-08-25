@@ -161,7 +161,10 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
         for (RenderLayer layer : this.activeLayers) {
             for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                bufferBuilder.end().release();
+                final BufferBuilder.BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+                if (builtBuffer != null) {
+                    builtBuffer.release();
+                }
             }
         }
 
