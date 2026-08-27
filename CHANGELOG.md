@@ -1,1 +1,3 @@
-* Implemented a more compatible fix for item durability bar layering (Fixes issue with Spectrum mod item slot decorations)
+* Restore depth test state after flushing the DrawContext (Fixes graphical issue with Map Atlases mod)
+* Fixed exception when closing unused buffers (Fixes crash in ATM10 modpack)
+* Fixed config file handle leak
