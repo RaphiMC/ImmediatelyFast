@@ -72,7 +72,7 @@ public abstract class MixinDrawContext {
     private void restoreDepthTestState(final Operation<Void> original) {
         final boolean currentDepthTestState = GlStateManager.DEPTH.capState.state;
         original.call();
-        if (GlStateManager.DEPTH.capState.state != currentDepthTestState) {
+        if (this.vertexConsumers instanceof BatchableBufferSource && GlStateManager.DEPTH.capState.state != currentDepthTestState) {
             if (currentDepthTestState) {
                 RenderSystem.enableDepthTest();
             } else {
