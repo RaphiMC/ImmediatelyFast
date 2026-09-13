@@ -1,3 +1,2 @@
-* Restore depth test state after flushing the DrawContext (Fixes graphical issue with Map Atlases mod)
-* Fixed exception when closing unused buffers (Fixes crash in ATM10 modpack)
-* Fixed config file handle leak
+* Only restore depth state if currently batching (Fixes rendering issues introduced in ImmediatelyFast 1.6.13)
+* Fixed RoughlyEnoughItems recipe tooltip rendering issues
