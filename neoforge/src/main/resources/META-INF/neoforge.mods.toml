@@ -9,7 +9,8 @@ version = "${version}"
 displayName = "ImmediatelyFast"
 description = "Speed up and optimize immediate mode rendering in Minecraft"
 authors = "RK_01"
-logoFile = "assets/immediatelyfast/icon.png"
+iconFile = "assets/immediatelyfast/icon.png" # >= NeoForge 26.2.0.50
+logoFile = "assets/immediatelyfast/icon.png" # < NeoForge 26.2.0.50
 displayURL = "https://github.com/RaphiMC/ImmediatelyFast"
 
 [[mixins]]
