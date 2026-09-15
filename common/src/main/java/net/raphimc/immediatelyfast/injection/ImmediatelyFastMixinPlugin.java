@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.injection;
 
 import net.raphimc.immediatelyfast.ImmediatelyFast;
+import net.raphimc.immediatelyfast.service.PlatformService;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -81,6 +82,10 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (!ImmediatelyFast.config.debug_only_print_additional_error_information && packageName.startsWith("print_additional_error_information")) {
+            return false;
+        }
+
+        if (packageName.startsWith("enhanced_batching.compat.iris") && PlatformService.INSTANCE.getModVersion("iris").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/582
             return false;
         }
 
