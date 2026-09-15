@@ -12,7 +12,7 @@ base {
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
     mods {
-        "immediatelyfast" {
+        "main" {
             sourceSet(project(":common").sourceSets.main)
             sourceSet(project.sourceSets.main)
         }
