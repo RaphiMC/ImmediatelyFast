@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling;
 
-import com.mojang.blaze3d.shaders.ShaderType;
+import com.mojang.renderpearl.api.pipeline.ShaderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
@@ -28,8 +28,7 @@ import java.util.Set;
 public class CoreShaderBlacklist {
 
     private static final Set<Identifier> BLACKLIST = Set.of(
-        Identifier.withDefaultNamespace("core/text"),
-        Identifier.withDefaultNamespace("core/text_background")
+        Identifier.withDefaultNamespace("core/text")
     );
 
     static {

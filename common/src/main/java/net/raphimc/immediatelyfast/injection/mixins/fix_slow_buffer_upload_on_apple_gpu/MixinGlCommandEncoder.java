@@ -18,8 +18,8 @@
 package net.raphimc.immediatelyfast.injection.mixins.fix_slow_buffer_upload_on_apple_gpu;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.opengl.DirectStateAccess;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.backend.opengl.DirectStateAccess;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,10 +27,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.nio.ByteBuffer;
 
-@Mixin(targets = "com.mojang.blaze3d.opengl.GlCommandEncoder")
+@Mixin(targets = "com.mojang.renderpearl.backend.opengl.GlCommandEncoder")
 public abstract class MixinGlCommandEncoder {
 
-    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/DirectStateAccess;bufferSubData(IJLjava/nio/ByteBuffer;I)V"))
+    @Redirect(method = "writeToBuffer", at = @At(value = "INVOKE", target = "Lcom/mojang/renderpearl/backend/opengl/DirectStateAccess;bufferSubData(IJLjava/nio/ByteBuffer;I)V"))
     private void fixSlowBufferUploadOnAppleGpu(final DirectStateAccess instance, final int buffer, final long offset, final ByteBuffer data, final int usage, @Local(name = "slice", argsOnly = true) final GpuBufferSlice slice) {
         if (ImmediatelyFast.runtimeConfig.fix_slow_buffer_upload_on_apple_gpu && offset == 0 && slice.length() == slice.buffer().size()) {
             instance.bufferData(buffer, data, usage);

@@ -18,18 +18,18 @@
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.renderpearl.backend.opengl.GlConst;
+import com.mojang.renderpearl.backend.opengl.GlStateManager;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "com.mojang.blaze3d.opengl.GlCommandEncoder")
+@Mixin(targets = "com.mojang.renderpearl.backend.opengl.GlCommandEncoder")
 public abstract class MixinGlCommandEncoder {
 
-    @WrapWithCondition(method = "submitRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/GlStateManager;_glBindFramebuffer(II)V"))
+    @WrapWithCondition(method = "submitRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/renderpearl/backend/opengl/GlStateManager;_glBindFramebuffer(II)V"))
     private boolean dontUnbindFramebuffer(final int target, final int framebuffer) {
         return !ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching;
     }

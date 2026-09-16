@@ -17,9 +17,9 @@
  */
 package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 
-import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.GpuFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -36,7 +36,7 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
     private final Slot rootSlot;
 
     public SignAtlasRenderTarget(final int id) {
-        super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, true, GpuFormat.RGBA8_UNORM);
+        super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
         Minecraft.getInstance().getTextureManager().register(this.textureId, new RenderTargetTexture(this));
@@ -48,7 +48,7 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
     }
 
     public void clear() {
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.getColorTexture(), CLEAR_COLOR, this.getDepthTexture(), 0F);
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.getColorTexture(), CLEAR_COLOR, this.getDepthTexture(), 0D);
         this.rootSlot.subSlot1 = null;
         this.rootSlot.subSlot2 = null;
     }
@@ -95,7 +95,7 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
             }
             this.occupied = false;
             removeUnoccupiedSubSlots(this);
-            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), CLEAR_COLOR, SignAtlasRenderTarget.this.getDepthTexture(), 0F, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height);
+            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), CLEAR_COLOR, SignAtlasRenderTarget.this.getDepthTexture(), 0D, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height, 0);
         }
 
         public Slot findSlot(final int width, final int height) {

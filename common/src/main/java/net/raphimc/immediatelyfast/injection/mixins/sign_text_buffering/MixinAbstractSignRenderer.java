@@ -18,16 +18,17 @@
 package net.raphimc.immediatelyfast.injection.mixins.sign_text_buffering;
 
 import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.LightCoordsUtil;
@@ -45,6 +46,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 @Mixin(AbstractSignRenderer.class)
 public abstract class MixinAbstractSignRenderer {
@@ -83,12 +86,7 @@ public abstract class MixinAbstractSignRenderer {
                 modelViewMatrix.pushMatrix().identity();
                 final GpuBufferSlice fog = RenderSystem.getShaderFog();
                 RenderSystem.setShaderFog(Minecraft.getInstance().gameRenderer.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
-                final GpuTextureView previousColorTextureOverride = RenderSystem.outputColorTextureOverride;
-                final GpuTextureView previousDepthTextureOverride = RenderSystem.outputDepthTextureOverride;
-                RenderSystem.outputColorTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getColorTextureView();
-                RenderSystem.outputDepthTextureOverride = ImmediatelyFast.signTextCache.signAtlasRenderTarget.getDepthTextureView();
                 mixinSignText.immediatelyFast$setShouldCache(false);
-
                 try {
                     final PoseStack textPoseStack = new PoseStack();
                     textPoseStack.translate(slot.x, slot.y, 0F);
@@ -96,16 +94,23 @@ public abstract class MixinAbstractSignRenderer {
                     state.drawOutline = true; // Always render outline, regardless of distance to sign
                     final SubmitNodeStorage submitNodeStorage = new SubmitNodeStorage();
                     this.submitSignText(state, textPoseStack, submitNodeStorage, signText);
-                    Minecraft.getInstance().gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeStorage);
+                    try (
+                        final FeatureRenderDispatcher.PreparedFrame frame = Minecraft.getInstance().gameRenderer.featureRenderDispatcher().prepareFrame(submitNodeStorage);
+                        final RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                            () -> "Picture in picture",
+                            ImmediatelyFast.signTextCache.signAtlasRenderTarget.getColorTextureView(), Optional.empty(),
+                            ImmediatelyFast.signTextCache.signAtlasRenderTarget.getDepthTextureView(), OptionalDouble.empty()
+                        )
+                    ) {
+                        RenderSystem.bindDefaultUniforms(renderPass);
+                        FeatureRenderDispatcher.renderAllFeatures(renderPass, frame);
+                    }
                 } finally {
                     mixinSignText.immediatelyFast$setShouldCache(true);
-                    RenderSystem.outputColorTextureOverride = previousColorTextureOverride;
-                    RenderSystem.outputDepthTextureOverride = previousDepthTextureOverride;
                     RenderSystem.setShaderFog(fog);
                     modelViewMatrix.popMatrix();
                     RenderSystem.restoreProjectionMatrix();
                 }
-
                 ImmediatelyFast.signTextCache.slotCache.put(signText, slot);
             } else {
                 ImmediatelyFast.LOGGER.warn("Failed to find a free slot for sign text (" + ImmediatelyFast.signTextCache.slotCache.size() + " sign texts in atlas). Falling back to immediate mode rendering.");

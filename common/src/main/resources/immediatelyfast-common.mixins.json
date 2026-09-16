@@ -14,7 +14,6 @@
     "enhanced_batching.MixinScissorState",
     "enhanced_batching.compat.iris.MixinIris_OuterWrappedRenderType",
     "enhanced_batching.compat.iris.MixinRenderTypeFeatureRenderer_Group",
-    "fast_text_lookup.MixinNameTagFeatureRenderer_GlyphRenderer",
     "fast_text_lookup.MixinTextFeatureRenderer_GlyphRenderer",
     "fix_slow_buffer_upload_on_apple_gpu.MixinGlCommandEncoder",
     "font_atlas_resizing.MixinFontTexture",
@@ -24,7 +23,7 @@
     "map_atlas_generation.MixinMapTextureManager",
     "map_atlas_generation.MixinMapTextureManager_MapInstance",
     "print_additional_error_information.MixinGlDebug",
-    "resource_pack_conflict_handling.MixinShaderManager",
+    "resource_pack_conflict_handling.MixinMinecraft",
     "sign_text_buffering.MixinAbstractSignRenderer",
     "sign_text_buffering.MixinSignText",
     "skip_text_translucency_sorting.MixinRenderTypes"

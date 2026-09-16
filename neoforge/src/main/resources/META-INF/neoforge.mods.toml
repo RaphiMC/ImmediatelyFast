@@ -9,8 +9,7 @@ version = "${version}"
 displayName = "ImmediatelyFast"
 description = "Speed up and optimize immediate mode rendering in Minecraft"
 authors = "RK_01"
-iconFile = "assets/immediatelyfast/icon.png" # >= NeoForge 26.2.0.50
-logoFile = "assets/immediatelyfast/icon.png" # < NeoForge 26.2.0.50
+iconFile = "assets/immediatelyfast/icon.png"
 displayURL = "https://github.com/RaphiMC/ImmediatelyFast"
 
 [[mixins]]
@@ -21,10 +20,10 @@ config = "immediatelyfast-neoforge.mixins.json"
 
 [[dependencies.immediatelyfast]]
 modId = "minecraft"
-versionRange = "[26.2.0]"
+versionRange = "[26.3.0]"
 side = "CLIENT"
 
 [[dependencies.immediatelyfast]]
 modId = "neoforge"
-versionRange = "[26.2.0.0,26.3.0.0)"
+versionRange = "[26.3.0.0,26.4.0.0)"
 side = "CLIENT"

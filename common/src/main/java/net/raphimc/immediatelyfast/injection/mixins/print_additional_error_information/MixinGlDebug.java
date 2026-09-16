@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.print_additional_error_information;
 
-import com.mojang.blaze3d.opengl.GlDebug;
+import com.mojang.renderpearl.backend.opengl.GlDebug;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

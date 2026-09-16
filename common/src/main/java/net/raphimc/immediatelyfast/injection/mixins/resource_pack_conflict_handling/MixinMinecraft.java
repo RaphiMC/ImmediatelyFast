@@ -17,18 +17,22 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.resource_pack_conflict_handling;
 
-import com.mojang.blaze3d.shaders.ShaderType;
+import com.mojang.renderpearl.api.pipeline.ShaderType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShaderManager;
+import net.minecraft.client.Options;
+import net.minecraft.client.gui.font.FontManager;
+import net.minecraft.client.resources.MapTextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.VanillaPackResources;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
 import net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling.CoreShaderBlacklist;
+import net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling.ImmediatelyFastResourcePackMetadata;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,24 +42,42 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mixin(ShaderManager.class)
-public abstract class MixinShaderManager {
+@Mixin(Minecraft.class)
+public abstract class MixinMinecraft {
 
-    @Inject(method = "apply(Lnet/minecraft/client/renderer/ShaderManager$Configs;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("RETURN"))
-    private void checkForCoreShaderModifications(final ShaderManager.Configs preparations, final ResourceManager manager, final ProfilerFiller profiler, final CallbackInfo ci) {
+    @Shadow
+    @Final
+    private ReloadableResourceManager resourceManager;
+
+    @Shadow
+    public abstract VanillaPackResources getVanillaPackResources();
+
+    @Shadow
+    @Final
+    private FontManager fontManager;
+
+    @Shadow
+    @Final
+    public Options options;
+
+    @Shadow
+    public abstract MapTextureManager getMapTextureManager();
+
+    @Inject(method = "onResourceLoadFinished", at = @At("RETURN"))
+    private void checkResourcePackCompatibility(CallbackInfo ci) {
         PackResources resourcePackWhichBreaksFontAtlasResizing = null;
         PackResources resourcePackWhichBreaksMapAtlasGeneration = null;
         try {
             final Set<PackResources> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
                 final Identifier vertexShaderIdentifier = ShaderType.VERTEX.idConverter().idToFile(shaderIdentifier);
-                final PackResources vertexShaderResourcePack = manager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
-                if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
+                final PackResources vertexShaderResourcePack = this.resourceManager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
+                if (vertexShaderResourcePack != null && !immediatelyFast$arePackResourcesEqual(vertexShaderResourcePack, this.getVanillaPackResources().fullResources())) {
                     breakingResourcePacks.add(vertexShaderResourcePack);
                 }
                 final Identifier fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().idToFile(shaderIdentifier);
-                final PackResources fragmentShaderResourcePack = manager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
-                if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(Minecraft.getInstance().getVanillaPackResources())) {
+                final PackResources fragmentShaderResourcePack = this.resourceManager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
+                if (fragmentShaderResourcePack != null && !immediatelyFast$arePackResourcesEqual(fragmentShaderResourcePack, this.getVanillaPackResources().fullResources())) {
                     breakingResourcePacks.add(fragmentShaderResourcePack);
                 }
             }
@@ -105,14 +127,17 @@ public abstract class MixinShaderManager {
 
     @Unique
     private void immediatelyFast$reloadFontStorages() {
-        // Force reload the font manager to rebuild the font atlas textures
-        Minecraft.getInstance().fontManager.updateOptions(Minecraft.getInstance().options);
+        this.fontManager.updateOptions(this.options); // Force reload the font manager to rebuild the font atlas textures
     }
 
     @Unique
     private void immediatelyFast$reloadMapTextures() {
-        // Force reset the map texture manager
-        Minecraft.getInstance().getMapTextureManager().resetData();
+        this.getMapTextureManager().resetData(); // Force reset the map texture manager
+    }
+
+    @Unique
+    private static boolean immediatelyFast$arePackResourcesEqual(final PackResources a, final PackResources b) {
+        return a.location().equals(b.location());
     }
 
 }

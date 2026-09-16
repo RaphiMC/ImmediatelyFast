@@ -19,8 +19,8 @@ package net.raphimc.immediatelyfast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mojang.blaze3d.systems.DeviceInfo;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.device.DeviceInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastConfig;

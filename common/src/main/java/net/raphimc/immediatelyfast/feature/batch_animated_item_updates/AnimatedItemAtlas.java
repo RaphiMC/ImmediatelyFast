@@ -17,8 +17,8 @@
  */
 package net.raphimc.immediatelyfast.feature.batch_animated_item_updates;
 
-import com.mojang.blaze3d.GpuFormat;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.GpuFormat;
 import net.minecraft.client.gui.render.DynamicAtlasAllocator;
 import net.minecraft.client.gui.render.GuiItemAtlas;
 import net.minecraft.client.gui.render.GuiRenderer;
