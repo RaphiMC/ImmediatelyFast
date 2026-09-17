@@ -28,7 +28,7 @@
   "depends": {
     "java": ">=25",
     "minecraft": "26.3.x",
-    "fabricloader": ">=0.19.5"
+    "fabricloader": ">=0.19.3"
   },
   "custom": {
     "modmenu": {

@@ -10,6 +10,7 @@ displayName = "ImmediatelyFast"
 description = "Speed up and optimize immediate mode rendering in Minecraft"
 authors = "RK_01"
 iconFile = "assets/immediatelyfast/icon.png"
+bannerFile = "assets/immediatelyfast/icon.png"
 displayURL = "https://github.com/RaphiMC/ImmediatelyFast"
 
 [[mixins]]
