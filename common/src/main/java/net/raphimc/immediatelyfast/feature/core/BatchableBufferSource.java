@@ -214,21 +214,21 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
             final Identifier textureId = multiPhase.getPhases().texture.getId().orElse(null);
             if (textureId != null) {
                 if (textureId.getPath().startsWith(HorseArmorItem.ENTITY_TEXTURE_PREFIX)) {
-                    final String horseTexturePath = textureId.getPath().substring(HorseArmorItem.ENTITY_TEXTURE_PREFIX.length());
-                    if (horseTexturePath.startsWith("horse_markings")) {
+                    final String horseTexturePath = textureId.getPath();
+                    if (horseTexturePath.startsWith("horse_markings", HorseArmorItem.ENTITY_TEXTURE_PREFIX.length())) {
                         return 2;
-                    } else if (horseTexturePath.startsWith("armor/")) {
+                    } else if (horseTexturePath.startsWith("armor/", HorseArmorItem.ENTITY_TEXTURE_PREFIX.length())) {
                         return 3;
                     } else {
                         return 1;
                     }
                 } else if (textureId.getPath().startsWith("textures/entity/villager/")) {
-                    final String villagerTexturePath = textureId.getPath().substring("textures/entity/villager/".length());
-                    if (villagerTexturePath.startsWith("type/")) {
+                    final String villagerTexturePath = textureId.getPath();
+                    if (villagerTexturePath.startsWith("type/", "textures/entity/villager/".length())) {
                         return 2;
-                    } else if (villagerTexturePath.startsWith("profession/")) {
+                    } else if (villagerTexturePath.startsWith("profession/", "textures/entity/villager/".length())) {
                         return 3;
-                    } else if (villagerTexturePath.startsWith("profession_level/")) {
+                    } else if (villagerTexturePath.startsWith("profession_level/", "textures/entity/villager/".length())) {
                         return 4;
                     } else {
                         return 1;
