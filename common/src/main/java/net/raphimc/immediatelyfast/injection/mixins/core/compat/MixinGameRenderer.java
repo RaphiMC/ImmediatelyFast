@@ -28,6 +28,7 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.CoreShaderBlacklist;
+import net.raphimc.immediatelyfast.compat.KnownHudShaders;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastResourcePackMetadata;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -61,6 +62,7 @@ public abstract class MixinGameRenderer {
         ResourcePack resourcePackWhichBreaksHudBatching = null;
         try {
             final Set<ResourcePack> breakingResourcePacks = new HashSet<>();
+            final Set<ResourcePack> breakingHudResourcePacks = new HashSet<>();
             for (Map.Entry<String, ShaderProgram> shaderProgramEntry : this.programs.entrySet()) {
                 if (!CoreShaderBlacklist.isBlacklisted(shaderProgramEntry.getKey())) {
                     continue;
@@ -70,11 +72,15 @@ public abstract class MixinGameRenderer {
                 final ResourcePack vertexShaderResourcePack = factory.getResource(vertexShaderIdentifier).map(Resource::getPack).orElse(null);
                 if (vertexShaderResourcePack != null && !vertexShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
                     breakingResourcePacks.add(vertexShaderResourcePack);
+                    breakingHudResourcePacks.add(vertexShaderResourcePack);
                 }
                 final Identifier fragmentShaderIdentifier = new Identifier("shaders/core/" + shaderProgramEntry.getValue().getFragmentShader().getName() + ".fsh");
                 final ResourcePack fragmentShaderResourcePack = factory.getResource(fragmentShaderIdentifier).map(Resource::getPack).orElse(null);
                 if (fragmentShaderResourcePack != null && !fragmentShaderResourcePack.equals(MinecraftClient.getInstance().getDefaultResourcePack())) {
                     breakingResourcePacks.add(fragmentShaderResourcePack);
+                    if (!KnownHudShaders.isCompatible(shaderProgramEntry.getKey(), shaderProgramEntry.getValue().getVertexShader().getName(), shaderProgramEntry.getValue().getFragmentShader().getName(), factory)) {
+                        breakingHudResourcePacks.add(fragmentShaderResourcePack);
+                    }
                 }
             }
             for (ResourcePack resourcePack : breakingResourcePacks) {
@@ -85,7 +91,7 @@ public abstract class MixinGameRenderer {
                 if (!metadata.compatibleFeatures().contains("font_atlas_resizing")) {
                     resourcePackWhichBreaksFontAtlasResizing = resourcePack;
                 }
-                if (!metadata.compatibleFeatures().contains("hud_batching")) {
+                if (breakingHudResourcePacks.contains(resourcePack) && !metadata.compatibleFeatures().contains("hud_batching")) {
                     resourcePackWhichBreaksHudBatching = resourcePack;
                 }
             }
