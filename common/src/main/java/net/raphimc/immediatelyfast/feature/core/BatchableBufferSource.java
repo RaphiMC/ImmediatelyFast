@@ -34,6 +34,7 @@ import net.minecraft.util.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
 import net.raphimc.immediatelyfast.compat.IrisCompat;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -48,10 +49,11 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
      */
     private final static BufferBuilder FALLBACK_BUFFER = new BufferBuilder(0);
 
-    protected final Map<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>() : new Reference2ObjectLinkedOpenHashMap<>();
-    protected final Set<RenderLayer> activeLayers = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>() : new ReferenceLinkedOpenHashSet<>();
+    protected final Map<RenderLayer, ReferenceSet<BufferBuilder>> fallbackBuffers = IrisCompat.IRIS_LOADED ? new Object2ObjectLinkedOpenHashMap<>(4) : new Reference2ObjectLinkedOpenHashMap<>(4);
+    protected final Set<RenderLayer> activeLayers = IrisCompat.IRIS_LOADED ? new ObjectLinkedOpenHashSet<>(4) : new ReferenceLinkedOpenHashSet<>(4);
 
     protected boolean drawFallbackLayersFirst = false;
+    private ArrayDeque<ReferenceSet<BufferBuilder>> freeFallbackSets;
 
     public BatchableBufferSource() {
         this(ImmutableMap.of());
@@ -126,8 +128,23 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         this.drawCurrentLayer();
+        boolean skipped = false;
         for (RenderLayer layer : this.layerBuffers.keySet()) {
+            if (this.getClass() == BatchableBufferSource.class && !this.drawFallbackLayersFirst
+                    && layer.getClass() == RenderLayer.MultiPhase.class) {
+                final BufferBuilder fixed = this.layerBuffers.get(layer);
+                if (fixed != null && !fixed.isBuilding() && !this.activeLayers.contains(layer) && !this.fallbackBuffers.containsKey(layer)) {
+                    if (!skipped) {
+                        skipped = true;
+                        RenderSystem.getVertexSorting(); // Keep the render-thread check even when every fixed layer is idle.
+                    }
+                    continue;
+                }
+            }
             this.draw(layer);
+        }
+        if (skipped && IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
+            IrisCompat.renderWithExtendedVertexFormat.accept(true);
         }
     }
 
@@ -142,12 +159,22 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         }
 
         this.activeLayers.remove(layer);
-        for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+        if (this.getClass() == BatchableBufferSource.class && !this.fallbackBuffers.containsKey(layer)) {
+            final BufferBuilder bufferBuilder = this.layerBuffers.containsKey(layer) ? this.layerBuffers.get(layer) : null;
             if (bufferBuilder != null) {
                 layer.draw(bufferBuilder, RenderSystem.getVertexSorting());
             }
+        } else {
+            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+                if (bufferBuilder != null) {
+                    layer.draw(bufferBuilder, RenderSystem.getVertexSorting());
+                }
+            }
         }
-        this.fallbackBuffers.remove(layer);
+        final ReferenceSet<BufferBuilder> removed = this.fallbackBuffers.remove(layer);
+        if (this.getClass() == BatchableBufferSource.class && removed != null) {
+            this.releaseFallbackSet(removed);
+        }
 
         if (IrisCompat.IRIS_LOADED && !IrisCompat.isRenderingLevel.getAsBoolean()) {
             IrisCompat.renderWithExtendedVertexFormat.accept(true);
@@ -159,16 +186,23 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
         this.currentLayer = Optional.empty();
         this.drawFallbackLayersFirst = false;
 
-        for (RenderLayer layer : this.activeLayers) {
-            for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
-                final BufferBuilder.BuiltBuffer builtBuffer = bufferBuilder.endNullable();
-                if (builtBuffer != null) {
-                    builtBuffer.release();
+        if (!this.activeLayers.isEmpty()) {
+            for (RenderLayer layer : this.activeLayers) {
+                for (BufferBuilder bufferBuilder : this.getBufferBuilder(layer)) {
+                    final BufferBuilder.BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+                    if (builtBuffer != null) {
+                        builtBuffer.release();
+                    }
                 }
             }
         }
 
         this.activeLayers.clear();
+        if (this.getClass() == BatchableBufferSource.class && !this.fallbackBuffers.isEmpty()) {
+            for (ReferenceSet<BufferBuilder> set : this.fallbackBuffers.values()) {
+                this.releaseFallbackSet(set);
+            }
+        }
         this.fallbackBuffers.clear();
     }
 
@@ -200,8 +234,32 @@ public class BatchableBufferSource extends VertexConsumerProvider.Immediate impl
 
     protected BufferBuilder addNewFallbackBuffer(final RenderLayer layer) {
         final BufferBuilder bufferBuilder = BufferBuilderPool.get();
-        this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
+        if (this.getClass() == BatchableBufferSource.class) {
+            ReferenceSet<BufferBuilder> set = this.fallbackBuffers.get(layer);
+            if (set == null) {
+                set = this.freeFallbackSets == null ? null : this.freeFallbackSets.pollLast();
+                if (set == null) {
+                    set = new ReferenceLinkedOpenHashSet<>();
+                }
+                this.fallbackBuffers.put(layer, set);
+            }
+            set.add(bufferBuilder);
+        } else {
+            this.fallbackBuffers.computeIfAbsent(layer, k -> new ReferenceLinkedOpenHashSet<>()).add(bufferBuilder);
+        }
         return bufferBuilder;
+    }
+
+    private void releaseFallbackSet(final ReferenceSet<BufferBuilder> set) {
+        if (set instanceof ReferenceLinkedOpenHashSet && set.size() <= 64) {
+            if (this.freeFallbackSets == null) {
+                this.freeFallbackSets = new ArrayDeque<>();
+            }
+            if (this.freeFallbackSets.size() < 16) {
+                set.clear();
+                this.freeFallbackSets.addLast(set);
+            }
+        }
     }
 
     protected int getLayerOrder(final RenderLayer layer) {
