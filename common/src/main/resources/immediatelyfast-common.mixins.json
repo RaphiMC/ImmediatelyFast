@@ -10,6 +10,8 @@
     "batch_animated_item_updates.MixinGuiRenderer",
     "core.MixinDebugScreenEntries",
     "core.MixinMinecraft",
+    "debug_chart_batching.MixinAbstractDebugChart",
+    "debug_chart_batching.MixinGuiRenderState",
     "enhanced_batching.MixinRenderTypeFeatureRenderer_Group",
     "enhanced_batching.MixinScissorState",
     "enhanced_batching.compat.iris.MixinIris_OuterWrappedRenderType",
