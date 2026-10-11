@@ -28,6 +28,7 @@ public class ImmediatelyFastConfig {
     public int map_atlas_size = 2048;
     public boolean skip_text_translucency_sorting = true;
     public boolean fast_text_lookup = true;
+    public boolean world_text_layout_cache = true;
     public boolean avoid_redundant_framebuffer_switching = true;
     public boolean fix_slow_buffer_upload_on_apple_gpu = true;
     public boolean batch_animated_item_updates = true;
@@ -51,6 +52,7 @@ public class ImmediatelyFastConfig {
             case "map_atlas_generation" -> this.map_atlas_generation;
             case "skip_text_translucency_sorting" -> this.skip_text_translucency_sorting;
             case "fast_text_lookup" -> this.fast_text_lookup;
+            case "world_text_layout_cache" -> this.world_text_layout_cache;
             case "avoid_redundant_framebuffer_switching" -> this.avoid_redundant_framebuffer_switching;
             case "fix_slow_buffer_upload_on_apple_gpu" -> this.fix_slow_buffer_upload_on_apple_gpu;
             case "batch_animated_item_updates" -> this.batch_animated_item_updates;

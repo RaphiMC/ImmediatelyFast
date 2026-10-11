@@ -66,6 +66,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.fast_text_lookup && packageName.startsWith("fast_text_lookup")) {
             return false;
         }
+        if (!ImmediatelyFast.config.world_text_layout_cache && packageName.startsWith("world_text_layout_cache")) {
+            return false;
+        }
         if (!ImmediatelyFast.config.avoid_redundant_framebuffer_switching && packageName.startsWith("avoid_redundant_framebuffer_switching")) {
             return false;
         }

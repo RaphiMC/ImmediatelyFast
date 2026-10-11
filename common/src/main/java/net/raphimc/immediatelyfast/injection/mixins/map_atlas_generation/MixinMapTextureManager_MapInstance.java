@@ -21,6 +21,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.MapTextureManager;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
@@ -30,10 +31,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.minecraft.client.resources.MapTextureManager$MapInstance")
 public abstract class MixinMapTextureManager_MapInstance {
+
+    @Unique
+    private static final int[] immediatelyFast$mapColors = new int[256];
 
     @Shadow
     @Final
@@ -56,6 +61,18 @@ public abstract class MixinMapTextureManager_MapInstance {
             this.immediatelyFast$atlasX = MapAtlas.getAtlasXFromLocation(location) * MapAtlas.MAP_SIZE;
             this.immediatelyFast$atlasY = MapAtlas.getAtlasYFromLocation(location) * MapAtlas.MAP_SIZE;
         }
+    }
+
+    @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;getPixels()Lcom/mojang/blaze3d/platform/NativeImage;"))
+    private void computeMapColorLookupTable(final CallbackInfo ci) {
+        for (int packedId = 0; packedId < immediatelyFast$mapColors.length; packedId++) {
+            immediatelyFast$mapColors[packedId] = MapColor.getColorFromPackedId(packedId);
+        }
+    }
+
+    @Redirect(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/MapColor;getColorFromPackedId(I)I"))
+    private int useMapColorLookupTable(final int packedId) {
+        return immediatelyFast$mapColors[packedId & 0xFF];
     }
 
     @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V", shift = At.Shift.AFTER))
