@@ -26,7 +26,11 @@
     "resource_pack_conflict_handling.MixinMinecraft",
     "sign_text_buffering.MixinAbstractSignRenderer",
     "sign_text_buffering.MixinSignText",
-    "skip_text_translucency_sorting.MixinRenderTypes"
+    "skip_text_translucency_sorting.MixinRenderTypes",
+    "world_text_layout_cache.MixinFontManager",
+    "world_text_layout_cache.MixinMinecraft",
+    "world_text_layout_cache.MixinSubmitNodeCollection",
+    "world_text_layout_cache.MixinTextFeatureRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

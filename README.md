@@ -114,6 +114,7 @@ ImmediatelyFast has a config file which can be found in the `config` folder of y
 * `font_atlas_resizing`: Increases the sizes of the font atlas textures. This improves performance with high resolution or custom server fonts.
 * `map_atlas_generation`: Puts the map textures into a single texture instead of multiple textures. This improves performance when many maps are on screen.
 * `fast_text_lookup`: Caches some data between rendering text characters. This slightly improves performance when rendering a lot of text.
+* `world_text_layout_cache`: Caches the glyph layout of text rendered in the world (signs, text displays). This improves performance when a lot of unchanging text is visible.
 * `avoid_redundant_framebuffer_switching`: This optimization reduces the number of framebuffer switches when rendering many different things in the world (entities, particles, block entities, ...) or the HUD to increase FPS.
 * `fix_slow_buffer_upload_on_apple_gpu`: This optimization reverts a Minecraft change which causes performance regressions on Apple GPUs. This is enabled by default for Apple GPUs.
 * `experimental_disable_error_checking`: Disables OpenGL error checking. This may improve performance on certain systems, but can cause hard to debug issues if enabled.
