@@ -1,2 +1,2 @@
-* Only restore depth state if currently batching (Fixes rendering issues introduced in ImmediatelyFast 1.6.13)
-* Fixed RoughlyEnoughItems recipe tooltip rendering issues
+* Fixed rendering of spell cooldowns from Iron's Spells 'N Spellbooks
+* Fixed Cosmetica screen rendering
