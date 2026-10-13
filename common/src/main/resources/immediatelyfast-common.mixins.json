@@ -16,6 +16,7 @@
     "core.compat.MixinGameRenderer",
     "core.compat.MixinTextDisplayEntityRenderer",
     "core.compat.iris.MixinIris_ShadowRenderer",
+    "core.compat.kupe.MixinKupe_FormattedCharSeqRenderer",
     "core.compat.rei.MixinRei_BatchedEntryRendererManager",
     "core.compat.rei.MixinRei_EntryDefinition_EntryRenderer",
     "disable_error_checking.MixinGL11",
