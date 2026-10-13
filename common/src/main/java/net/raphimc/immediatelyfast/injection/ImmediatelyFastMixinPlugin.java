@@ -78,6 +78,8 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
 
         if (packageName.startsWith("core.compat.iris") && PlatformService.INSTANCE.getModVersion("iris").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/460
             return false;
+        } else if (packageName.startsWith("core.compat.kupe") && PlatformService.INSTANCE.getModVersion("kupe").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/485
+            return false;
         } else if (packageName.startsWith("hud_batching.compat.appleskin") && PlatformService.INSTANCE.getModVersion("appleskin").isEmpty()) { // https://github.com/RaphiMC/ImmediatelyFast/issues/314
             return false;
         }
