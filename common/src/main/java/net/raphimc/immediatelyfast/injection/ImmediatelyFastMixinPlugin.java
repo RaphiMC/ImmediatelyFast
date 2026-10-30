@@ -54,6 +54,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.enhanced_batching && packageName.startsWith("enhanced_batching")) {
             return false;
         }
+        if (!ImmediatelyFast.config.debug_chart_batching && packageName.startsWith("debug_chart_batching")) {
+            return false;
+        }
         if (!ImmediatelyFast.config.font_atlas_resizing && packageName.startsWith("font_atlas_resizing")) {
             return false;
         }

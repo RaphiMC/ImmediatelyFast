@@ -22,6 +22,7 @@ public class ImmediatelyFastConfig {
     // Regular config values
     private String REGULAR_INFO = "----- Regular config values below -----";
     public boolean enhanced_batching = true;
+    public boolean debug_chart_batching = true;
     public boolean font_atlas_resizing = true;
     public int font_atlas_size = 1024;
     public boolean map_atlas_generation = true;
@@ -47,6 +48,7 @@ public class ImmediatelyFastConfig {
     public boolean getBoolean(final String key, final boolean defaultValue) {
         return switch (key) {
             case "enhanced_batching" -> this.enhanced_batching;
+            case "debug_chart_batching" -> this.debug_chart_batching;
             case "font_atlas_resizing" -> this.font_atlas_resizing;
             case "map_atlas_generation" -> this.map_atlas_generation;
             case "skip_text_translucency_sorting" -> this.skip_text_translucency_sorting;
