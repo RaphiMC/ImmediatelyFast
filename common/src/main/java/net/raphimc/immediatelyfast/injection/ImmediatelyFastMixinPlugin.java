@@ -71,6 +71,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.fix_slow_buffer_upload_on_apple_gpu && packageName.startsWith("fix_slow_buffer_upload_on_apple_gpu")) {
             return false;
         }
+        if (!ImmediatelyFast.config.fast_gui_layer_lookup && packageName.startsWith("fast_gui_layer_lookup")) {
+            return false;
+        }
         if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling && packageName.startsWith("resource_pack_conflict_handling")) {
             return false;
         }

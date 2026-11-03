@@ -12,6 +12,8 @@
     "core.MixinRenderSystem",
     "enhanced_batching.MixinFeatureRenderDispatcher",
     "enhanced_batching.MixinRenderBuffers",
+    "fast_gui_layer_lookup.MixinGuiRenderState",
+    "fast_gui_layer_lookup.MixinGuiRenderState_Node",
     "fast_text_lookup.MixinFont_GlyphVisitor",
     "fix_slow_buffer_upload_on_apple_gpu.MixinGlCommandEncoder",
     "font_atlas_resizing.MixinFontTexture",
