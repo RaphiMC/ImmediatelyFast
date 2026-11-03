@@ -74,6 +74,9 @@ public class ImmediatelyFastMixinPlugin implements IMixinConfigPlugin {
         if (!ImmediatelyFast.config.batch_animated_item_updates && packageName.startsWith("batch_animated_item_updates")) {
             return false;
         }
+        if (!ImmediatelyFast.config.fast_gui_layer_lookup && packageName.startsWith("fast_gui_layer_lookup")) {
+            return false;
+        }
         if (ImmediatelyFast.config.experimental_disable_resource_pack_conflict_handling && packageName.startsWith("resource_pack_conflict_handling")) {
             return false;
         }
