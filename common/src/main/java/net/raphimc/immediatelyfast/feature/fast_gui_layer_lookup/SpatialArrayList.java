@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class SpatialArrayList<E extends ScreenArea> extends ArrayList<E> {
 
-    private final ScreenRectangleQuadTree tree = new ScreenRectangleQuadTree();
+    private final ScreenRectangleQuadTree quadTree = new ScreenRectangleQuadTree();
     private int left = Integer.MAX_VALUE;
     private int top = Integer.MAX_VALUE;
     private int right = Integer.MIN_VALUE;
@@ -36,9 +36,9 @@ public class SpatialArrayList<E extends ScreenArea> extends ArrayList<E> {
         final int previousModCount = this.modCount;
         final boolean result = super.add(element);
         if (this.indexedModCount == previousModCount) {
-            final ScreenRectangle bounds = element.bounds();
-            if (bounds != null) {
-                this.index(bounds);
+            final ScreenRectangle elementBounds = element.bounds();
+            if (elementBounds != null) {
+                this.index(elementBounds);
             }
             this.indexedModCount = this.modCount;
         }
@@ -60,15 +60,15 @@ public class SpatialArrayList<E extends ScreenArea> extends ArrayList<E> {
         if (this.left >= bounds.right() || this.right <= bounds.left() || this.top >= bounds.bottom() || this.bottom <= bounds.top()) {
             return false;
         }
-        return this.tree.intersects(bounds);
+        return this.quadTree.intersects(bounds);
     }
 
-    private void index(final ScreenRectangle bounds) {
-        this.left = Math.min(bounds.left(), this.left);
-        this.top = Math.min(bounds.top(), this.top);
-        this.right = Math.max(bounds.right(), this.right);
-        this.bottom = Math.max(bounds.bottom(), this.bottom);
-        this.tree.add(bounds);
+    private void index(final ScreenRectangle elementBounds) {
+        this.left = Math.min(elementBounds.left(), this.left);
+        this.top = Math.min(elementBounds.top(), this.top);
+        this.right = Math.max(elementBounds.right(), this.right);
+        this.bottom = Math.max(elementBounds.bottom(), this.bottom);
+        this.quadTree.add(elementBounds);
     }
 
 }
