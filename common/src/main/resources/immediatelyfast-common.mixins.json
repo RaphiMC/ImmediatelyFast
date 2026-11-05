@@ -5,8 +5,6 @@
   "compatibilityLevel": "JAVA_25",
   "plugin": "net.raphimc.immediatelyfast.injection.ImmediatelyFastMixinPlugin",
   "client": [
-    "avoid_redundant_framebuffer_switching.MixinGlCommandEncoder",
-    "avoid_redundant_framebuffer_switching.MixinGlSurface",
     "batch_animated_item_updates.MixinGuiRenderer",
     "core.MixinDebugScreenEntries",
     "core.MixinMinecraft",
