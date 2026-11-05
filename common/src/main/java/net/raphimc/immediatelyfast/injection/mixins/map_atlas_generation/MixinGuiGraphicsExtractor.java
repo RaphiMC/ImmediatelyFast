@@ -20,10 +20,10 @@ package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiPipeline;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapRenderState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,8 +35,8 @@ import static net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas.
 @Mixin(GuiGraphicsExtractor.class)
 public abstract class MixinGuiGraphicsExtractor {
 
-    @WrapOperation(method = "map", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;innerBlit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lcom/mojang/renderpearl/api/textures/GpuTextureView;Lcom/mojang/renderpearl/api/textures/GpuSampler;IIIIFFFFI)V", ordinal = 0))
-    private void modifyTextureCoordinates(final GuiGraphicsExtractor instance, final RenderPipeline pipeline, final GpuTextureView textureView, final GpuSampler sampler, final int x0, final int y0, final int x1, final int y1, float u0, float u1, float v0, float v1, final int color, final Operation<Void> original, @Local(name = "mapRenderState", argsOnly = true) final MapRenderState mapRenderState) {
+    @WrapOperation(method = "map", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;innerBlit(Lnet/minecraft/client/gui/GuiPipeline;Lcom/mojang/renderpearl/api/textures/GpuTextureView;Lcom/mojang/renderpearl/api/textures/GpuSampler;IIIIFFFFI)V", ordinal = 0))
+    private void modifyTextureCoordinates(final GuiGraphicsExtractor instance, final GuiPipeline pipeline, final GpuTextureView textureView, final GpuSampler sampler, final int x0, final int y0, final int x1, final int y1, float u0, float u1, float v0, float v1, final int color, final Operation<Void> original, @Local(name = "mapRenderState", argsOnly = true) final MapRenderState mapRenderState) {
         final IMapRenderState immediatelyFast$mapRenderState = (IMapRenderState) mapRenderState;
         if (immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId() != null && immediatelyFast$mapRenderState.immediatelyFast$getAtlasTextureId().equals(mapRenderState.texture)) {
             u0 = (float) immediatelyFast$mapRenderState.immediatelyFast$getAtlasX() / ATLAS_SIZE;

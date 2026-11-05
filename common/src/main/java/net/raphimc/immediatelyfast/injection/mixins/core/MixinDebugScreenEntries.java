@@ -17,11 +17,13 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.core;
 
+import net.minecraft.client.core.registries.ClientRegistries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
 import net.minecraft.client.gui.components.debug.DebugScreenProfile;
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastDebugScreenEntry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +32,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,19 +43,15 @@ public abstract class MixinDebugScreenEntries {
     @Shadow
     @Final
     @Mutable
-    public static Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> PROFILES;
+    public static Map<DebugScreenProfile, Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus>> PROFILES;
 
-    @Shadow
-    private static Identifier register(final Identifier identifier, final DebugScreenEntry entry) {
-        return null;
-    }
-
-    @Inject(method = "<clinit>", at = @At("RETURN"))
-    private static void addImmediatelyFastEntry(final CallbackInfo ci) {
-        final Identifier entryId = register(ImmediatelyFastDebugScreenEntry.ENTRY_ID, new ImmediatelyFastDebugScreenEntry());
-        final Map<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> profiles = new HashMap<>();
-        for (Map.Entry<DebugScreenProfile, Map<Identifier, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
-            final Map<Identifier, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
+    @Inject(method = "bootstrap", at = @At("RETURN"))
+    private static void addImmediatelyFastEntry(final Registry<DebugScreenEntry> registry, final CallbackInfoReturnable<Object> cir) {
+        final ResourceKey<DebugScreenEntry> entryId = ResourceKey.create(ClientRegistries.DEBUG_SCREEN_ENTRY, ImmediatelyFastDebugScreenEntry.ENTRY_ID);
+        Registry.register(registry, entryId, new ImmediatelyFastDebugScreenEntry());
+        final Map<DebugScreenProfile, Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus>> profiles = new HashMap<>();
+        for (Map.Entry<DebugScreenProfile, Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus>> entry : PROFILES.entrySet()) {
+            final Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus> entries = new HashMap<>(entry.getValue());
             entries.put(entryId, DebugScreenEntryStatus.IN_OVERLAY);
             profiles.put(entry.getKey(), entries);
         }

@@ -24,6 +24,7 @@ import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.renderpearl.api.commands.RenderPass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.RenderPassLayouts;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
@@ -97,7 +98,8 @@ public abstract class MixinAbstractSignRenderer {
                     try (
                         final FeatureRenderDispatcher.PreparedFrame frame = Minecraft.getInstance().gameRenderer.featureRenderDispatcher().prepareFrame(submitNodeStorage);
                         final RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                            () -> "Picture in picture",
+                            () -> "ImmediatelyFast Sign Atlas render",
+                            RenderPassLayouts.COLOR_DEPTH,
                             ImmediatelyFast.signTextCache.signAtlasRenderTarget.getColorTextureView(), Optional.empty(),
                             ImmediatelyFast.signTextCache.signAtlasRenderTarget.getDepthTextureView(), OptionalDouble.empty()
                         )

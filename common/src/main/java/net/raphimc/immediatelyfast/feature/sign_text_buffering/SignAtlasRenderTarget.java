@@ -20,15 +20,23 @@ package net.raphimc.immediatelyfast.feature.sign_text_buffering;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.commands.RenderPass;
+import com.mojang.renderpearl.api.textures.AddressMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPassLayouts;
+import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.util.RenderTargetTexture;
 import org.joml.Vector4f;
+import org.joml.Vector4fc;
+
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseable {
 
-    private static final Vector4f CLEAR_COLOR = new Vector4f(0F);
+    private static final Vector4fc CLEAR_COLOR = new Vector4f(0F);
     public static final int ATLAS_SIZE = ImmediatelyFast.config.experimental_sign_atlas_size;
 
     private final int id;
@@ -39,7 +47,7 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
         super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
-        Minecraft.getInstance().getTextureManager().register(this.textureId, new RenderTargetTexture(this));
+        Minecraft.getInstance().getTextureManager().register(this.textureId, new TextureResources(this.getColorTexture(), this.getColorTextureView(), RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false)));
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
     }
 
@@ -95,7 +103,16 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
             }
             this.occupied = false;
             removeUnoccupiedSubSlots(this);
-            RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(SignAtlasRenderTarget.this.getColorTexture(), CLEAR_COLOR, SignAtlasRenderTarget.this.getDepthTexture(), 0D, this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height, 0);
+            try (final RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
+                () -> "ImmediatelyFast Sign Atlas slot clear",
+                RenderPassLayouts.COLOR_DEPTH,
+                SignAtlasRenderTarget.this.getColorTextureView(),
+                Optional.of(CLEAR_COLOR),
+                SignAtlasRenderTarget.this.getDepthTextureView(),
+                OptionalDouble.of(0D),
+                new RenderPass.RenderArea(this.x, ATLAS_SIZE - this.y - this.height, this.width, this.height))) {
+                // No drawing needed, the render pass clears the region on creation
+            }
         }
 
         public Slot findSlot(final int width, final int height) {
