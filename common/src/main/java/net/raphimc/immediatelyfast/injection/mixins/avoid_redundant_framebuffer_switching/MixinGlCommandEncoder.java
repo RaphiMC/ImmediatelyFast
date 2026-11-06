@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinGlCommandEncoder {
 
     @WrapWithCondition(method = "submitRenderPass", at = @At(value = "INVOKE", target = "Lcom/mojang/renderpearl/backend/opengl/GlStateManager;_glBindFramebuffer(II)V"))
-    private boolean dontUnbindFramebuffer(final int target, final int framebuffer) {
+    private boolean dontUnbindFramebuffer(final GlStateManager stateManager, final int target, final int framebuffer) {
         return !ImmediatelyFast.runtimeConfig.avoid_redundant_framebuffer_switching;
     }
 
