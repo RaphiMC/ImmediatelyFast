@@ -18,8 +18,8 @@
 package net.raphimc.immediatelyfast.injection.mixins.avoid_redundant_framebuffer_switching;
 
 import com.mojang.renderpearl.backend.opengl.GlConst;
-import com.mojang.renderpearl.backend.opengl.GlStateManager;
 import com.mojang.renderpearl.backend.opengl.GlSurface;
+import org.lwjgl.opengl.GL33C;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,8 +30,8 @@ public abstract class MixinGlSurface {
 
     // https://github.com/RaphiMC/ImmediatelyFast/issues/350
     @Inject(method = "present", at = @At("HEAD"))
-    private static void unbindFramebufferBeforeSwappingBuffers(final CallbackInfo ci) {
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
+    private void unbindFramebufferBeforeSwappingBuffers(final CallbackInfo ci) {
+        GL33C.glBindFramebuffer(GlConst.GL_FRAMEBUFFER, 0);
     }
 
 }
