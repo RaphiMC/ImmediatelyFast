@@ -23,6 +23,7 @@ import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.client.gui.components.debug.DebugScreenEntryStatus;
 import net.minecraft.client.gui.components.debug.DebugScreenProfile;
 import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.ResourceKey;
 import net.raphimc.immediatelyfast.feature.core.ImmediatelyFastDebugScreenEntry;
 import org.spongepowered.asm.mixin.Final;
@@ -32,7 +33,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +46,7 @@ public abstract class MixinDebugScreenEntries {
     public static Map<DebugScreenProfile, Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus>> PROFILES;
 
     @Inject(method = "bootstrap", at = @At("RETURN"))
-    private static void addImmediatelyFastEntry(final Registry<DebugScreenEntry> registry, final CallbackInfoReturnable<Object> cir) {
+    private static void addImmediatelyFastEntry(final WritableRegistry<DebugScreenEntry> registry, final CallbackInfo ci) {
         final ResourceKey<DebugScreenEntry> entryId = ResourceKey.create(ClientRegistries.DEBUG_SCREEN_ENTRY, ImmediatelyFastDebugScreenEntry.ENTRY_ID);
         Registry.register(registry, entryId, new ImmediatelyFastDebugScreenEntry());
         final Map<DebugScreenProfile, Map<ResourceKey<DebugScreenEntry>, DebugScreenEntryStatus>> profiles = new HashMap<>();

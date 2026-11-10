@@ -25,6 +25,7 @@ import com.mojang.renderpearl.api.textures.AddressMode;
 import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPassLayouts;
+import net.minecraft.client.renderer.texture.ExternalTextureProvider;
 import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -47,7 +48,7 @@ public class SignAtlasRenderTarget extends TextureTarget implements AutoCloseabl
         super("ImmediatelyFast Sign Atlas", ATLAS_SIZE, ATLAS_SIZE, GpuFormat.RGBA8_UNORM, GpuFormat.D32_FLOAT);
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "sign_atlas/" + id);
-        Minecraft.getInstance().getTextureManager().register(this.textureId, new TextureResources(this.getColorTexture(), this.getColorTextureView(), RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false)));
+        Minecraft.getInstance().getTextureManager().registerProvider(this.textureId, new ExternalTextureProvider(new TextureResources(this.getColorTexture(), this.getColorTextureView(), RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false))));
         this.rootSlot = new Slot(null, 0, 0, ATLAS_SIZE, ATLAS_SIZE);
     }
 

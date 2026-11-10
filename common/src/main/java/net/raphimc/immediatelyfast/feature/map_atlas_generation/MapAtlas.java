@@ -25,6 +25,7 @@ import com.mojang.renderpearl.api.textures.GpuSampler;
 import com.mojang.renderpearl.api.textures.GpuTexture;
 import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.ExternalTextureProvider;
 import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
@@ -58,7 +59,7 @@ public class MapAtlas implements AutoCloseable {
         this.texture = RenderSystem.getDevice().createTexture("ImmediatelyFast Map Atlas " + id, GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING, GpuFormat.RGBA8_UNORM, ATLAS_SIZE, ATLAS_SIZE, 1, 1);
         final GpuTextureView textureView = RenderSystem.getDevice().createTextureView(this.texture);
         final GpuSampler sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false);
-        Minecraft.getInstance().getTextureManager().register(this.textureId, new TextureResources(this.texture, textureView, sampler));
+        Minecraft.getInstance().getTextureManager().registerProvider(this.textureId, new ExternalTextureProvider(new TextureResources(this.texture, textureView, sampler)));
     }
 
     public int getNextLocation() {
