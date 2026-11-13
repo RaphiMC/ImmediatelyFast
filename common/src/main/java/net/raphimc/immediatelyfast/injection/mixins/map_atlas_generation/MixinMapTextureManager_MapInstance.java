@@ -17,16 +17,15 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.map_atlas_generation;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import com.mojang.renderpearl.api.textures.GpuTexture;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.resources.MapTextureManager;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.raphimc.immediatelyfast.feature.map_atlas_generation.MapAtlas;
 import net.raphimc.immediatelyfast.injection.interfaces.IMapTextureManager;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,12 +34,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.client.resources.MapTextureManager$MapInstance")
 public abstract class MixinMapTextureManager_MapInstance {
 
-    @Shadow
-    @Final
-    private DynamicTexture texture;
-
     @Unique
-    private AbstractTexture immediatelyFast$atlasTexture;
+    private GpuTexture immediatelyFast$atlasTexture;
 
     @Unique
     private int immediatelyFast$atlasX;
@@ -58,10 +53,10 @@ public abstract class MixinMapTextureManager_MapInstance {
         }
     }
 
-    @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/texture/DynamicTexture;upload()V", shift = At.Shift.AFTER))
-    private void updateAtlasTexture(final CallbackInfo ci) {
+    @Inject(method = "updateTextureIfNeeded", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/NativeImage;writeToGpuTexture(Lcom/mojang/renderpearl/api/commands/CommandEncoder;Lcom/mojang/renderpearl/api/textures/GpuTexture;)V", shift = At.Shift.AFTER))
+    private void updateAtlasTexture(final CallbackInfo ci, @Local(name = "pixels") final NativeImage pixels) {
         if (this.immediatelyFast$atlasTexture != null) {
-            RenderSystem.getDevice().createCommandEncoder().writeToTexture(this.immediatelyFast$atlasTexture.getTexture(), this.texture.getPixels(), 0, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
+            pixels.writeToGpuTexture(RenderSystem.getDevice().createCommandEncoder(), this.immediatelyFast$atlasTexture, 0, 0, this.immediatelyFast$atlasX, this.immediatelyFast$atlasY);
         }
     }
 

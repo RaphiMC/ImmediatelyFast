@@ -17,11 +17,18 @@
  */
 package net.raphimc.immediatelyfast.feature.map_atlas_generation;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.renderpearl.api.GpuFormat;
+import com.mojang.renderpearl.api.textures.AddressMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import com.mojang.renderpearl.api.textures.GpuTexture;
+import com.mojang.renderpearl.api.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.ExternalTextureProvider;
+import net.minecraft.client.renderer.texture.TextureResources;
 import net.minecraft.resources.Identifier;
 import net.raphimc.immediatelyfast.ImmediatelyFast;
-import net.raphimc.immediatelyfast.util.GpuOnlyTexture;
 
 public class MapAtlas implements AutoCloseable {
 
@@ -43,14 +50,16 @@ public class MapAtlas implements AutoCloseable {
 
     private final int id;
     private final Identifier textureId;
-    private final AbstractTexture texture;
+    private final GpuTexture texture;
     private int mapCount;
 
     public MapAtlas(final int id) {
         this.id = id;
         this.textureId = Identifier.fromNamespaceAndPath("immediatelyfast", "map_atlas/" + id);
-        this.texture = new GpuOnlyTexture("ImmediatelyFast Map Atlas " + id, ATLAS_SIZE, ATLAS_SIZE);
-        Minecraft.getInstance().getTextureManager().register(this.textureId, this.texture);
+        this.texture = RenderSystem.getDevice().createTexture("ImmediatelyFast Map Atlas " + id, GpuTexture.USAGE_COPY_DST | GpuTexture.USAGE_TEXTURE_BINDING, GpuFormat.RGBA8_UNORM, ATLAS_SIZE, ATLAS_SIZE, 1, 1);
+        final GpuTextureView textureView = RenderSystem.getDevice().createTextureView(this.texture);
+        final GpuSampler sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.CLAMP_TO_EDGE, AddressMode.CLAMP_TO_EDGE, FilterMode.NEAREST, FilterMode.NEAREST, false);
+        Minecraft.getInstance().getTextureManager().registerProvider(this.textureId, new ExternalTextureProvider(new TextureResources(this.texture, textureView, sampler)));
     }
 
     public int getNextLocation() {
@@ -76,7 +85,7 @@ public class MapAtlas implements AutoCloseable {
         return this.textureId;
     }
 
-    public AbstractTexture getTexture() {
+    public GpuTexture getTexture() {
         return this.texture;
     }
 
