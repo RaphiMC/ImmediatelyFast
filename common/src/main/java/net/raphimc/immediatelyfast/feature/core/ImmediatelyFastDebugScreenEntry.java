@@ -18,6 +18,7 @@
 package net.raphimc.immediatelyfast.feature.core;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.debug.DebugGroup;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.resources.Identifier;
@@ -36,7 +37,7 @@ import java.util.List;
 public class ImmediatelyFastDebugScreenEntry implements DebugScreenEntry {
 
     public static final Identifier ENTRY_ID = Identifier.fromNamespaceAndPath("immediatelyfast", "immediatelyfast");
-    private static final Identifier SECTION_ID = ENTRY_ID;
+    private static final DebugGroup SECTION_ID = DebugGroup.Builder.titled("ImmediatelyFast").build();
 
     @Override
     public void display(final DebugScreenDisplayer displayer, final Level level, final LevelChunk clientChunk, final LevelChunk serverChunk) {

@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.resources.MapTextureManager;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.VanillaPackResources;
@@ -70,12 +71,12 @@ public abstract class MixinMinecraft {
         try {
             final Set<PackResources> breakingResourcePacks = new HashSet<>();
             for (Identifier shaderIdentifier : CoreShaderBlacklist.getBlacklist()) {
-                final Identifier vertexShaderIdentifier = ShaderType.VERTEX.idConverter().idToFile(shaderIdentifier);
+                final Identifier vertexShaderIdentifier = new FileToIdConverter("shaders", ShaderType.VERTEX.getExtension()).idToFile(shaderIdentifier);
                 final PackResources vertexShaderResourcePack = this.resourceManager.getResource(vertexShaderIdentifier).map(Resource::source).orElse(null);
                 if (vertexShaderResourcePack != null && !immediatelyFast$arePackResourcesEqual(vertexShaderResourcePack, this.getVanillaPackResources().fullResources())) {
                     breakingResourcePacks.add(vertexShaderResourcePack);
                 }
-                final Identifier fragmentShaderIdentifier = ShaderType.FRAGMENT.idConverter().idToFile(shaderIdentifier);
+                final Identifier fragmentShaderIdentifier = new FileToIdConverter("shaders", ShaderType.FRAGMENT.getExtension()).idToFile(shaderIdentifier);
                 final PackResources fragmentShaderResourcePack = this.resourceManager.getResource(fragmentShaderIdentifier).map(Resource::source).orElse(null);
                 if (fragmentShaderResourcePack != null && !immediatelyFast$arePackResourcesEqual(fragmentShaderResourcePack, this.getVanillaPackResources().fullResources())) {
                     breakingResourcePacks.add(fragmentShaderResourcePack);

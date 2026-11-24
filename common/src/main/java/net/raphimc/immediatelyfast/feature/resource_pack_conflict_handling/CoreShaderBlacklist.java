@@ -19,6 +19,7 @@ package net.raphimc.immediatelyfast.feature.resource_pack_conflict_handling;
 
 import com.mojang.renderpearl.api.pipeline.ShaderType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -35,11 +36,11 @@ public class CoreShaderBlacklist {
         if (false /* Set to true if updating the game version to validate the identifiers */) {
             final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
             for (Identifier shaderIdentifier : BLACKLIST) {
-                final Resource vertexShaderResource = resourceManager.getResource(ShaderType.VERTEX.idConverter().idToFile(shaderIdentifier)).orElse(null);
+                final Resource vertexShaderResource = resourceManager.getResource(new FileToIdConverter("shaders", ShaderType.VERTEX.getExtension()).idToFile(shaderIdentifier)).orElse(null);
                 if (vertexShaderResource == null) {
                     throw new RuntimeException("Couldn't find vertex shader " + shaderIdentifier);
                 }
-                final Resource fragmentShaderResource = resourceManager.getResource(ShaderType.FRAGMENT.idConverter().idToFile(shaderIdentifier)).orElse(null);
+                final Resource fragmentShaderResource = resourceManager.getResource(new FileToIdConverter("shaders", ShaderType.FRAGMENT.getExtension()).idToFile(shaderIdentifier)).orElse(null);
                 if (fragmentShaderResource == null) {
                     throw new RuntimeException("Couldn't find fragment shader " + shaderIdentifier);
                 }

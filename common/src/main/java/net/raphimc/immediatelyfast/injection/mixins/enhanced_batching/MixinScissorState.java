@@ -17,7 +17,7 @@
  */
 package net.raphimc.immediatelyfast.injection.mixins.enhanced_batching;
 
-import com.mojang.blaze3d.systems.ScissorState;
+import com.mojang.renderpearl.util.ScissorState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
